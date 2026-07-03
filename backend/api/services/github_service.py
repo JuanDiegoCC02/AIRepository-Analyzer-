@@ -9,7 +9,7 @@ class GitHubService:
 
         parsed = urlparse(repository_url)
 
-        path = path.strip("/")
+        path = parsed.path.strip("/")
 
         parts = path.split("/")
 
