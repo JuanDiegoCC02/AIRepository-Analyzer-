@@ -25,7 +25,7 @@ class GitHubService:
     def get_repository(cls, repository_url):
 
         owner, repository = cls.extract_owner_repo(repository_url)
-        
+            
         url = f"{cls.BASE_URL}/{owner}/{repository}"
 
         response = requests.get(url)
