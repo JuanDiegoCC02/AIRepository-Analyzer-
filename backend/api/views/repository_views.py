@@ -14,7 +14,7 @@ class RepositoryAnalyzerView(APIView):
         if not repository_url:
             return Response(
                 {"error": "Repository URL is required. "},
-                status = status.HTTP_400_BAD_REQUEST
+                status = status.HTTP_400_BAD_REQUEST    
             ) 
         
         try:
