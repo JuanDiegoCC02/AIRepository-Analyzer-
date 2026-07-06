@@ -1,5 +1,6 @@
 from api.services.github_service import GitHubService
 from api.serializers import RepositorySerializer
+from api.models import Repository
 
 
 class AnalyzerService: 
@@ -52,10 +53,11 @@ class AnalyzerService:
 
           repository_data = cls.format_repository_data(github_repository)
           
-          serializer = RepositorySerializer(data = repository_data)
+          repository, created = Repository.objects.update_or_create(
+               github_id = repository_data["github_id"],
+               defaults = repository_data
+          )
 
-          serializer.is_valid(raise_exception=True)
-     
-          serializer.save()
+          serializer = RepositorySerializer(repository)
 
           return serializer.data
