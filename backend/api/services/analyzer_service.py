@@ -5,51 +5,57 @@ from api.serializers import RepositorySerializer
 class AnalyzerService: 
 
      @staticmethod
-     def analyze_repository(repository_url):
-          github_repository = GitHubService.get_repository(repository_url):
+     def format_repository_data(repository):
 
-          repository_data = {
+          return {
                
-               "github_id": github_repository["id"],
+               "github_id": repository["id"],
 
-               "owner": github_repository["owner"]["login"],
+               "owner": repository["owner"]["login"],
 
-               "name": github_repository["name"],
+               "name": repository["name"],
 
-               "full_name": github_repository["full_name"],
+               "full_name": repository["full_name"],
 
-               "description": github_repository["description"],
+               "description": repository["description"],
 
-               "html_url": github_repository["html_url"],
+               "html_url": repository["html_url"],
 
-               "language": github_repository["language"],
+               "language": repository["language"],
 
-               "license": (github_repository["license"]["name"] 
-                           if github_repository["license"]
+               "license": (repository["license"]["name"] 
+                           if repository["license"]
                            else None
                            ),
 
-                "default_branch": github_repository["default_branch"],
+                "default_branch": repository["default_branch"],
 
-                "stars": github_repository["stargazers_count"],
+                "stars": repository["stargazers_count"],
 
-                "forks": github_repository["forks_count"],
+                "forks": repository["forks_count"],
 
-                "watchers": github_repository["watchers_count"],
+                "watchers": repository["watchers_count"],
 
-                "open_issues": github_repository["open_issues_count"],
+                "open_issues": repository["open_issues_count"],
 
-                "github_created_at": github_repository["created_at"],
+                "github_created_at": repository["created_at"],
 
-                "github_updated_at": github_repository["updated_at"],
+                "github_updated_at": repository["updated_at"],
 
 
           }
 
-          serializer = RepositorySerializer(data=repository_data)
+     @classmethod
+     def analyze_repository(cls, repository_url):
+          
+          github_repository = GitHubService.get_repository(repository_url)
+
+          repository_data = cls.format_repository_data(github_repository)
+          
+          serializer = RepositorySerializer(data = repository_data)
 
           serializer.is_valid(raise_exception=True)
-
+     
           serializer.save()
 
           return serializer.data
