@@ -2,7 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from api.services import GitHubService
+from api.services import AnalyzerService
+
 
 
 class RepositoryAnalyzerView(APIView):
@@ -19,9 +20,9 @@ class RepositoryAnalyzerView(APIView):
         
         try:
             
-            repository_data = GitHubService.get_repository(repository_url)
+            data = AnalyzerService.analyze_repository(repository_url)
 
-            return Response(repository_data)
+            return Response(data)
         
         except Exception as e: 
 
