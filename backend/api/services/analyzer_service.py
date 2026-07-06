@@ -5,6 +5,7 @@ from api.models import Repository
 
 class AnalyzerService: 
 
+# formats the repository data from GitHub API response to match the Repository model fields
      @staticmethod
      def format_repository_data(repository):
 
@@ -46,6 +47,7 @@ class AnalyzerService:
 
           }
 
+# Analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
      def analyze_repository(cls, repository_url):
           
