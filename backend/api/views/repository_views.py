@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.services import AnalyzerService
+from rest_framework.generics import ListAPIView
+from api.models import Repository
+from api.serializers import RepositorySerializer
 
 
 
@@ -30,3 +33,10 @@ class RepositoryAnalyzerView(APIView):
                 {"error": str(e)},
                 status = status.HTTP_400_BAD_REQUEST    
             )
+
+
+
+class RepositoryListView(ListAPIView):
+
+    queryset = Repository.objects.all().order_by("-updated_at")
+    serializer_class = RepositorySerializer
