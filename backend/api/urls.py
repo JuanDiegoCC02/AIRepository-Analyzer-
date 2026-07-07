@@ -1,5 +1,5 @@
 from django.urls import path 
-from api.views import RepositoryAnalyzerView
+from api.views import RepositoryAnalyzerView, RepositoryListView
 
 urlpatterns = [
 
@@ -7,5 +7,10 @@ urlpatterns = [
          RepositoryAnalyzerView.as_view(),
          name = "repository-analyze"
          ),
+
+    path("repositories/",
+         RepositoryListView.as_view(),
+         name = "repository-list"
+         )
 
 ]
