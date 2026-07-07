@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Repository
+from .models import Repository, Analysis
 
 
 @admin.register(Repository)
@@ -25,4 +25,14 @@ class RepositoryAdmin(admin.ModelAdmin):
 
     ordering = (
         "-stars",
+    )
+
+
+@admin.register(Analysis)
+class AnalysisAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "repository",
+        "overall_score",
+        "project_type",
     )
