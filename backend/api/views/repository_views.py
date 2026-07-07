@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.services import AnalyzerService
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from api.models import Repository
 from api.serializers import RepositorySerializer
 
@@ -40,3 +40,14 @@ class RepositoryListView(ListAPIView):
 
     queryset = Repository.objects.all().order_by("-updated_at")
     serializer_class = RepositorySerializer
+
+
+
+class RepositoryDetailView(RetrieveAPIView):
+
+    queryset = Repository.objects.all()
+    serializer_class = RepositorySerializer
+
+
+
+    
