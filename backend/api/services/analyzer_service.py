@@ -65,7 +65,8 @@ class AnalyzerService:
           score = RepositoryScore.popularity(repository.stars)
 
           category = RepositoryClassifier.classify(
-               repository.language,
+               repository.name,
+               repository.language or "",
                repository.description or ""
           )
 
