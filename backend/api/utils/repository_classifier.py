@@ -30,7 +30,7 @@ class RepositoryClassifier:
             return "Artificial Intelligence"
         
         if "pytorch" in text:
-            return "Articial Intelligence"
+            return "Artificial Intelligence"
         
         if "docker" in text:
             return "DevOps"
