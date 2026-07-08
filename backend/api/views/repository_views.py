@@ -13,7 +13,7 @@ class RepositoryAnalyzerView(APIView):
 
     def post(self, request):
 
-        repository_url = request.data.get("url")
+        repository_url = request.data.get("repository_url")
 
         if not repository_url:
             return Response(
