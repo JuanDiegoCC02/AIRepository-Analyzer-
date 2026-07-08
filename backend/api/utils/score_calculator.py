@@ -32,5 +32,17 @@ class RepositoryScore:
         return 50
     
 
+    @staticmethod
+    def documentation(description):
 
+        if description and len(description) > 120:
+            return 100
+        
+        if description and len(description) > 60:
+            return 80
+        
+        if description:
+            return 60
+        
+        return 20
     
