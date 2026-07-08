@@ -46,3 +46,14 @@ class RepositoryScore:
         
         return 20
     
+    
+    @staticmethod
+    def overall(popularity, activity, documentation):
+
+        return round(
+            (
+                popularity +
+                activity +
+                documentation
+            ) /3
+        )
