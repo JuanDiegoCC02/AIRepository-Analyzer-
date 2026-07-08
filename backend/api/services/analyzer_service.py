@@ -1,6 +1,8 @@
 from api.services.github_service import GitHubService
 from api.serializers import RepositorySerializer
 from api.models import Repository
+from api.utils.score_calculator import RepositoryScore
+from api.utils.repository_classifier import RepositoryClassifier
 
 
 class AnalyzerService: 
@@ -47,7 +49,7 @@ class AnalyzerService:
 
           }
 
-# Analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
+# analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
      def analyze_repository(cls, repository_url):
           
@@ -60,6 +62,19 @@ class AnalyzerService:
                defaults = repository_data
           )
 
+          score = RepositoryScore.popularity(repository.stars)
+
+          category = RepositoryClassifier.classify(
+               repository.language,
+               repository.description or ""
+          )
+
           serializer = RepositorySerializer(repository)
 
-          return serializer.data
+          return {
+               "repository": serializer.data,
+               "analysis": {
+                    "popularity_score": score,
+                    "category": category,
+               }
+          }
