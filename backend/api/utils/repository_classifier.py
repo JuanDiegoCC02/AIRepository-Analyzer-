@@ -1,9 +1,14 @@
 class RepositoryClassifier:
 
     @staticmethod
-    def classify(name, language, description):
+    def classify(name, language, description, topics):
 
-        text = f"{name} {language} {description}".lower()
+        text = (
+            f"{name}"
+            f"{language}"
+            f"{description}"
+            f"{"".join(topics)}"
+        )
 
         if "react" in text:
             return "Frontend"
