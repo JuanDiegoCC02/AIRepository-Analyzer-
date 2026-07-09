@@ -87,7 +87,9 @@ class AnalyzerService:
           )
 
 
-          serializer = RepositorySerializer(repository)
+          repository_serializer = RepositorySerializer(repository)
+          analysis_serializer = AnalysisSerializer(analysis)
+          
 
           return {
                "repository": serializer.data,
