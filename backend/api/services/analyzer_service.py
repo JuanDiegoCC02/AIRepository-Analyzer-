@@ -1,6 +1,5 @@
 from api.services.github_service import GitHubService
-from api.serializers import RepositorySerializer
-from api.serializers import AnalysisSerializer
+from api.serializers import RepositorySerializer, AnalysisSerializer
 from api.models import Repository, Analysis
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
