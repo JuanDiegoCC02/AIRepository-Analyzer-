@@ -3,7 +3,7 @@ from api.serializers import RepositorySerializer, AnalysisSerializer
 from api.models import Repository, Analysis
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
-
+from api.services import ActivityService
 
 
 class AnalyzerService: 
@@ -99,4 +99,5 @@ class AnalyzerService:
           return {
                "repository": repository_serializer.data,
                "analysis": analysis_serializer.data,
+               "activity": activity_score,
           }
