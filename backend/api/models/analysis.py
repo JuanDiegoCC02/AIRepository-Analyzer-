@@ -22,9 +22,9 @@ class Analysis(models.Model):
 
     overall_score = models.PositiveSmallIntegerField(default=0)
 
-    ai_summary = models.TextField(blank=True)
+    ai_summary = models.TextField(blank=True, default="")
 
-    recommendations = models.TextField(blank=True)
+    recommendations = models.TextField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
