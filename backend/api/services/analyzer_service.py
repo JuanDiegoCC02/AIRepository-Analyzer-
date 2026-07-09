@@ -5,6 +5,7 @@ from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
 
 
+
 class AnalyzerService: 
 
 # formats the repository data from GitHub API response to match the Repository model fields
@@ -85,9 +86,14 @@ class AnalyzerService:
                }
           )
 
+          activity = ActivityService.calculate(
+               repository.github_updated_at
+          )
+
 
           repository_serializer = RepositorySerializer(repository)
           analysis_serializer = AnalysisSerializer(analysis)
+          activity_score = activity
           
 
           return {
