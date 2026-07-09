@@ -11,6 +11,8 @@ class Repository(models.Model):
 
     description = models.TextField(blank=True, null= True)
 
+    topics = models.JSONField(default=list)
+
     html_url = models.URLField(max_length=500)
 
     language = models.CharField(max_length=200, blank=True, null=True)
