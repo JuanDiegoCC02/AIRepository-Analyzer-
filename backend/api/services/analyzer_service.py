@@ -92,9 +92,6 @@ class AnalyzerService:
           
 
           return {
-               "repository": serializer.data,
-               "analysis": {
-                    "popularity_score": score,
-                    "category": category,
-               }
+               "repository": repository_serializer.data,
+               "analysis": analysis_serializer.data,
           }
