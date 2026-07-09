@@ -27,7 +27,7 @@ class AnalyzerService:
 
                "language": repository["language"],
 
-               "license": (repository["license"]["name"] 
+               "license_name": (repository["license"]["name"] 
                            if repository["license"]
                            else None
                            ),
