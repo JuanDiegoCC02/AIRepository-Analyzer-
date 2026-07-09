@@ -1,6 +1,7 @@
 from api.services.github_service import GitHubService
 from api.serializers import RepositorySerializer
-from api.models import Repository
+from api.serializers import AnalysisSerializer
+from api.models import Repository, Analysis
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
 
@@ -69,8 +70,22 @@ class AnalyzerService:
               repository.language,
               repository.description,
               repository.topics
-
           )
+          
+          analysis, created = Analysis.objects.update_or_create(
+               repository=repository,
+               defaults={
+                    "project_type": category,
+                    "popularity_score": score,
+                    "activity_score": 0,
+                    "documentation_score": 0,
+                    "maintainability_score": 0,
+                    "overall_score": score,
+                    "ai_summary": "",
+                    "recommendations": "",
+               }
+          )
+
 
           serializer = RepositorySerializer(repository)
 
