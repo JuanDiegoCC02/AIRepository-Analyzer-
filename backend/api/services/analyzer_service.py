@@ -95,11 +95,11 @@ class AnalyzerService:
                repository=repository,
                defaults={
                     "project_type": category,
-                    "popularity_score": score,
-                    "activity_score": 0,
-                    "documentation_score": 0,
-                    "maintainability_score": 0,
-                    "overall_score": score,
+                    "popularity_score": popularity_score,
+                    "activity_score": activity_score,
+                    "documentation_score": documentation_score,
+                    "maintainability_score": maintainability_score,
+                    "overall_score": overall_score,
                     "ai_summary": "",
                     "recommendations": "",
                }
@@ -111,9 +111,9 @@ class AnalyzerService:
                repository.github_updated_at
           )
 
-
           repository_serializer = RepositorySerializer(repository)
           analysis_serializer = AnalysisSerializer(analysis)
+
           activity_score = activity
           
 
