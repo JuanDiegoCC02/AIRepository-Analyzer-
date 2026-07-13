@@ -1,7 +1,8 @@
+from api.models.repository import Repository
+from api.models.analysis import Analysis
 
-from api.serializers import RepositorySerializer, AnalysisSerializer
-
-from api.models import Repository, Analysis
+from api.serializers.repository_serializer import RepositorySerializer
+from api.serializers.analysis_serializer import AnalysisSerializer
 
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
