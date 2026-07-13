@@ -1,6 +1,6 @@
 from rest_framework import serializers 
 
-from api.models import Analysis
+from api.models.analysis import Analysis
 
 class AnalysisSerializer(serializers.ModelSerializer):
 

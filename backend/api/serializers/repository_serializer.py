@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from api.models import Repository
+
+from api.models.repository import Repository
 
 class RepositorySerializer(serializers.ModelSerializer):
 
