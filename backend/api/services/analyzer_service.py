@@ -3,7 +3,7 @@ from api.serializers import RepositorySerializer, AnalysisSerializer
 from api.models import Repository, Analysis
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
-from api.services import ActivityService
+from api.services import ActivityService, OverallScoreService, DocumentationService, MaintainabilityService
 
 
 class AnalyzerService: 
@@ -63,6 +63,10 @@ class AnalyzerService:
                defaults = repository_data
           )
 
+          popularity_score = RepositoryScore.popularity(
+               repository.stars
+          )
+
           score = RepositoryScore.popularity(repository.stars)
 
           category = RepositoryClassifier.classify(
@@ -70,6 +74,21 @@ class AnalyzerService:
               repository.language,
               repository.description,
               repository.topics
+          )
+          
+          activity_score - ActivityService.calculate(
+               repository.github_updated_at
+          )
+
+          documentation_score = DocumentationService.calculate(...)
+
+          maintainability_score = MaintainabilityService.calculate(...)
+
+          overall_score = OverallScoreService.calculate(
+               popularity_score,
+               activity_score,
+               documentation_score,
+               maintainability_score
           )
           
           analysis, created = Analysis.objects.update_or_create(
@@ -85,6 +104,8 @@ class AnalyzerService:
                     "recommendations": "",
                }
           )
+
+          
 
           activity = ActivityService.calculate(
                repository.github_updated_at
