@@ -1,3 +1,5 @@
+## services package
+
 from .github_service import GitHubService
 from .analyzer_service import AnalyzerService
 from .documentation_service import DocumentationService
