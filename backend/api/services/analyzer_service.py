@@ -3,7 +3,10 @@ from api.serializers import RepositorySerializer, AnalysisSerializer
 from api.models import Repository, Analysis
 from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
-from api.services import ActivityService, OverallScoreService, DocumentationService, MaintainabilityService
+from api.services.activity_service import ActivityService
+from api.services.documentation_service import DocumentationService
+from api.services.maintainability_service import MaintainabilityService
+from api.services.overall_score_service import OverallScoreService
 
 
 class AnalyzerService: 
