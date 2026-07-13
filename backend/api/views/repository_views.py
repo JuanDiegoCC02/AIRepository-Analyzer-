@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import status
 
-from api.services import AnalyzerService
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from api.models import Repository
-from api.serializers import RepositorySerializer
+from api.models.repository import Repository
 
+from api.serializers.repository_serializer import RepositorySerializer
+
+from api.services.analyzer_service import AnalyzerService
 
 
 class RepositoryAnalyzerView(APIView):

@@ -1,1 +1,3 @@
-from .repository_views import RepositoryAnalyzerView, RepositoryListView, RepositoryDetailView
+from .repository_views import RepositoryAnalyzerView 
+from .repository_views import RepositoryListView
+from .repository_views import RepositoryDetailView
