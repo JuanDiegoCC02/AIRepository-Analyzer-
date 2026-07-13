@@ -120,5 +120,4 @@ class AnalyzerService:
           return {
                "repository": repository_serializer.data,
                "analysis": analysis_serializer.data,
-               "activity": activity_score,
           }
