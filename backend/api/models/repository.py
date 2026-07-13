@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Repository(models.Model):
     github_id = models.BigIntegerField(unique=True)
 
