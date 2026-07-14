@@ -12,6 +12,7 @@ from api.services.activity_service import ActivityService
 from api.services.documentation_service import DocumentationService
 from api.services.maintainability_service import MaintainabilityService
 from api.services.overall_score_service import OverallScoreService
+from api.services.technologies_service import TechnologiesService
 
 
 class AnalyzerService: 
@@ -86,9 +87,13 @@ class AnalyzerService:
                repository.github_updated_at
           )
 
-          documentation_score = DocumentationService.calculate(...)
+          documentation_score = DocumentationService.calculate(
+               github_repository
+          )
 
-          maintainability_score = MaintainabilityService.calculate(...)
+          maintainability_score = MaintainabilityService.calculate(
+               github_repository
+          )
 
           overall_score = OverallScoreService.calculate(
                popularity_score,
@@ -111,6 +116,15 @@ class AnalyzerService:
                }
           )
 
+          languages = TechnologiesService.get_languages(
+          repository.owner,
+          repository.name
+          )
+
+          technologies = TechnologiesService.calculate_percentages(
+          languages
+          )
+
           
 
           repository_serializer = RepositorySerializer(repository)
@@ -120,4 +134,5 @@ class AnalyzerService:
           return {
                "repository": repository_serializer.data,
                "analysis": analysis_serializer.data,
+               "technologies": technologies,
           }
