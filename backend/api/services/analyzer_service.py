@@ -75,8 +75,6 @@ class AnalyzerService:
                repository.stars
           )
 
-          score = RepositoryScore.popularity(repository.stars)
-
           category = RepositoryClassifier.classify(
               repository.name,
               repository.language,
@@ -84,7 +82,7 @@ class AnalyzerService:
               repository.topics
           )
           
-          activity_score - ActivityService.calculate(
+          activity_score = ActivityService.calculate(
                repository.github_updated_at
           )
 
@@ -115,15 +113,9 @@ class AnalyzerService:
 
           
 
-          activity = ActivityService.calculate(
-               repository.github_updated_at
-          )
-
           repository_serializer = RepositorySerializer(repository)
           analysis_serializer = AnalysisSerializer(analysis)
 
-          activity_score = activity
-          
 
           return {
                "repository": repository_serializer.data,
