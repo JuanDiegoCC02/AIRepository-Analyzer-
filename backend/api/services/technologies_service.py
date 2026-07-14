@@ -2,7 +2,6 @@ import requests
 
 
 class TechnologiesService:
-
     BASE_URL = "https://api.github.com/repos"
 
     @classmethod
@@ -10,11 +9,10 @@ class TechnologiesService:
 
         url = f"{cls.BASE_URL}/{owner}/{repository}/languages"
 
-        print("=" * 50)
-        print("URL:", url)
-
         response = requests.get(url)
 
+        print("=" * 50)
+        print("URL:", url)
         print("STATUS:", response.status_code)
         print("BODY:", response.text)
         print("=" * 50)
@@ -28,3 +26,28 @@ class TechnologiesService:
             )
 
         return response.json()
+
+    @staticmethod
+    def calculate_percentages(languages):
+
+        total = sum(languages.values())
+
+        if total == 0:
+            return []
+
+        results = []
+
+        for language, bytes_count in languages.items():
+
+            percentage = round(
+                (bytes_count / total) * 100,
+                2
+            )
+
+            results.append({
+                "language": language,
+                "bytes": bytes_count,
+                "percentage": percentage
+            })
+
+        return results
