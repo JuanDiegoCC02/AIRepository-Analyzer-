@@ -1,21 +1,30 @@
-import request 
+import requests
 
 
 class TechnologiesService:
+
     BASE_URL = "https://api.github.com/repos"
 
     @classmethod
     def get_languages(cls, owner, repository):
-        
-        url = f"{cls.BASE_URL}/{owner}/{repository}/langueages"
-        reponse = request.get(url)
 
-        if reponse.status_code == 404:
+        url = f"{cls.BASE_URL}/{owner}/{repository}/languages"
+
+        print("=" * 50)
+        print("URL:", url)
+
+        response = requests.get(url)
+
+        print("STATUS:", response.status_code)
+        print("BODY:", response.text)
+        print("=" * 50)
+
+        if response.status_code == 404:
             raise Exception("Repository languages not found.")
 
-        if reponse.status_code != 200:
+        if response.status_code != 200:
             raise Exception(
-                f"GitHub API returned {reponse.status_code}"
+                f"GitHub API returned {response.status_code}"
             )
-        
-        return reponse.json()
+
+        return response.json()
