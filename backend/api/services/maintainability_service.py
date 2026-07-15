@@ -4,9 +4,19 @@
 class MaintainabilityService:
 
     @staticmethod
-    def calculate(language, stars, forks, open_issues):
+    def calculate(repository):
 
         score = 50
+
+        language = repository.get("language")
+
+        stars = repository.get("stargazers_count", 0)
+
+        forks = repository.get("forks_count", 0)
+
+        issues = repository.get("open_issues_count", 0)
+
+        license = repository.get("license")
 
         if language in [
             "Python",
@@ -25,10 +35,10 @@ class MaintainabilityService:
         if forks >= 100:
             score += 10
 
-        if open_issues <= 100:
+        if issues <= 100:
             score += 15
 
-        if score > 100:
-            score = 100
+        if license:
+            score += 10
 
-        return score
+        return min(score, 100)
