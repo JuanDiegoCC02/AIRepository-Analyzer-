@@ -72,6 +72,15 @@ class AnalyzerService:
                defaults = repository_data
           )
 
+          languages = TechnologiesService.get_languages(
+               repository.owner,
+               repository.name
+          )
+
+          technologies = TechnologiesService.calculate_percentages(
+          languages
+          )
+
           popularity_score = RepositoryScore.popularity(
                repository.stars
           )
@@ -81,15 +90,6 @@ class AnalyzerService:
               repository.language,
               repository.description,
               repository.topics
-          )
-
-          languages = TechnologiesService.get_languages(
-          repository.owner,
-          repository.name
-          )
-
-          technologies = TechnologiesService.calculate_percentages(
-          languages
           )
           
           activity_score = ActivityService.calculate(
