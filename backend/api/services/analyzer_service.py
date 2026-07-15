@@ -82,6 +82,15 @@ class AnalyzerService:
               repository.description,
               repository.topics
           )
+
+          languages = TechnologiesService.get_languages(
+          repository.owner,
+          repository.name
+          )
+
+          technologies = TechnologiesService.calculate_percentages(
+          languages
+          )
           
           activity_score = ActivityService.calculate(
                repository.github_updated_at
@@ -116,16 +125,6 @@ class AnalyzerService:
                }
           )
 
-          languages = TechnologiesService.get_languages(
-          repository.owner,
-          repository.name
-          )
-
-          technologies = TechnologiesService.calculate_percentages(
-          languages
-          )
-
-          
 
           repository_serializer = RepositorySerializer(repository)
           analysis_serializer = AnalysisSerializer(analysis)
