@@ -93,7 +93,7 @@ class AnalyzerService:
           )
           
           activity_score = ActivityService.calculate(
-               repository.github_updated_at
+               github_repository
           )
 
           documentation_score = DocumentationService.calculate(
