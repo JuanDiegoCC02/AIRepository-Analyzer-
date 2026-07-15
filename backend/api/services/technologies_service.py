@@ -27,6 +27,8 @@ class TechnologiesService:
 
         return response.json()
 
+
+
     @staticmethod
     def calculate_percentages(languages):
 
@@ -51,3 +53,16 @@ class TechnologiesService:
             })
 
         return results
+    
+
+
+    @staticmethod
+    def primary_language(technologies):
+
+        if not technologies:
+            return None
+
+        return max(
+            technologies,
+            key=lambda technology: technology["percentage"]
+        )["language"]
