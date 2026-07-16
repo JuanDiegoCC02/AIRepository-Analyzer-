@@ -13,6 +13,7 @@ from api.services.documentation_service import DocumentationService
 from api.services.maintainability_service import MaintainabilityService
 from api.services.overall_score_service import OverallScoreService
 from api.services.technologies_service import TechnologiesService
+from api.services.recommendation_service import RecommendationService
 
 
 class AnalyzerService: 
@@ -111,6 +112,17 @@ class AnalyzerService:
                maintainability_score
           )
           
+          analysis_scores = {
+          "popularity_score": popularity_score,
+          "activity_score": activity_score,
+          "documentation_score": documentation_score,
+          "maintainability_score": maintainability_score,
+          }
+          
+          recommendations = RecommendationService.generate(
+          analysis_scores
+          )
+          
           analysis, created = Analysis.objects.update_or_create(
                repository=repository,
                defaults={
@@ -121,7 +133,7 @@ class AnalyzerService:
                     "maintainability_score": maintainability_score,
                     "overall_score": overall_score,
                     "ai_summary": "",
-                    "recommendations": "",
+                    "recommendations": "\n".join(recommendations),
                }
           )
 
