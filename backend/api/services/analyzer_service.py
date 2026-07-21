@@ -72,6 +72,18 @@ class AnalyzerService:
         }
      
 
+     @staticmethod
+     def build_scores(analysis):
+
+        return {
+            "popularity": analysis.popularity_score,
+            "activity": analysis.activity_score,
+            "documentation": analysis.documentation_score,
+            "maintainability": analysis.maintainability_score,
+            "overall": analysis.overall_score,
+        }
+     
+
      
 
 
