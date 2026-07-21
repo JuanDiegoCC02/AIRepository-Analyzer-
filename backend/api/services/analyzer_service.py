@@ -84,7 +84,17 @@ class AnalyzerService:
         }
      
 
+     @staticmethod
+     def build_classification(repository, analysis):
+
+        return {
+            "project_type": analysis.project_type,
+            "main_language": repository.language,
+        }
      
+
+     
+
 
 
 # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
