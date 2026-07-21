@@ -14,6 +14,7 @@ from api.services.maintainability_service import MaintainabilityService
 from api.services.overall_score_service import OverallScoreService
 from api.services.technologies_service import TechnologiesService
 from api.services.recommendation_service import RecommendationService
+from api.services.ai_summary_service import AISummaryService
 
 
 class AnalyzerService: 
