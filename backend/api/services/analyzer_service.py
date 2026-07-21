@@ -61,6 +61,7 @@ class AnalyzerService:
           }
      
 
+# build of the metrics
      @staticmethod
      def build_metrics(repository):
 
@@ -72,6 +73,7 @@ class AnalyzerService:
         }
      
 
+# build of the score
      @staticmethod
      def build_scores(analysis):
 
@@ -84,6 +86,7 @@ class AnalyzerService:
         }
      
 
+# build of the classification
      @staticmethod
      def build_classification(repository, analysis):
 
@@ -93,8 +96,34 @@ class AnalyzerService:
         }
      
 
-     
+# build of the reponse
+     @classmethod
+     def build_response(
+        cls,
+        repository_serializer,
+        analysis_serializer,
+        repository,
+        analysis,
+        technologies,
+    ):
 
+        return {
+
+            "repository": repository_serializer.data,
+
+            "analysis": analysis_serializer.data,
+
+            "technologies": technologies,
+
+            "metrics": cls.build_metrics(repository),
+
+            "scores": cls.build_scores(analysis),
+
+            "classification": cls.build_classification(
+                repository,
+                analysis,
+            ),
+        }
 
 
 # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
