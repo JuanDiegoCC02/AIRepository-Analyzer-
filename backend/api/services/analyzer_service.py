@@ -58,8 +58,22 @@ class AnalyzerService:
 
                 "github_updated_at": repository["updated_at"],
 
-
           }
+     
+
+     @staticmethod
+     def build_metrics(repository):
+
+        return {
+            "stars": repository.stars,
+            "forks": repository.forks,
+            "watchers": repository.watchers,
+            "open_issues": repository.open_issues,
+        }
+     
+
+     
+
 
 # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
@@ -154,3 +168,5 @@ class AnalyzerService:
                "analysis": analysis_serializer.data,
                "technologies": technologies,
           }
+     
+     

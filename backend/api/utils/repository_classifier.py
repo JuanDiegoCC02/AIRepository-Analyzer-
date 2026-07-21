@@ -1,43 +1,79 @@
 class RepositoryClassifier:
 
-    @staticmethod
-    def classify(name, language, description, topics):
+    CATEGORIES = {
+        "Frontend": [
+            "react",
+            "vue",
+            "angular",
+            "svelte",
+            "next",
+            "nuxt",
+            "vite",
+        ],
 
-        text = (
-            f"{name}"
-            f"{language}"
-            f"{description}"
-            f"{"".join(topics)}"
-        )
+        "Backend": [
+            "django",
+            "flask",
+            "fastapi",
+            "spring",
+            "express",
+            "laravel",
+            "node",
+        ],
 
-        if "react" in text:
-            return "Frontend"
-        
-        if "vue" in text:
-            return "Frontend"
-        
-        if "angular" in text:
-            return "Frontend"
+        "Artificial Intelligence": [
+            "machine learning",
+            "deep learning",
+            "tensorflow",
+            "pytorch",
+            "keras",
+            "huggingface",
+            "llm",
+            "transformers",
+        ],
 
-        if "django" in text:
-            return "Backend"
-        
-        if "flask" in text:
-            return "Backend"
-        
-        if "fastapi" in text:
-            return "Backend"
+        "DevOps": [
+            "docker",
+            "kubernetes",
+            "terraform",
+            "ansible",
+            "jenkins",
+            "github actions",
+        ],
 
-        if "machine learning" in text:
-            return "Artificial Intelligence"
+        "Mobile": [
+            "flutter",
+            "android",
+            "ios",
+            "swift",
+            "kotlin",
+            "react native",
+        ],
 
-        if "tensorflow" in text:
-            return "Artificial Intelligence"
-        
-        if "pytorch" in text:
-            return "Artificial Intelligence"
-        
-        if "docker" in text:
-            return "DevOps"
+        "Data Science": [
+            "pandas",
+            "numpy",
+            "matplotlib",
+            "scikit",
+            "jupyter",
+        ],
+    }
+
+    @classmethod
+    def classify(cls, name, language, description, topics):
+
+        text = " ".join([
+            name or "",
+            language or "",
+            description or "",
+            " ".join(topics or [])
+        ]).lower()
+
+        for category, keywords in cls.CATEGORIES.items():
+
+            for keyword in keywords:
+
+                if keyword in text:
+                    return category
 
         return "General"
