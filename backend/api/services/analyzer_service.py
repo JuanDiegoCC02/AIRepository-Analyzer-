@@ -139,7 +139,7 @@ class AnalyzerService:
                     "documentation_score": documentation_score,
                     "maintainability_score": maintainability_score,
                     "overall_score": overall_score,
-                    "ai_summary": "",
+                    "ai_summary": summary,
                     "recommendations": "\n".join(recommendations),
                }
           )
