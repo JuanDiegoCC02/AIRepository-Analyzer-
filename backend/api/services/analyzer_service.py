@@ -214,10 +214,12 @@ class AnalyzerService:
           analysis_serializer = AnalysisSerializer(analysis)
 
 
-          return {
-               "repository": repository_serializer.data,
-               "analysis": analysis_serializer.data,
-               "technologies": technologies,
-          }
+          return cls.build_response(
+            repository_serializer,
+            analysis_serializer,
+            repository,
+            analysis,
+            technologies,
+         )
      
      
