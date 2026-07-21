@@ -123,6 +123,12 @@ class AnalyzerService:
           recommendations = RecommendationService.generate(
           analysis_scores
           )
+
+          summary = AISummaryService.generate(
+               github_repository,
+               category,
+               overall_score,
+          )
           
           analysis, created = Analysis.objects.update_or_create(
                repository=repository,
