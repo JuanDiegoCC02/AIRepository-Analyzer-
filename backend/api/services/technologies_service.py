@@ -66,3 +66,14 @@ class TechnologiesService:
             technologies,
             key=lambda technology: technology["percentage"]
         )["language"]
+    
+
+
+    @staticmethod
+    def get_main_stack(technologies):
+        
+        return[
+            technology["language"]
+            for technology in technologies
+            if technology ["percentage"] >=5
+        ]
