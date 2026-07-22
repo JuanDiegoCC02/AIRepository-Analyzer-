@@ -183,6 +183,7 @@ class AnalyzerService:
           "activity_score": activity_score,
           "documentation_score": documentation_score,
           "maintainability_score": maintainability_score,
+          "overall_score": overall_score,
           }
           
           recommendations = RecommendationService.generate(
