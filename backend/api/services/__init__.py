@@ -7,4 +7,5 @@ from .maintainability_service import MaintainabilityService
 from .overall_score_service import OverallScoreService
 from .recommendation_service import RecommendationService
 from .ai_summary_service import AISummaryService
+from .repository_insights_service import RepositoryInsightsService
 
