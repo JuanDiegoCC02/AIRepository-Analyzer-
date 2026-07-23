@@ -15,6 +15,7 @@ from api.services.overall_score_service import OverallScoreService
 from api.services.technologies_service import TechnologiesService
 from api.services.recommendation_service import RecommendationService
 from api.services.ai_summary_service import AISummaryService
+from api.services.repository_insights_service import RepositoryInsightsService
 
 
 class AnalyzerService: 
@@ -105,6 +106,7 @@ class AnalyzerService:
         repository,
         analysis,
         technologies,
+        insights,
     ):
 
         return {
@@ -123,6 +125,8 @@ class AnalyzerService:
                 repository,
                 analysis,
             ),
+            
+             "insights": insights,
         }
 
 
@@ -185,6 +189,12 @@ class AnalyzerService:
           "maintainability_score": maintainability_score,
           "overall_score": overall_score,
           }
+
+          insights = RepositoryInsightsService.generate(
+          repository,
+          analysis,
+          technologies,
+          )
           
           recommendations = RecommendationService.generate(
           analysis_scores
@@ -221,6 +231,7 @@ class AnalyzerService:
             repository,
             analysis,
             technologies,
+            insights,
          )
      
      
