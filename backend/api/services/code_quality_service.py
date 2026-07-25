@@ -6,7 +6,6 @@ class CodeQualityService:
         score = 0
 
         # Issues
-
         issues = repository.get(
             "open_issues_count",
             0
@@ -22,32 +21,26 @@ class CodeQualityService:
             score += 10
 
         # Wiki
-
         if repository.get("has_wiki"):
             score += 10
 
         # Projects
-
         if repository.get("has_projects"):
             score += 10
 
         # Discussions
-
         if repository.get("has_discussions"):
             score += 10
 
         # License
-
         if repository.get("license"):
             score += 20
 
         # Default Branch
-
         if repository.get("default_branch") == "main":
             score += 10
 
         # Archived
-
         if not repository.get("archived"):
             score += 10
 
