@@ -2,19 +2,22 @@
 
 
 class OverallScoreService:
+
     @staticmethod
     def calculate(
-        popularity_score,
-        activity_score,
-        documentation_score,
-        maintainability_score,
+        popularity,
+        activity,
+        documentation,
+        maintainability,
+        code_quality,
     ):
-        
-        overall_score = (
-            popularity_score
-            + activity_score
-            + documentation_score
-            +maintainability_score
-        ) / 4
 
-        return round (overall_score)
+        total = (
+            popularity +
+            activity +
+            documentation +
+            maintainability +
+            code_quality
+        )
+
+        return round(total / 5)
