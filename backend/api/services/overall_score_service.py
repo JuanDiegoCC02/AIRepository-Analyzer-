@@ -10,6 +10,7 @@ class OverallScoreService:
         documentation,
         maintainability,
         code_quality,
+        community,
     ):
 
         total = (
@@ -17,7 +18,8 @@ class OverallScoreService:
             activity +
             documentation +
             maintainability +
-            code_quality
+            code_quality+
+            community
         )
 
-        return round(total / 5)
+        return round(total / 6)
