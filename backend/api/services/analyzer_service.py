@@ -184,7 +184,7 @@ class AnalyzerService:
                popularity_score,
                activity_score,
                documentation_score,
-               maintainability_score
+               maintainability_score,
                code_quality_score,
           )
           
