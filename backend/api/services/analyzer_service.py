@@ -85,6 +85,7 @@ class AnalyzerService:
             "documentation": analysis.documentation_score,
             "maintainability": analysis.maintainability_score,
             "overall": analysis.overall_score,
+            "code_quality": analysis.code_quality_score,
         }
      
 
