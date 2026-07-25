@@ -197,11 +197,7 @@ class AnalyzerService:
           "overall_score": overall_score,
           }
 
-          insights = RepositoryInsightsService.generate(
-          repository,
-          analysis,
-          technologies,
-          )
+
           
           recommendations = RecommendationService.generate(
           analysis_scores
@@ -226,6 +222,12 @@ class AnalyzerService:
                     "recommendations": "\n".join(recommendations),
                     "code_quality_score": code_quality_score,
                }
+          )
+
+          insights = RepositoryInsightsService.generate(
+          repository,
+          analysis,
+          technologies,
           )
 
 
