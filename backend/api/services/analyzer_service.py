@@ -17,6 +17,7 @@ from api.services.recommendation_service import RecommendationService
 from api.services.ai_summary_service import AISummaryService
 from api.services.repository_insights_service import RepositoryInsightsService
 from api.services.code_quality_service import CodeQualityService
+from api.services.community_service import CommunityService
 
 
 class AnalyzerService: 
@@ -181,14 +182,21 @@ class AnalyzerService:
           github_repository
           )
 
+          community_score = CommunityService.calculate(
+          github_repository
+          )
+
+          
           overall_score = OverallScoreService.calculate(
                popularity_score,
                activity_score,
                documentation_score,
                maintainability_score,
                code_quality_score,
+               community_score,
           )
-          
+
+
           analysis_scores = {
           "popularity_score": popularity_score,
           "activity_score": activity_score,
@@ -222,6 +230,7 @@ class AnalyzerService:
                     "ai_summary": summary,
                     "recommendations": "\n".join(recommendations),
                     "code_quality_score": code_quality_score,
+                    "community_score": community_score,
                }
           )
 
