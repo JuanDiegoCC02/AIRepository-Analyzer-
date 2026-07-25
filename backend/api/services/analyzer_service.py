@@ -223,6 +223,7 @@ class AnalyzerService:
                     "overall_score": overall_score,
                     "ai_summary": summary,
                     "recommendations": "\n".join(recommendations),
+                    "code_quality_score": code_quality_score,
                }
           )
 
