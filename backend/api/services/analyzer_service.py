@@ -16,6 +16,7 @@ from api.services.technologies_service import TechnologiesService
 from api.services.recommendation_service import RecommendationService
 from api.services.ai_summary_service import AISummaryService
 from api.services.repository_insights_service import RepositoryInsightsService
+from api.services.code_quality_service import CodeQualityService
 
 
 class AnalyzerService: 
@@ -175,11 +176,16 @@ class AnalyzerService:
                github_repository
           )
 
+          code_quality_score = CodeQualityService.calculate(
+          github_repository
+          )
+
           overall_score = OverallScoreService.calculate(
                popularity_score,
                activity_score,
                documentation_score,
                maintainability_score
+               code_quality_score,
           )
           
           analysis_scores = {
