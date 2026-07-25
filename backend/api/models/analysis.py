@@ -26,6 +26,8 @@ class Analysis(models.Model):
 
     recommendations = models.TextField(blank=True, default="")
 
+    code_quality_score = models.PositiveSmallIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
