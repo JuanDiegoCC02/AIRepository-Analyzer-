@@ -195,6 +195,7 @@ class AnalyzerService:
           "documentation_score": documentation_score,
           "maintainability_score": maintainability_score,
           "overall_score": overall_score,
+          "code_quality_score": code_quality_score,
           }
 
 
