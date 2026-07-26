@@ -67,13 +67,30 @@ class AnalyzerService:
 
 # build of the metrics
      @staticmethod
-     def build_metrics(repository):
+     def build_metrics(cls, repository, github_repository):
 
         return {
             "stars": repository.stars,
+
             "forks": repository.forks,
+
             "watchers": repository.watchers,
+
             "open_issues": repository.open_issues,
+
+            "default_branch": repository.default_branch,
+
+            "size": github_repository.get("size"),
+
+            "subscribers": github_repository.get("subscribers_count"),
+
+            "network_count": github_repository.get("network_count"),
+
+            "metrics": cls.build_metrics(
+            repository,
+            github_repository
+            ),
+             
         }
      
 
@@ -83,11 +100,17 @@ class AnalyzerService:
 
         return {
             "popularity": analysis.popularity_score,
+
             "activity": analysis.activity_score,
+
             "documentation": analysis.documentation_score,
+
             "maintainability": analysis.maintainability_score,
+
             "overall": analysis.overall_score,
+
             "code_quality": analysis.code_quality_score,
+
             "community_score": analysis.community_score,
         }
      
@@ -98,6 +121,7 @@ class AnalyzerService:
 
         return {
             "project_type": analysis.project_type,
+
             "main_language": repository.language,
         }
      
@@ -212,6 +236,7 @@ class AnalyzerService:
           "documentation_score": documentation_score,
           "maintainability_score": maintainability_score,
           "overall_score": overall_score,
+          "community_score": community_score,
           "code_quality_score": code_quality_score,
           }
 
