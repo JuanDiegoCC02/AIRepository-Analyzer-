@@ -9,4 +9,5 @@ from .recommendation_service import RecommendationService
 from .ai_summary_service import AISummaryService
 from .repository_insights_service import RepositoryInsightsService
 from .code_quality_service import CodeQualityService
+from .repository_statistics_service import RepositoryStatisticsService
 
