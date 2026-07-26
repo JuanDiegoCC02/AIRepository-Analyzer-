@@ -123,6 +123,10 @@ class AnalyzerService:
             "project_type": analysis.project_type,
 
             "main_language": repository.language,
+
+            "license": repository.license_name,
+
+            "owner": repository.owner,
         }
      
 
