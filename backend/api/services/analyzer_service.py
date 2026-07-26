@@ -18,6 +18,7 @@ from api.services.ai_summary_service import AISummaryService
 from api.services.repository_insights_service import RepositoryInsightsService
 from api.services.code_quality_service import CodeQualityService
 from api.services.community_service import CommunityService
+from api.services.repository_statistics_service import RepositoryStatisticsService
 
 
 class AnalyzerService: 
@@ -110,6 +111,7 @@ class AnalyzerService:
         repository,
         analysis,
         technologies,
+        statistics,
         insights,
     ):
 
@@ -120,6 +122,8 @@ class AnalyzerService:
             "analysis": analysis_serializer.data,
 
             "technologies": technologies,
+
+            "statistics": statistics,
 
             "metrics": cls.build_metrics(repository),
 
@@ -154,6 +158,10 @@ class AnalyzerService:
 
           technologies = TechnologiesService.calculate_percentages(
           languages
+          )
+
+          statistics = RepositoryStatisticsService.generate(
+              github_repository
           )
 
           popularity_score = RepositoryScore.popularity(
@@ -252,6 +260,7 @@ class AnalyzerService:
             repository,
             analysis,
             technologies,
+            statistics,
             insights,
          )
      
