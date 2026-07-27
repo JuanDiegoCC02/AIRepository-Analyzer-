@@ -156,6 +156,7 @@ class AnalyzerService:
         technologies,
         statistics,
         insights,
+        contributors,
     ):
 
         return {
@@ -178,6 +179,8 @@ class AnalyzerService:
             ),
             
              "insights": insights,
+
+             "contributors": contributors,
         }
 
 
@@ -315,6 +318,7 @@ class AnalyzerService:
             technologies,
             statistics,
             insights,
+            contributors_summary,
          )
      
      
