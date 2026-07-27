@@ -27,7 +27,7 @@ class ContributorsService:
         return response.json()
 
     @staticmethod
-    def sumarize(contributors):
+    def summarize(contributors):
         return{
             "total_contributors": len(contributors),
             "top_contributors": [
