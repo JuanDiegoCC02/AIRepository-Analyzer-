@@ -25,3 +25,16 @@ class ContributorsService:
             )
 
         return response.json()
+
+    @staticmethod
+    def sumarize(contributors):
+        return{
+            "total_contributors": len(contributors),
+            "top_contributors": [
+                {
+                    "username": contributor["login"],
+                    "contributions": contributor["contributions"]
+                }
+                for contributor in contributors[:10]
+            ]
+        }
