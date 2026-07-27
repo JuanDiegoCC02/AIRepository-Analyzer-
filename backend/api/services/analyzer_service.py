@@ -19,6 +19,7 @@ from api.services.repository_insights_service import RepositoryInsightsService
 from api.services.code_quality_service import CodeQualityService
 from api.services.community_service import CommunityService
 from api.services.repository_statistics_service import RepositoryStatisticsService
+from api.services.contributors_service import ContributorsService
 
 
 class AnalyzerService: 
@@ -200,6 +201,15 @@ class AnalyzerService:
 
           technologies = TechnologiesService.calculate_percentages(
           languages
+          )
+
+          contributors = ContributorsService.get_contributors(
+              repository.owner,
+              repository.name,
+          )
+
+          contributors_summary = ContributorsService.summarize(
+              contributors
           )
 
           statistics = RepositoryStatisticsService.generate(
