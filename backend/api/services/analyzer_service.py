@@ -158,6 +158,7 @@ class AnalyzerService:
         statistics,
         insights,
         contributors,
+        readme,
     ):
 
         return {
@@ -182,6 +183,8 @@ class AnalyzerService:
              "insights": insights,
 
              "contributors": contributors,
+
+             "readme": readme,
         }
 
 
@@ -329,6 +332,7 @@ class AnalyzerService:
             statistics,
             insights,
             contributors_summary,
+            readme_analysis,
          )
      
      
