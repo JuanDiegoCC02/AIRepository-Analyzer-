@@ -20,6 +20,7 @@ from api.services.code_quality_service import CodeQualityService
 from api.services.community_service import CommunityService
 from api.services.repository_statistics_service import RepositoryStatisticsService
 from api.services.contributors_service import ContributorsService
+from api.services.readme_service import ReadmeService
 
 
 class AnalyzerService: 
@@ -204,6 +205,11 @@ class AnalyzerService:
 
           technologies = TechnologiesService.calculate_percentages(
           languages
+          )
+
+          readme = ReadmeService.get_readme(
+              repository.owner,
+              repository.name,
           )
 
           contributors = ContributorsService.get_contributors(
