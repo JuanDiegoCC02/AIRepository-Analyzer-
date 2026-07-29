@@ -3,56 +3,184 @@
 
 class RepositoryInsightsService:
 
+    @staticmethod 
+    def popularity(score):
+        if score >= 90:
+            return "This repository is highly popular winthin the GitHub community."
+        
+        if score >= 70:
+            return "This repository has solid community adoption."
+        
+        if score >= 50:
+            return " This repository has moderate popularity."
+
+        return "This repository has limited community adoption."
+
     @staticmethod
+    def activity(score):
+        if score >= 80:
+            return "Development activity is high."
+
+        if score >= 60:
+            return "Reposiotry receives regular updates."
+
+        return "Repository activity is relatively low."
+
+    @staticmethod
+    def documentation (score):
+        if score >= 90:
+            return "Documentation is excellent and comprehensive."
+
+        if score >= 70:
+            return "Documentation quality is good."
+
+        if score >= 50:
+            return "Documentation is acceptable but could be improved."
+
+        return "Documentation quality is poor."
+
+    @staticmethod
+    def maintainability(score):
+        if score >= 90:
+            return " Code maintainability is acceptable."
+
+        if score >= 70:
+            return "Repository is easy to maintain."
+
+        if score >= 50:
+            return "Maintainability is acceptable."
+
+        return "Repository may be difficult to maintain."
+
+    @staticmethod
+    def code_quality(score):
+        if score >= 90:
+            return "Code quality indicators are excellent."
+
+        if  score >= 70:
+            return "Community engagement is strong."
+
+        if score >= 50:
+            return "Community activity is moderate."
+
+        return "Community engagement is limited."
+
+    @staticmethod
+    def community(score):
+        if score >= 90:
+            return "Community participation is outstanding."
+
+        if score >= 70:
+            return "Community engagement is strong."
+
+        if score >= 50:
+            return "Community activity is moderate." 
+
+        return "Community engagement is limited."
+
+    @staticmethod
+    def overall(score):
+        if score >= 90:
+            return "Overall repository health is excellent."
+
+        if score >= 80:
+            return "Overall repository health is very good." 
+
+        if score >= 70:
+            return "Repository quality is good."
+
+        if score >= 50:
+            return "Repository quality is average."
+
+        return "Repository requires significant improvements."
+
+    @staticmethod
+    def technology(technologies):
+        if not technologies:
+            return None
+
+        main = technologies[0]
+
+        return(
+            f"The dominant technology is "
+            f"{main['lenguage']} ({main['percentage']}%)."
+        )
+
+    @staticmethod
+    def project_type(project_type):
+        return (
+            f"The repository is classified as {project_type}"
+        )
+
+    @staticmethod
+    def production_ready(score):
+        if score >= 85:
+            return (
+                "Repository appears suitable for production environments."
+            )
+
+        if score >= 70:
+            return (
+                "Repository is suitable for the develoment and testing environments."
+            )
+
+        return (
+            "Repository requires additionnal improvements before production deployment."
+        )
+
+    @classmethod
     def generate(
+        cls,
         repository,
         analysis,
         technologies,
     ):
 
-        insights = []
+        insights = [
+            cls.popularity(
+                analysis.popularity_score
+            ),
 
-        # Popularidad
-        if analysis.popularity_score >= 90:
-            insights.append(
-                "This repository is highly popular within the GitHub community."
-            )
+            cls.activity(
+                analysis.activity_score
+            ),
 
-        elif analysis.popularity_score >= 70:
-            insights.append(
-                "This repository has a solid community adoption."
-            )
+            cls.documentation(
+                analysis.documentation_score
+            ),
 
-        else:
-            insights.append(
-                "This repository has limited community adoption."
-            )
+            cls.maintainability(
+                analysis.maintainability_score
+            ),
 
-        # Actividad
+            cls.code_quality(
+                analysis.code_quality_score
+            ),
 
-        if analysis.activity_score >= 80:
-            insights.append(
-                "Development activity is high."
-            )
+            cls.community(
+                analysis.community_score
+            ),
 
-        else:
-            insights.append(
-                "Repository activity is relatively low."
-            )
+            cls.overall(
+                analysis.overall_score
+            ),
 
-        # Tecnologías
-        if technologies:
+            cls.project_type(
+                analysis.project_type_score
+            ),
 
-            main = technologies[0]
+            cls.production_ready(
+                analysis.overall_score
+            ),
+        ]
 
-            insights.append(
-                f"The main technology is {main['language']} ({main['percentage']}%)."
-            )
+        technology = cls.technology(
+            technologies
+        )
 
-        # Tipo
-
-        insights.append(
-            f"The repository is classified as {analysis.project_type}."
+        if technology: insights.append(
+            technology
         )
 
         return insights
+
