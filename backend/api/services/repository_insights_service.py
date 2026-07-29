@@ -3,6 +3,8 @@
 
 class RepositoryInsightsService:
 
+
+#popularity method
     @staticmethod 
     def popularity(score):
         if score >= 90:
@@ -16,6 +18,8 @@ class RepositoryInsightsService:
 
         return "This repository has limited community adoption."
 
+
+#activity method
     @staticmethod
     def activity(score):
         if score >= 80:
@@ -26,6 +30,8 @@ class RepositoryInsightsService:
 
         return "Repository activity is relatively low."
 
+
+#documentation method
     @staticmethod
     def documentation (score):
         if score >= 90:
@@ -39,6 +45,8 @@ class RepositoryInsightsService:
 
         return "Documentation quality is poor."
 
+
+#maintainability method
     @staticmethod
     def maintainability(score):
         if score >= 90:
@@ -52,6 +60,8 @@ class RepositoryInsightsService:
 
         return "Repository may be difficult to maintain."
 
+
+#code quality method
     @staticmethod
     def code_quality(score):
         if score >= 90:
@@ -65,6 +75,8 @@ class RepositoryInsightsService:
 
         return "Community engagement is limited."
 
+
+#community method
     @staticmethod
     def community(score):
         if score >= 90:
@@ -78,6 +90,8 @@ class RepositoryInsightsService:
 
         return "Community engagement is limited."
 
+
+#overall method
     @staticmethod
     def overall(score):
         if score >= 90:
@@ -94,6 +108,8 @@ class RepositoryInsightsService:
 
         return "Repository requires significant improvements."
 
+
+#technology method
     @staticmethod
     def technology(technologies):
         if not technologies:
@@ -106,12 +122,16 @@ class RepositoryInsightsService:
             f"{main['lenguage']} ({main['percentage']}%)."
         )
 
+
+#project type method
     @staticmethod
     def project_type(project_type):
         return (
             f"The repository is classified as {project_type}"
         )
 
+
+#production ready method
     @staticmethod
     def production_ready(score):
         if score >= 85:
@@ -128,6 +148,8 @@ class RepositoryInsightsService:
             "Repository requires additionnal improvements before production deployment."
         )
 
+
+#class methods to generate
     @classmethod
     def generate(
         cls,
