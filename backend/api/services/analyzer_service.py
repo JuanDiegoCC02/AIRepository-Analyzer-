@@ -212,6 +212,10 @@ class AnalyzerService:
               repository.name,
           )
 
+          readme_analysis = ReadmeService.analyze(
+              readme
+          )
+
           contributors = ContributorsService.get_contributors(
               repository.owner,
               repository.name,
