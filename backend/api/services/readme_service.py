@@ -37,3 +37,27 @@ class ReadmeService:
             "download_url": data["download_url"],
             "content": content,
         }
+
+
+    @staticmethod
+
+    def analyze(readme):
+        if readme is None:
+            return 
+        {
+            "exists": False,
+            "size": 0, 
+            "word_count": 0,
+            "sections": 0,
+        }
+
+        content = readme["content"]
+        words = len(content.split())
+        sections = content.count("#")
+
+        return {
+            "exists": True,
+            "size": readme["size"],
+            "word_count": words,
+            "sections": sections,
+        }
