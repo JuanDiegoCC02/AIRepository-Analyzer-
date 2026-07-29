@@ -69,7 +69,7 @@ class AnalyzerService:
 
 # build of the metrics
      @staticmethod
-     def build_metrics(cls, repository, github_repository):
+     def build_metrics(repository, github_repository):
 
         return {
             "stars": repository.stars,
@@ -87,11 +87,6 @@ class AnalyzerService:
             "subscribers": github_repository.get("subscribers_count"),
 
             "network_count": github_repository.get("network_count"),
-
-            "metrics": cls.build_metrics(
-            repository,
-            github_repository
-            ),
              
         }
      
@@ -153,6 +148,7 @@ class AnalyzerService:
         repository_serializer,
         analysis_serializer,
         repository,
+        github_repository,
         analysis,
         technologies,
         statistics,
@@ -171,7 +167,10 @@ class AnalyzerService:
 
             "statistics": statistics,
 
-            "metrics": cls.build_metrics(repository),
+            "metrics": cls.build_metrics(
+                repository,
+                github_repository,
+                ),
 
             "scores": cls.build_scores(analysis),
 
@@ -291,9 +290,10 @@ class AnalyzerService:
           )
 
           summary = AISummaryService.generate(
-               github_repository,
-               category,
-               overall_score,
+              github_repository,
+              category,
+              technologies,
+              analysis_scores,
           )
           
           analysis, created = Analysis.objects.update_or_create(
@@ -327,6 +327,7 @@ class AnalyzerService:
             repository_serializer,
             analysis_serializer,
             repository,
+            github_repository,
             analysis,
             technologies,
             statistics,
