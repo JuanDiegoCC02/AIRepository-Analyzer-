@@ -341,6 +341,7 @@ class AnalyzerService:
             insights,
             contributors_summary,
             readme_analysis,
+            health,
          )
      
      
