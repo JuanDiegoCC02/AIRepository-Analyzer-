@@ -156,6 +156,7 @@ class AnalyzerService:
         insights,
         contributors,
         readme,
+        health,
     ):
 
         return {
@@ -185,6 +186,8 @@ class AnalyzerService:
              "contributors": contributors,
 
              "readme": readme,
+
+             "health": health,
 
         }
 
