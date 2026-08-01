@@ -21,6 +21,7 @@ from api.services.community_service import CommunityService
 from api.services.repository_statistics_service import RepositoryStatisticsService
 from api.services.contributors_service import ContributorsService
 from api.services.readme_service import ReadmeService
+from api.services.repository_health_service import RepositoryHealthService
 
 
 class AnalyzerService: 
@@ -184,6 +185,7 @@ class AnalyzerService:
              "contributors": contributors,
 
              "readme": readme,
+
         }
 
 
@@ -283,7 +285,9 @@ class AnalyzerService:
           "code_quality_score": code_quality_score,
           }
 
-
+          health = RepositoryHealthService.generate(
+             analysis_scores
+         )
           
           recommendations = RecommendationService.generate(
           analysis_scores
