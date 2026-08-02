@@ -154,6 +154,7 @@ class AnalyzerService:
         github_repository,
         analysis,
         technologies,
+        topics,
         statistics,
         insights,
         contributors,
@@ -168,6 +169,8 @@ class AnalyzerService:
             "analysis": analysis_serializer.data,
 
             "technologies": technologies,
+
+            "topics": topics,
 
             "statistics": statistics,
 
@@ -343,6 +346,7 @@ class AnalyzerService:
             github_repository,
             analysis,
             technologies,
+            topics,
             statistics,
             insights,
             contributors_summary,
