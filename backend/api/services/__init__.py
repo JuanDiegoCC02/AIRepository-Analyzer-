@@ -16,5 +16,6 @@ from .repository_statistics_service import RepositoryStatisticsService
 from .contributors_service import ContributorsService
 from .readme_service import ReadmeService
 from .repository_health_service import RepositoryHealthService
-
+from .technologies_service import TechnologiesService
+from .repository_topics_service import RepositoryTopicsService
 
