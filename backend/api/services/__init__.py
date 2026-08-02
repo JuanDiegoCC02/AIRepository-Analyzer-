@@ -11,6 +11,7 @@ from .ai_summary_service import AISummaryService
 from .ai_service import AIService
 from .repository_insights_service import RepositoryInsightsService
 from .code_quality_service import CodeQualityService
+from .community_service import CommunityService
 from .repository_statistics_service import RepositoryStatisticsService
 from .contributors_service import ContributorsService
 from .readme_service import ReadmeService
