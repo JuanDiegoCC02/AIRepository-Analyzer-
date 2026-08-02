@@ -22,6 +22,8 @@ from api.services.repository_statistics_service import RepositoryStatisticsServi
 from api.services.contributors_service import ContributorsService
 from api.services.readme_service import ReadmeService
 from api.services.repository_health_service import RepositoryHealthService
+from api.services.repository_topics_service import RepositoryTopicsService
+
 
 
 class AnalyzerService: 
@@ -212,6 +214,10 @@ class AnalyzerService:
 
           technologies = TechnologiesService.calculate_percentages(
           languages
+          )
+
+          topics = RepositoryTopicsService.analyze(
+              github_repository.get("topics", [])
           )
 
           readme = ReadmeService.get_readme(
