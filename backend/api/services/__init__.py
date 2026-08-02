@@ -12,4 +12,5 @@ from .code_quality_service import CodeQualityService
 from .repository_statistics_service import RepositoryStatisticsService
 from .contributors_service import ContributorsService
 from .readme_service import ReadmeService
+from .repository_health_service import RepositoryHealthService
 
