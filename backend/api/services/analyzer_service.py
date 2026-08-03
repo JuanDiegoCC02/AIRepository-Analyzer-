@@ -162,6 +162,7 @@ class AnalyzerService:
         contributors,
         readme,
         health,
+        maturity,
     ):
 
         return {
@@ -195,6 +196,8 @@ class AnalyzerService:
              "readme": readme,
 
              "health": health,
+
+             "maturity": maturity, 
 
         }
 
@@ -358,6 +361,7 @@ class AnalyzerService:
             contributors_summary,
             readme_analysis,
             health,
+            maturity,
          )
 
      
