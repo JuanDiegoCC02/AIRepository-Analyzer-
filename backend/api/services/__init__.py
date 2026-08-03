@@ -18,4 +18,5 @@ from .readme_service import ReadmeService
 from .repository_health_service import RepositoryHealthService
 from .technologies_service import TechnologiesService
 from .repository_topics_service import RepositoryTopicsService
+from .repository_maturity_service import RepositoryMaturityService
 
