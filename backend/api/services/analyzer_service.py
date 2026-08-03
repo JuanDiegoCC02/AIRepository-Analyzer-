@@ -23,6 +23,8 @@ from api.services.contributors_service import ContributorsService
 from api.services.readme_service import ReadmeService
 from api.services.repository_health_service import RepositoryHealthService
 from api.services.repository_topics_service import RepositoryTopicsService
+from api.services.repository_maturity_service import RepositoryMaturityService
+
 
 
 
@@ -245,6 +247,10 @@ class AnalyzerService:
               github_repository
           )
 
+          maturity = RepositoryMaturityService.calculate(
+              github_repository
+          )
+
           popularity_score = RepositoryScore.popularity(
                repository.stars
           )
@@ -353,5 +359,5 @@ class AnalyzerService:
             readme_analysis,
             health,
          )
-        
+
      
