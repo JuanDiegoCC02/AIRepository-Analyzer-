@@ -164,6 +164,7 @@ class AnalyzerService:
         readme,
         health,
         maturity,
+        releases
     ):
 
         return {
@@ -199,6 +200,8 @@ class AnalyzerService:
              "health": health,
 
              "maturity": maturity, 
+
+             "releases": releases,
 
         }
 
@@ -372,6 +375,7 @@ class AnalyzerService:
             readme_analysis,
             health,
             maturity,
+            release_summary,
          )
 
      
