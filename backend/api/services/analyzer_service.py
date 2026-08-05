@@ -327,7 +327,7 @@ class AnalyzerService:
             repository.name,
             repository.language,
             repository.description,
-            repository.topics
+            github_repository.get("topics", []),
         )
 
         # 7 calculate analysis scores
