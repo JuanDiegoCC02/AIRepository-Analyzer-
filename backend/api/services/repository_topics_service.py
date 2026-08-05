@@ -6,10 +6,10 @@ class RepositoryTopicsService:
 
         if not topics:
             return{
-                "frameworks": [],
-                "domains": [],
-                "tools": [],
-                "other": [],
+                "frameworks": ["not found"],
+                "domains": ["not found"],
+                "tools": ["not found"],
+                "other": ["not found"],
             }
 
         frameworks = []
