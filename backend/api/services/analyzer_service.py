@@ -24,6 +24,7 @@ from api.services.readme_service import ReadmeService
 from api.services.repository_health_service import RepositoryHealthService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.repository_maturity_service import RepositoryMaturityService
+from api.services.release_analysis_service import ReleaseAnalysisService
 
 
 
@@ -235,6 +236,15 @@ class AnalyzerService:
 
           readme_analysis = ReadmeService.analyze(
               readme
+          )
+
+          releases = ReleaseAnalysisService.get_releases(
+              repository.owner,
+              repository.name,
+          )
+
+          release_summary = ReleaseAnalysisService.summarize(
+              releases
           )
 
           contributors = ContributorsService.get_contributors(
