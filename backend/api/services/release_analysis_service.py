@@ -59,6 +59,23 @@ class ReleaseAnalysisService:
         return "Inactive"
     
 
+    @staticmethod
+    def stability(total_releases):
+        if total_releases >= 100:
+            return "Excellent"
+
+        if total_releases >= 50:
+            return "High"
+
+        if total_releases >= 20:
+            return "Good"
+
+        if total_releases >= 5:
+            return "Moderate"
+
+        return "Low"
+    
+
     @classmethod
     def summarize(cls, releases):
         if not releases: 
