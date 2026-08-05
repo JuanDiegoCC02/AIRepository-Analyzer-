@@ -1,4 +1,4 @@
-from datetime import datetime, time, timezone 
+from datetime import datetime, timezone 
 import requests 
 
 class ReleaseAnalysisService:
@@ -8,23 +8,23 @@ class ReleaseAnalysisService:
 
     @classmethod
     def get_releases(cls, owner, repository):
-        ulr = (
+        url = (
             f"{cls.BASE_URL}/"
             f"{owner}/"
             f"{repository}/releases"
         )
 
-        reponse = requests.get(url)
+        response = requests.get(url)
 
-        if reponse.status_code == 404:
+        if response.status_code == 404:
             return ["not found"]
 
-        if reponse.status_code != 200:
+        if response.status_code != 200:
             raise Exception(
-                f"Github API returned {reponse.status_code}"
+                f"Github API returned {response.status_code}"
             )
 
-        return reponse.json()
+        return response.json()
 
 
     @staticmethod
@@ -43,7 +43,7 @@ class ReleaseAnalysisService:
 
 
     @staticmethod
-    def realease_status(days):
+    def release_status(days):
         if days <= 30:
             return "Very Active"
         
@@ -59,33 +59,33 @@ class ReleaseAnalysisService:
         return "Inactive"
     
 
-        @classmethod
-        def summarize(cls, releases):
-            if not release: 
-                return{
-                    "total_releases": 0,
-                    "published_at": None,
-                    "lastest_release": None,
-                    "days_since_release": None,
-                    "release_status": "No Releases",
-                    "stability": "Unknown",
-                }
-
-            latest = releases [0]
-
-            days = cls.days_since_release(
-                lastest["published_at"]
-            )
-
-            return {
-                "total_releases": len(releases),
-                "published_at": lastest["published_at"],
-                "lastest_release": lastest["tag_name"],
-                "days_since_release": days,
-                "release_status": cls.release_status(
-                    days
-                ),
-                "stability": cls.stability(
-                    len(releases)
-                ),
+    @classmethod
+    def summarize(cls, releases):
+        if not releases: 
+            return{
+                "total_releases": 0,
+                "published_at": None,
+                "lastest_release": None,
+                "days_since_release": None,
+                "release_status": "No Releases",
+                "stability": "Unknown",
             }
+
+        latest = releases [0]
+
+        days = cls.days_since_release(
+            latest["published_at"]
+        )
+
+        return {
+            "total_releases": len(releases),
+            "published_at": latest["published_at"],
+            "lastest_release": latest["tag_name"],
+            "days_since_release": days,
+            "release_status": cls.release_status(
+                days
+            ),
+            "stability": cls.stability(
+                len(releases)
+            ),
+        }
