@@ -58,4 +58,34 @@ class ReleaseAnalysisService:
         
         return "Inactive"
     
-        
+
+        @classmethod
+        def summarize(cls, releases):
+            if not release: 
+                return{
+                    "total_releases": 0,
+                    "published_at": None,
+                    "lastest_release": None,
+                    "days_since_release": None,
+                    "release_status": "No Releases",
+                    "stability": "Unknown",
+                }
+
+            latest = releases [0]
+
+            days = cls.days_since_release(
+                lastest["published_at"]
+            )
+
+            return {
+                "total_releases": len(releases),
+                "published_at": lastest["published_at"],
+                "lastest_release": lastest["tag_name"],
+                "days_since_release": days,
+                "release_status": cls.release_status(
+                    days
+                ),
+                "stability": cls.stability(
+                    len(releases)
+                ),
+            }
