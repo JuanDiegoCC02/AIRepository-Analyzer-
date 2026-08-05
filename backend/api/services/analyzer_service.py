@@ -206,162 +206,225 @@ class AnalyzerService:
         }
 
 
-# analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
+# new structure for the analyzer that will help in the division of responsibilities.
+     @staticmethod
+     def load_external_resources(
+            repository,
+            github_repository,
+        ):
+
+            languages = TechnologiesService.get_languages(
+                repository.owner,
+                repository.name,
+            )
+
+            technologies = TechnologiesService.calculate_percentages(
+                languages
+            )
+
+            readme = ReadmeService.get_readme(
+                repository.owner,
+                repository.name,
+            )
+
+            readme_analysis = ReadmeService.analyze(
+                readme
+            )
+
+            contributors = ContributorsService.get_contributors(
+                repository.owner,
+                repository.name,
+            )
+
+            contributors_summary = ContributorsService.summarize(
+                contributors
+            )
+
+            statistics = RepositoryStatisticsService.generate(
+                github_repository
+            )
+
+            topics = RepositoryTopicsService.analyze(
+            github_repository.get(
+                "topics",
+                []
+             )
+            )
+
+            maturity = RepositoryMaturityService.calculate(
+                github_repository
+            )
+
+            releases = ReleaseAnalysisService.get_releases(
+                repository.owner,
+                repository.name,
+            )
+
+            releases_summary = ReleaseAnalysisService.summarize(
+                releases
+            )
+
+            return {
+
+                "technologies": technologies,
+
+                "readme": readme_analysis,
+
+                "contributors": contributors_summary,
+
+                "statistics": statistics,
+
+                "topics": topics,
+
+                "maturity": maturity,
+
+                "releases": releases_summary,
+
+        }
+
+
+        # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
      def analyze_repository(cls, repository_url):
-          
-          github_repository = GitHubService.get_repository(repository_url)
 
-          repository_data = cls.format_repository_data(github_repository)
-          
-          repository, created = Repository.objects.update_or_create(
-               github_id = repository_data["github_id"],
-               defaults = repository_data
-          )
+        # 1 fetch repository from GitHub
+        github_repository = GitHubService.get_repository(
+            repository_url
+        )
 
-          languages = TechnologiesService.get_languages(
-               repository.owner,
-               repository.name
-          )
+        # 2 format repository data
+        repository_data = cls.format_repository_data(
+            github_repository
+        )
 
-          technologies = TechnologiesService.calculate_percentages(
-          languages
-          )
+        # 3 create or update repository
+        repository, created = Repository.objects.update_or_create(
+            github_id=repository_data["github_id"],
+            defaults=repository_data
+        )
 
-          topics = RepositoryTopicsService.analyze(
-              github_repository.get("topics", [])
-          )
+        # 4 load external resources
+        resources = cls.load_external_resources(
+            repository,
+            github_repository,
+        )
 
-          readme = ReadmeService.get_readme(
-              repository.owner,
-              repository.name,
-          )
+        technologies = resources["technologies"]
+        statistics = resources["statistics"]
+        contributors_summary = resources["contributors"]
+        readme_analysis = resources["readme"]
+        release_summary = resources["releases"]
+        topics = resources["topics"]
+        maturity = resources["maturity"]
 
-          readme_analysis = ReadmeService.analyze(
-              readme
-          )
+        # 5 calculate popularity
+        popularity_score = RepositoryScore.popularity(
+            repository.stars
+        )
 
-          releases = ReleaseAnalysisService.get_releases(
-              repository.owner,
-              repository.name,
-          )
+        # 6 classify repository
+        category = RepositoryClassifier.classify(
+            repository.name,
+            repository.language,
+            repository.description,
+            repository.topics
+        )
 
-          release_summary = ReleaseAnalysisService.summarize(
-              releases
-          )
+        # 7 calculate analysis scores
+        activity_score = ActivityService.calculate(
+            github_repository
+        )
 
-          contributors = ContributorsService.get_contributors(
-              repository.owner,
-              repository.name,
-          )
+        documentation_score = DocumentationService.calculate(
+            github_repository
+        )
 
-          contributors_summary = ContributorsService.summarize(
-              contributors
-          )
+        maintainability_score = MaintainabilityService.calculate(
+            github_repository
+        )
 
-          statistics = RepositoryStatisticsService.generate(
-              github_repository
-          )
+        code_quality_score = CodeQualityService.calculate(
+            github_repository
+        )
 
-          maturity = RepositoryMaturityService.calculate(
-              github_repository
-          )
+        community_score = CommunityService.calculate(
+            github_repository
+        )
 
-          popularity_score = RepositoryScore.popularity(
-               repository.stars
-          )
+        # 8 calculate overall score
+        overall_score = OverallScoreService.calculate(
+            popularity_score,
+            activity_score,
+            documentation_score,
+            maintainability_score,
+            code_quality_score,
+            community_score,
+        )
 
-          category = RepositoryClassifier.classify(
-              repository.name,
-              repository.language,
-              repository.description,
-              repository.topics
-          )
-          
-          activity_score = ActivityService.calculate(
-               github_repository
-          )
+        # 9 build scores dictionary
+        analysis_scores = {
+            "popularity_score": popularity_score,
+            "activity_score": activity_score,
+            "documentation_score": documentation_score,
+            "maintainability_score": maintainability_score,
+            "overall_score": overall_score,
+            "community_score": community_score,
+            "code_quality_score": code_quality_score,
+        }
 
-          documentation_score = DocumentationService.calculate(
-               github_repository
-          )
+        # 10 repository health
+        health = RepositoryHealthService.generate(
+            analysis_scores
+        )
 
-          maintainability_score = MaintainabilityService.calculate(
-               github_repository
-          )
+        # 11 generate recommendations
+        recommendations = RecommendationService.generate(
+            analysis_scores
+        )
 
-          code_quality_score = CodeQualityService.calculate(
-          github_repository
-          )
+        # 12 generate AI summary
+        summary = AISummaryService.generate(
+            github_repository,
+            category,
+            technologies,
+            analysis_scores,
+        )
 
-          community_score = CommunityService.calculate(
-          github_repository
-          )
+        # 13 save analysis
+        analysis, created = Analysis.objects.update_or_create(
+            repository=repository,
+            defaults={
+                "project_type": category,
+                "popularity_score": popularity_score,
+                "activity_score": activity_score,
+                "documentation_score": documentation_score,
+                "maintainability_score": maintainability_score,
+                "overall_score": overall_score,
+                "ai_summary": summary,
+                "recommendations": "\n".join(recommendations),
+                "code_quality_score": code_quality_score,
+                "community_score": community_score,
+            }
+        )
 
-          
-          overall_score = OverallScoreService.calculate(
-               popularity_score,
-               activity_score,
-               documentation_score,
-               maintainability_score,
-               code_quality_score,
-               community_score,
-          )
+        # 14 generate insights
+        insights = RepositoryInsightsService.generate(
+            repository,
+            analysis,
+            technologies,
+        )
 
+        # 15 serialize database objects
+        repository_serializer = RepositorySerializer(
+            repository
+        )
 
-          analysis_scores = {
-          "popularity_score": popularity_score,
-          "activity_score": activity_score,
-          "documentation_score": documentation_score,
-          "maintainability_score": maintainability_score,
-          "overall_score": overall_score,
-          "community_score": community_score,
-          "code_quality_score": code_quality_score,
-          }
+        analysis_serializer = AnalysisSerializer(
+            analysis
+        )
 
-          health = RepositoryHealthService.generate(
-             analysis_scores
-         )
-          
-          recommendations = RecommendationService.generate(
-          analysis_scores
-          )
-
-          summary = AISummaryService.generate(
-              github_repository,
-              category,
-              technologies,
-              analysis_scores,
-          )
-          
-          analysis, created = Analysis.objects.update_or_create(
-               repository=repository,
-               defaults={
-                    "project_type": category,
-                    "popularity_score": popularity_score,
-                    "activity_score": activity_score,
-                    "documentation_score": documentation_score,
-                    "maintainability_score": maintainability_score,
-                    "overall_score": overall_score,
-                    "ai_summary": summary,
-                    "recommendations": "\n".join(recommendations),
-                    "code_quality_score": code_quality_score,
-                    "community_score": community_score,
-               }
-          )
-
-          insights = RepositoryInsightsService.generate(
-          repository,
-          analysis,
-          technologies,
-          )
-
-
-          repository_serializer = RepositorySerializer(repository)
-          analysis_serializer = AnalysisSerializer(analysis)
-
-
-          return cls.build_response(
+        # 16 build final API response
+        return cls.build_response(
             repository_serializer,
             analysis_serializer,
             repository,
@@ -376,6 +439,5 @@ class AnalyzerService:
             health,
             maturity,
             release_summary,
-         )
-
+        )
      

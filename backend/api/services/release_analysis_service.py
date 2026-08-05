@@ -82,7 +82,7 @@ class ReleaseAnalysisService:
             return{
                 "total_releases": 0,
                 "published_at": None,
-                "lastest_release": None,
+                "latest_release": None,
                 "days_since_release": None,
                 "release_status": "No Releases",
                 "stability": "Unknown",
@@ -97,7 +97,7 @@ class ReleaseAnalysisService:
         return {
             "total_releases": len(releases),
             "published_at": latest["published_at"],
-            "lastest_release": latest["tag_name"],
+            "latest_release": latest["tag_name"],
             "days_since_release": days,
             "release_status": cls.release_status(
                 days
