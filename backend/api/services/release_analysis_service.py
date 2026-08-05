@@ -1,8 +1,10 @@
-from datetime import datetime, time 
+from datetime import datetime, time, timezone 
 import requests 
 
 class ReleaseAnalysisService:
+
     BASE_URL = "https://api.github.com/repos"
+
 
     @classmethod
     def get_releases(cls, owner, repository):
@@ -23,3 +25,37 @@ class ReleaseAnalysisService:
             )
 
         return reponse.json()
+
+
+    @staticmethod
+    def days_since_release(date_string):
+        published = datetime.strptime(
+            date_string,
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        published = published.replace(
+            tzinfo=timezone.utc
+        )
+
+        today = datetime.now(timezone.utc)
+
+        return (today - published).days
+
+
+    @staticmethod
+    def realease_status(days):
+        if days <= 30:
+            return "Very Active"
+        
+        if days <= 90:
+            return "Active"
+        
+        if days <= 180:
+            return "Moderate"
+        
+        if days <= 365:
+            return "Low Activity"
+        
+        return "Inactive"
+    
+        
