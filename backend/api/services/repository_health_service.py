@@ -1,7 +1,7 @@
 
 
 
-class RepostoryHealthService:
+class RepositoryHealthService:
 
     @staticmethod
     def generate(scores):
