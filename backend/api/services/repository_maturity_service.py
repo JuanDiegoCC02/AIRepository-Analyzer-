@@ -1,5 +1,5 @@
 from datetime import datetime
-from djanngo.utils.timezone import now
+from django.utils.timezone import now
 
 class RepositoryMaturityService:
 
