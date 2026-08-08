@@ -4,20 +4,15 @@ from api.models.analysis import Analysis
 from api.serializers.repository_serializer import RepositorySerializer
 from api.serializers.analysis_serializer import AnalysisSerializer
 
-from api.utils.score_calculator import RepositoryScore
 from api.utils.repository_classifier import RepositoryClassifier
 
 from api.services.github_service import GitHubService
-from api.services.activity_service import ActivityService
-from api.services.documentation_service import DocumentationService
-from api.services.maintainability_service import MaintainabilityService
-from api.services.overall_score_service import OverallScoreService
+
 from api.services.technologies_service import TechnologiesService
 from api.services.recommendation_service import RecommendationService
 from api.services.ai_summary_service import AISummaryService
 from api.services.repository_insights_service import RepositoryInsightsService
-from api.services.code_quality_service import CodeQualityService
-from api.services.community_service import CommunityService
+
 from api.services.repository_statistics_service import RepositoryStatisticsService
 from api.services.contributors_service import ContributorsService
 from api.services.readme_service import ReadmeService
@@ -25,6 +20,7 @@ from api.services.repository_health_service import RepositoryHealthService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.repository_maturity_service import RepositoryMaturityService
 from api.services.release_analysis_service import ReleaseAnalysisService
+from api.services.analysis_score_service import AnalysisScoreService
 
 
 
@@ -317,60 +313,19 @@ class AnalyzerService:
         topics = resources["topics"]
         maturity = resources["maturity"]
 
-        # 5 calculate popularity
-        popularity_score = RepositoryScore.popularity(
-            repository.stars
-        )
-
-        # 6 classify repository
+        # 5 classify repository
         category = RepositoryClassifier.classify(
             repository.name,
             repository.language,
             repository.description,
-            github_repository.get("topics", []),
+            repository.topics
         )
 
-        # 7 calculate analysis scores
-        activity_score = ActivityService.calculate(
-            github_repository
+        # 6 calculate analysis scores
+        analysis_scores = AnalysisScoreService.calculate_scores(
+            repository,
+            github_repository,
         )
-
-        documentation_score = DocumentationService.calculate(
-            github_repository
-        )
-
-        maintainability_score = MaintainabilityService.calculate(
-            github_repository
-        )
-
-        code_quality_score = CodeQualityService.calculate(
-            github_repository
-        )
-
-        community_score = CommunityService.calculate(
-            github_repository
-        )
-
-        # 8 calculate overall score
-        overall_score = OverallScoreService.calculate(
-            popularity_score,
-            activity_score,
-            documentation_score,
-            maintainability_score,
-            code_quality_score,
-            community_score,
-        )
-
-        # 9 build scores dictionary
-        analysis_scores = {
-            "popularity_score": popularity_score,
-            "activity_score": activity_score,
-            "documentation_score": documentation_score,
-            "maintainability_score": maintainability_score,
-            "overall_score": overall_score,
-            "community_score": community_score,
-            "code_quality_score": code_quality_score,
-        }
 
         # 10 repository health
         health = RepositoryHealthService.generate(
@@ -395,15 +350,15 @@ class AnalyzerService:
             repository=repository,
             defaults={
                 "project_type": category,
-                "popularity_score": popularity_score,
-                "activity_score": activity_score,
-                "documentation_score": documentation_score,
-                "maintainability_score": maintainability_score,
-                "overall_score": overall_score,
+                "popularity_score": analysis_scores["popularity_score"],
+                "activity_score": analysis_scores["activity_score"],
+                "documentation_score": analysis_scores["documentation_score"],
+                "maintainability_score": analysis_scores["maintainability_score"],
+                "overall_score": analysis_scores["overall_score"],
                 "ai_summary": summary,
                 "recommendations": "\n".join(recommendations),
-                "code_quality_score": code_quality_score,
-                "community_score": community_score,
+                "code_quality_score": analysis_scores["code_quality_score"],
+                "community_score": analysis_scores["community_score"],
             }
         )
 
