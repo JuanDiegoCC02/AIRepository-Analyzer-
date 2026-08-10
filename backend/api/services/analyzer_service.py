@@ -119,11 +119,11 @@ class AnalyzerService:
 
             "maintainability": analysis.maintainability_score,
 
-            "overall": analysis.overall_score,
-
             "code_quality": analysis.code_quality_score,
 
             "community": analysis.community_score,
+
+            "overall": analysis.overall_score,
 
             "level": level,
         }
