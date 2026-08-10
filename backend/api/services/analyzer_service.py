@@ -21,6 +21,7 @@ from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.repository_maturity_service import RepositoryMaturityService
 from api.services.release_analysis_service import ReleaseAnalysisService
 from api.services.analysis_score_service import AnalysisScoreService
+from api.services.analysis_persistence_service import AnalysisPersistenceService
 
 
 
@@ -345,7 +346,13 @@ class AnalyzerService:
             analysis_scores,
         )
 
-     
+        analysis, created = AnalysisPersistenceService.save(
+            repository=repository,
+            category=category,
+            analysis_scores=analysis_scores,
+            summary=summary,
+            recommendations=recommendations,
+        )
 
         # generate insights
         insights = RepositoryInsightsService.generate(
