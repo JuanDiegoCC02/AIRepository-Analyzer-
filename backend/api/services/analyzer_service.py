@@ -28,7 +28,7 @@ from api.services.analysis_persistence_service import AnalysisPersistenceService
 
 class AnalyzerService: 
 
-# formats the repository data from GitHub API response to match the Repository model fields
+    # formats the repository data from GitHub API response to match the Repository model fields
      @staticmethod
      def format_repository_data(repository):
 
@@ -70,7 +70,7 @@ class AnalyzerService:
           }
      
 
-# build of the metrics
+    # build of the metrics
      @staticmethod
      def build_metrics(repository, github_repository):
 
@@ -94,7 +94,7 @@ class AnalyzerService:
         }
      
 
-# build of the score
+    # build_response of the score
      @staticmethod
      def build_scores(analysis):
 
@@ -129,7 +129,7 @@ class AnalyzerService:
         }
      
 
-# build of the classification
+    # build_response of the classification
      @staticmethod
      def build_classification(repository, analysis):
 
@@ -144,7 +144,7 @@ class AnalyzerService:
         }
      
 
-# build of the reponse
+    # build_respone of the data
      @classmethod
      def build_response(
         cls,
@@ -203,7 +203,7 @@ class AnalyzerService:
         }
 
 
-# new structure for the analyzer that will help in the division of responsibilities.
+    # new structure for the analyzer that will help in the division of responsibilities.
      @staticmethod
      def load_external_resources(
             repository,
@@ -280,7 +280,7 @@ class AnalyzerService:
         }
 
 
-        # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
+     # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
      def analyze_repository(cls, repository_url):
 
