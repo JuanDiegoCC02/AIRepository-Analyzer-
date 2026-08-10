@@ -345,22 +345,7 @@ class AnalyzerService:
             analysis_scores,
         )
 
-        # save analysis
-        analysis, created = Analysis.objects.update_or_create(
-            repository=repository,
-            defaults={
-                "project_type": category,
-                "popularity_score": analysis_scores["popularity_score"],
-                "activity_score": analysis_scores["activity_score"],
-                "documentation_score": analysis_scores["documentation_score"],
-                "maintainability_score": analysis_scores["maintainability_score"],
-                "overall_score": analysis_scores["overall_score"],
-                "ai_summary": summary,
-                "recommendations": "\n".join(recommendations),
-                "code_quality_score": analysis_scores["code_quality_score"],
-                "community_score": analysis_scores["community_score"],
-            }
-        )
+     
 
         # generate insights
         insights = RepositoryInsightsService.generate(
