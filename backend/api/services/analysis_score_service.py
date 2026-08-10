@@ -1,90 +1,105 @@
+from api.utils.score_calculator import RepositoryScore
+
 from api.services.activity_service import ActivityService
 from api.services.documentation_service import DocumentationService
 from api.services.maintainability_service import MaintainabilityService
 from api.services.code_quality_service import CodeQualityService
 from api.services.community_service import CommunityService
 from api.services.overall_score_service import OverallScoreService
-from api.utils.score_calculator import RepositoryScore
 
 
 class AnalysisScoreService:
 
     @staticmethod
-    def calculate_popularity(repository):
-        "Calculates the repository popularity scorebased on its GitHub stars."
+    def normalize_score(score):
+        "Ensures that a score is always a valid numberbetween 0 and 100"
 
-        return RepositoryScore.popularity(
+        if score is None:
+            return 0
+        try:
+            score = float(score)
+        except (TypeError, ValueError):
+            return 0
+
+        return max(0, min(100, score))
+
+    @staticmethod
+    def get_score_level(overall_score):
+        "Converts the overall score into a human-readable quality level"
+
+        if overall_score >= 90:
+            return "Excellent"
+        if overall_score >= 75:
+            return "Good"
+        if overall_score >= 50:
+            return "Average"
+
+        return "Needs Improvement"
+
+    @classmethod
+    def calculate_scores(
+        cls,
+        repository,
+        github_repository,
+    ):
+        "Calculates all repository analysis scores and returns a normalized result"
+
+        # Popularity
+        popularity_score = RepositoryScore.popularity(
             repository.stars
         )
 
-    @staticmethod
-    def calculate_activity(github_repository):
-        "Calculates the repository activity score using GitHub repository activity data."
-
-        return ActivityService.calculate(
+        # Activity
+        activity_score = ActivityService.calculate(
             github_repository
         )
 
-    @staticmethod
-    def calculate_documentation(github_repository):
-        "Calculates the repository documentation score."
-
-        return DocumentationService.calculate(
+        # Documentation
+        documentation_score = DocumentationService.calculate(
             github_repository
         )
 
-    @staticmethod
-    def calculate_maintainability(github_repository):
-        "Calculates the repository maintainability score."
-
-        return MaintainabilityService.calculate(
+        # Maintainability
+        maintainability_score = MaintainabilityService.calculate(
             github_repository
         )
 
-    @staticmethod
-    def calculate_code_quality(github_repository):
-        "Calculates the repository code quality score."
-
-        return CodeQualityService.calculate(
+        # Code quality
+        code_quality_score = CodeQualityService.calculate(
             github_repository
         )
 
-    @staticmethod
-    def calculate_community(github_repository):
-        "Calculates the repository community score."
-
-        return CommunityService.calculate(
+        # Community
+        community_score = CommunityService.calculate(
             github_repository
         )
 
-    @classmethod
-    def calculate_scores(cls, repository, github_repository):
-        "Calculates all individual repository scores and the final overall score."
-
-        popularity_score = cls.calculate_popularity(
-            repository
+        # Normalize individual scores
+        popularity_score = cls.normalize_score(
+            popularity_score
         )
 
-        activity_score = cls.calculate_activity(
-            github_repository
+        activity_score = cls.normalize_score(
+            activity_score
         )
 
-        documentation_score = cls.calculate_documentation(
-            github_repository
+        documentation_score = cls.normalize_score(
+            documentation_score
         )
 
-        maintainability_score = cls.calculate_maintainability(
-            github_repository
+        maintainability_score = cls.normalize_score(
+            maintainability_score
         )
 
-        code_quality_score = cls.calculate_code_quality(
-            github_repository
+        code_quality_score = cls.normalize_score(
+            code_quality_score
         )
 
-        community_score = cls.calculate_community(
-            github_repository
+        community_score = cls.normalize_score(
+            community_score
         )
 
+        # Calculate overall score
         overall_score = OverallScoreService.calculate(
             popularity_score,
             activity_score,
@@ -94,12 +109,29 @@ class AnalysisScoreService:
             community_score,
         )
 
+        overall_score = cls.normalize_score(
+            overall_score
+        )
+
+        # Determine quality level
+        level = cls.get_score_level(
+            overall_score
+        )
+
         return {
             "popularity_score": popularity_score,
+
             "activity_score": activity_score,
+
             "documentation_score": documentation_score,
+
             "maintainability_score": maintainability_score,
+
             "code_quality_score": code_quality_score,
+
             "community_score": community_score,
+
             "overall_score": overall_score,
+
+            "level": level,
         }
