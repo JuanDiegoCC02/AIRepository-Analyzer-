@@ -283,23 +283,23 @@ class AnalyzerService:
      @classmethod
      def analyze_repository(cls, repository_url):
 
-        # 1 fetch repository from GitHub
+        # fetch repository from GitHub
         github_repository = GitHubService.get_repository(
             repository_url
         )
 
-        # 2 format repository data
+        # format repository data
         repository_data = cls.format_repository_data(
             github_repository
         )
 
-        # 3 create or update repository
+        # create or update repository
         repository, created = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
         )
 
-        # 4 load external resources
+        # load external resources
         resources = cls.load_external_resources(
             repository,
             github_repository,
@@ -313,7 +313,7 @@ class AnalyzerService:
         topics = resources["topics"]
         maturity = resources["maturity"]
 
-        # 5 classify repository
+        # classify repository
         category = RepositoryClassifier.classify(
             repository.name,
             repository.language,
@@ -321,23 +321,23 @@ class AnalyzerService:
             repository.topics
         )
 
-        # 6 calculate analysis scores
+        # calculate analysis scores
         analysis_scores = AnalysisScoreService.calculate_scores(
             repository,
             github_repository,
         )
 
-        # 10 repository health
+        # repository health
         health = RepositoryHealthService.generate(
             analysis_scores
         )
 
-        # 11 generate recommendations
+        # generate recommendations
         recommendations = RecommendationService.generate(
             analysis_scores
         )
 
-        # 12 generate AI summary
+        # generate AI summary
         summary = AISummaryService.generate(
             github_repository,
             category,
@@ -345,7 +345,7 @@ class AnalyzerService:
             analysis_scores,
         )
 
-        # 13 save analysis
+        # save analysis
         analysis, created = Analysis.objects.update_or_create(
             repository=repository,
             defaults={
@@ -362,14 +362,14 @@ class AnalyzerService:
             }
         )
 
-        # 14 generate insights
+        # generate insights
         insights = RepositoryInsightsService.generate(
             repository,
             analysis,
             technologies,
         )
 
-        # 15 serialize database objects
+
         repository_serializer = RepositorySerializer(
             repository
         )
@@ -378,7 +378,6 @@ class AnalyzerService:
             analysis
         )
 
-        # 16 build final API response
         return cls.build_response(
             repository_serializer,
             analysis_serializer,
