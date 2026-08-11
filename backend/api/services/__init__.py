@@ -21,6 +21,6 @@ from .repository_maturity_service import RepositoryMaturityService
 from .release_analysis_service import ReleaseAnalysisService
 from .analysis_score_service import AnalysisScoreService
 from .analysis_persistence_service import AnalysisPersistenceService
-
+from .analysis_result_service import AnalysisResultService
 
 
