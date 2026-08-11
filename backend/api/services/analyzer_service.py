@@ -22,6 +22,7 @@ from api.services.repository_maturity_service import RepositoryMaturityService
 from api.services.release_analysis_service import ReleaseAnalysisService
 from api.services.analysis_score_service import AnalysisScoreService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
+from api.services.analysis_result_service import AnalysisResultService
 
 
 
@@ -153,6 +154,7 @@ class AnalyzerService:
         repository,
         github_repository,
         analysis,
+        analysis_result,
         technologies,
         topics,
         statistics,
@@ -169,6 +171,8 @@ class AnalyzerService:
             "repository": repository_serializer.data,
 
             "analysis": analysis_serializer.data,
+
+            "analysis_result": analysis_result,
 
             "technologies": technologies,
 
@@ -328,6 +332,11 @@ class AnalyzerService:
             github_repository,
         )
 
+        # build structured analysis result
+        analysis_result = AnalysisResultService.build(
+            analysis_scores
+        )
+
         # repository health
         health = RepositoryHealthService.generate(
             analysis_scores
@@ -376,6 +385,7 @@ class AnalyzerService:
             repository,
             github_repository,
             analysis,
+            analysis_result,
             technologies,
             topics,
             statistics,
