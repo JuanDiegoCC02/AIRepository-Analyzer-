@@ -3,153 +3,219 @@
 
 class RepositoryInsightsService:
 
-
-#popularity method
-    @staticmethod 
+    @staticmethod
     def popularity(score):
+
         if score >= 90:
-            return "This repository is highly popular winthin the GitHub community."
-        
+            return (
+                "This repository is highly popular within "
+                "the GitHub community."
+            )
+
         if score >= 70:
-            return "This repository has solid community adoption."
-        
+            return (
+                "This repository has solid community adoption."
+            )
+
         if score >= 50:
-            return " This repository has moderate popularity."
+            return (
+                "This repository has moderate popularity."
+            )
 
-        return "This repository has limited community adoption."
+        return (
+            "This repository has limited community adoption."
+        )
 
 
-#activity method
     @staticmethod
     def activity(score):
+
         if score >= 80:
-            return "Development activity is high."
+            return (
+                "Development activity is high."
+            )
 
         if score >= 60:
-            return "Reposiotry receives regular updates."
+            return (
+                "The repository receives regular updates."
+            )
 
-        return "Repository activity is relatively low."
+        return (
+            "Repository activity is relatively low."
+        )
 
 
-#documentation method
     @staticmethod
-    def documentation (score):
+    def documentation(score):
+
         if score >= 90:
-            return "Documentation is excellent and comprehensive."
+            return (
+                "Documentation is excellent and comprehensive."
+            )
 
         if score >= 70:
-            return "Documentation quality is good."
+            return (
+                "Documentation quality is good."
+            )
 
         if score >= 50:
-            return "Documentation is acceptable but could be improved."
+            return (
+                "Documentation is acceptable but could be improved."
+            )
 
-        return "Documentation quality is poor."
+        return (
+            "Documentation quality is poor."
+        )
 
 
-#maintainability method
     @staticmethod
     def maintainability(score):
+
         if score >= 90:
-            return " Code maintainability is acceptable."
+            return (
+                "Code maintainability is excellent."
+            )
 
         if score >= 70:
-            return "Repository is easy to maintain."
+            return (
+                "The repository is easy to maintain."
+            )
 
         if score >= 50:
-            return "Maintainability is acceptable."
+            return (
+                "Maintainability is acceptable."
+            )
 
-        return "Repository may be difficult to maintain."
+        return (
+            "The repository may be difficult to maintain."
+        )
 
 
-#code quality method
     @staticmethod
     def code_quality(score):
-        if score >= 90:
-            return "Code quality indicators are excellent."
 
-        if  score >= 70:
-            return "Community engagement is strong."
+        if score >= 90:
+            return (
+                "Code quality indicators are excellent."
+            )
+
+        if score >= 70:
+            return (
+                "Code quality indicators are strong."
+            )
 
         if score >= 50:
-            return "Community activity is moderate."
+            return (
+                "Code quality indicators are moderate."
+            )
 
-        return "Community engagement is limited."
+        return (
+            "Code quality indicators are limited."
+        )
+    
 
-
-#community method
     @staticmethod
     def community(score):
+
         if score >= 90:
-            return "Community participation is outstanding."
+            return (
+                "Community participation is outstanding."
+            )
 
         if score >= 70:
-            return "Community engagement is strong."
+            return (
+                "Community engagement is strong."
+            )
 
         if score >= 50:
-            return "Community activity is moderate." 
+            return (
+                "Community activity is moderate."
+            )
 
-        return "Community engagement is limited."
+        return (
+            "Community engagement is limited."
+        )
 
 
-#overall method
     @staticmethod
     def overall(score):
+
         if score >= 90:
-            return "Overall repository health is excellent."
+            return (
+                "Overall repository health is excellent."
+            )
 
         if score >= 80:
-            return "Overall repository health is very good." 
+            return (
+                "Overall repository health is very good."
+            )
 
         if score >= 70:
-            return "Repository quality is good."
+            return (
+                "Repository quality is good."
+            )
 
         if score >= 50:
-            return "Repository quality is average."
+            return (
+                "Repository quality is average."
+            )
 
-        return "Repository requires significant improvements."
+        return (
+            "Repository requires significant improvements."
+        )
 
 
-#technology method
     @staticmethod
     def technology(technologies):
+
         if not technologies:
             return None
 
         main = technologies[0]
 
-        return(
+        return (
             f"The dominant technology is "
-            f"{main['lenguage']} ({main['percentage']}%)."
+            f"{main['language']} "
+            f"({main['percentage']}%)."
         )
 
 
-#project type method
     @staticmethod
     def project_type(project_type):
+
+        if not project_type:
+            return None
+
         return (
-            f"The repository is classified as {project_type}"
+            f"The repository is classified as "
+            f"{project_type}."
         )
 
 
-#production ready method
+    # production readinnes
     @staticmethod
     def production_ready(score):
+
         if score >= 85:
             return (
-                "Repository appears suitable for production environments."
+                "Based on the analyzed metrics, the repository "
+                "appears suitable for production environments."
             )
 
         if score >= 70:
             return (
-                "Repository is suitable for the develoment and testing environments."
+                "The repository appears suitable for development "
+                "and testing environments, but additional validation "
+                "may be required before production deployment."
             )
 
         return (
-            "Repository requires additionnal improvements before production deployment."
+            "The repository requires additional improvements "
+            "before it should be considered for production deployment."
         )
 
 
-#class methods to generate
+
     @classmethod
     def generate(
         cls,
@@ -158,51 +224,90 @@ class RepositoryInsightsService:
         technologies,
     ):
 
-        insights = [
+        insights = []
+
+        # popularity
+        insights.append(
             cls.popularity(
                 analysis.popularity_score
-            ),
+            )
+        )
 
+      
+        # activity
+        insights.append(
             cls.activity(
                 analysis.activity_score
-            ),
+            )
+        )
 
+     
+        # documentation
+        insights.append(
             cls.documentation(
                 analysis.documentation_score
-            ),
+            )
+        )
 
+     
+        # maintainability
+        insights.append(
             cls.maintainability(
                 analysis.maintainability_score
-            ),
+            )
+        )
 
+
+        # code quality
+        insights.append(
             cls.code_quality(
                 analysis.code_quality_score
-            ),
+            )
+        )
 
+        # community
+        insights.append(
             cls.community(
                 analysis.community_score
-            ),
+            )
+        )
 
+      
+        # overall
+        insights.append(
             cls.overall(
                 analysis.overall_score
-            ),
+            )
+        )
 
-            cls.project_type(
-                analysis.project_type_score
-            ),
 
+        # project type
+        project_type = cls.project_type(
+            analysis.project_type
+        )
+
+        if project_type:
+            insights.append(
+                project_type
+            )
+
+      
+        # production readiness
+        insights.append(
             cls.production_ready(
                 analysis.overall_score
-            ),
-        ]
+            )
+        )
 
+    
+        # technology
         technology = cls.technology(
             technologies
         )
 
-        if technology: insights.append(
-            technology
-        )
+        if technology:
+            insights.append(
+                technology
+            )
 
         return insights
-
