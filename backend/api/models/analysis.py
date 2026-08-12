@@ -4,7 +4,7 @@ from .repository import Repository
 
 class Analysis(models.Model):
 
-    repository = models.OneToOneField(
+    repository = models.ForeignKey(
         Repository,
         on_delete=models.CASCADE,
         related_name="analysis"
@@ -20,23 +20,28 @@ class Analysis(models.Model):
 
     maintainability_score = models.PositiveSmallIntegerField(default=0)
 
-    overall_score = models.PositiveSmallIntegerField(default=0)
-
-    ai_summary = models.TextField(blank=True, default="")
-
-    recommendations = models.TextField(blank=True, default="")
-
     code_quality_score = models.PositiveSmallIntegerField(default=0)
 
     community_score = models.PositiveSmallIntegerField(default=0)
 
+    overall_score = models.PositiveSmallIntegerField(default=0)
+
+    ai_summary = models.TextField(blank=True, null=True)
+
+    recommendations = models.TextField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
-    updated_at = models.DateTimeField(auto_now=True)
-
     class Meta:
-        db_table = "analysis"
+
+        ordering = [
+            "-created_at"
+        ]
 
     def __str__(self):
-        return f"Analysis - {self.repository.full_name}"
+        
+        return (
+            f"{self.repository.full_name}"
+            f"Analysis - {self.created_at}"
+        )
     
