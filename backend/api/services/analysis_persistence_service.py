@@ -4,39 +4,41 @@ from api.models.analysis import Analysis
 class AnalysisPersistenceService:
 
     @staticmethod
-    def save (
+    def save_analysis (
         repository,
         category,
-        analysis_scores,
+        scores,
         summary,
         recommendations,
     ):
 
        # save analysis
-            analysis, created = Analysis.objects.update_or_create(
+            analysis = Analysis.objects.create(
+                  
                 repository=repository,
-                defaults={
-                    "project_type": category,
+
+                project_type=category, 
+                
+                    popularity_score = scores["popularity_score"],
     
-                    "popularity_score": analysis_scores["popularity_score"],
+                    activity_score = scores["activity_score"],
     
-                    "activity_score": analysis_scores["activity_score"],
+                    documentation_score = scores["documentation_score"],
     
-                    "documentation_score": analysis_scores["documentation_score"],
+                    maintainability_score = scores["maintainability_score"],
+
+                    code_quality_score = scores["code_quality_score"],
     
-                    "maintainability_score": analysis_scores["maintainability_score"],
-    
-                    "community_score": analysis_scores["community_score"],
+                    community_score = scores["community_score"],
                     
-                    "overall_score": analysis_scores["overall_score"],
+                    overall_score = scores["overall_score"],
     
-                    "ai_summary": summary,
+                    ai_summary = summary,
     
-                    "recommendations": "\n".join(recommendations),
+                    recommendations = "\n".join(recommendations),
                     
-                }
             )
 
-            return analysis, created 
+            return analysis 
         
         
