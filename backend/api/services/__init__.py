@@ -23,6 +23,5 @@ from .analysis_score_service import AnalysisScoreService
 from .analysis_persistence_service import AnalysisPersistenceService
 from .analysis_result_service import AnalysisResultService
 from .analysis_history_service import AnalysisHistoryService
-
-
+from .analysis_evaluation_service import AnalysisEvaluationService
 
