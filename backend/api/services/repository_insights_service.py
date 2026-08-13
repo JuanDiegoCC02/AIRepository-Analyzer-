@@ -192,7 +192,6 @@ class RepositoryInsightsService:
         )
 
 
-    # production readinnes
     @staticmethod
     def production_ready(score):
 
@@ -215,6 +214,39 @@ class RepositoryInsightsService:
         )
 
 
+    @staticmethod
+    def evaluation(evoluation_data):
+        if not evoluation_data:
+            return None
+
+        if not evoluation_data.get("available"):
+            return (
+                "Historical evolution is not available "
+                "because there is not enough analysis data."
+            )
+        
+        trend = evoluation_data.get(
+            "overall_trend"
+        )
+
+        difference = evoluation_data.get(
+            "overall_difference",
+            0
+        )
+
+        if trend == "Improving":
+            return (
+                f"Overall repository quality is improving. "
+                f"with an increase of {difference} points "
+                f"compared with the previous analysis."
+            )
+        return(
+            "Overall repository quality remains stable "
+            "compared with the previous analysis."
+        )
+        
+
+
 
     @classmethod
     def generate(
@@ -222,6 +254,7 @@ class RepositoryInsightsService:
         repository,
         analysis,
         technologies,
+        evolution=None,
     ):
 
         insights = []
@@ -308,6 +341,16 @@ class RepositoryInsightsService:
         if technology:
             insights.append(
                 technology
+            )
+
+
+        evolution_insight = cls.evolution(
+            evolution
+        )
+
+        if evolution_insight:
+            insights.append(
+                evolution_insight
             )
 
         return insights
