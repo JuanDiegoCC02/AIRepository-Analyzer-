@@ -244,6 +244,71 @@ class RepositoryInsightsService:
             "Overall repository quality remains stable "
             "compared with the previous analysis."
         )
+
+
+    @staticmethod
+    def evolution_details(evolution_data):
+        if not evolution_data:
+            return []
+
+        if not evolution_data.get("available"):
+            return []
+
+        comparison = evolution_data.get(
+            "comparison"
+        )
+
+        if not comparison:
+            return[]
+
+        insights = []
+
+        metrics = {
+            "activity": "Activity",
+            "documentation": "Documentation",
+            "maintainability": "Maintainability",
+            "code_quality": "Code quality",
+            "community": "Community",
+            "popularity": "Popularity",
+        }
+
+        for metric, label in metrics.items():
+            data = comparison.get(metric)
+
+            if not data:
+                continue
+
+            trend = data.get("trend")
+
+            difference = data.get(
+              "difference",
+               0
+            )
+
+            if trend == "Improving":
+                insights.append(
+                  f"{label} improved by "
+                  f"{difference} points compared "
+                  f"with the previous analysis."
+                )
+
+            elif trend == "Declining":
+                insights.append(
+                  f"{label} declined by "
+                  f"{abs(difference)} points compared "
+                  f"with the previous analysis."
+                )
+
+            elif trend == "Stable":
+                insights.append(
+                  f"{label} remained stable compared "
+                  f"with the previous analysis."
+                )
+
+        return insights
+
+
+
         
 
 
@@ -343,7 +408,7 @@ class RepositoryInsightsService:
                 technology
             )
 
-
+        # evolution summary
         evolution_insight = cls.evolution(
             evolution
         )
@@ -352,5 +417,15 @@ class RepositoryInsightsService:
             insights.append(
                 evolution_insight
             )
+
+
+        # detailed evolution
+        evolution_details = cls.evolution_details(
+            evolution
+        )
+
+        insights.extend(
+            evolution_details
+        )
 
         return insights
