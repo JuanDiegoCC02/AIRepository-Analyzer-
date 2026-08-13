@@ -23,6 +23,7 @@ from api.services.release_analysis_service import ReleaseAnalysisService
 from api.services.analysis_score_service import AnalysisScoreService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
 from api.services.analysis_result_service import AnalysisResultService
+from api.services.analysis_evaluation_service import AnalysisEvaluationService
 
 
 
@@ -163,7 +164,8 @@ class AnalyzerService:
         readme,
         health,
         maturity,
-        releases
+        releases,
+        evaluation
     ):
 
         return {
@@ -203,6 +205,8 @@ class AnalyzerService:
              "maturity": maturity, 
 
              "releases": releases,
+
+             "evaluation": evaluation,
 
         }
 
@@ -361,6 +365,11 @@ class AnalyzerService:
             analysis_scores=analysis_scores,
             summary=summary,
             recommendations=recommendations,
+        )
+
+        evaluation = AnalysisEvaluationService.generate(
+            repository,
+            analysis,
         )
 
         # generate insights
