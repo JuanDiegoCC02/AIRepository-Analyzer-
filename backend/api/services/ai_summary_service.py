@@ -223,3 +223,73 @@ class AISummaryService:
             "previous analysis."
         )
 
+
+    # main summary generator
+    @ classmethod
+    def generate ( 
+        cls, 
+        github_repository,
+        category,
+        technologies,
+        analysis_scores,
+        evolution=None
+        ): 
+
+        repository_name = github_repository.get(
+            "name",
+            "Unknown Repository"
+        )
+
+        description = github_repository.get(
+            "description"
+        )
+
+        language = github_repository.get(
+            "language",
+            "Unknown"
+        )
+
+        stars = github_repository.get(
+            "stargazers_count",
+            0
+        )
+
+        overall_score = analysis_scores.get(
+            "activity_score",
+            0
+        )
+
+        activity_score = analysis_scores.get(
+            "activity_score",
+            0
+        )
+
+        documentation_score = analysis_scores.get(
+            "documentation_score",
+            0
+        )
+
+        maintainability_score = analysis_scores.get(
+            "maintainability",
+            0
+        )
+
+        code_quality_score = analysis_scores.get(
+            "code_quality_score",
+            0
+        )
+
+        community_score = analysis_scores.get(
+            "community_score",
+            0
+        )
+
+        popularity_score = analysis_scores.get(
+            "popularity_score",
+            0
+        )
+
+
+
+
+
