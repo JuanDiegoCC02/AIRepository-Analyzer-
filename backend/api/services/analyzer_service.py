@@ -384,6 +384,7 @@ class AnalyzerService:
             repository,
             analysis,
             technologies,
+            evolution,
         )
 
 
