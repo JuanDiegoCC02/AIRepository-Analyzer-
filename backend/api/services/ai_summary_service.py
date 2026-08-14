@@ -290,6 +290,16 @@ class AISummaryService:
         )
 
 
+        #introduction
+        if description:
+            introduction = (
+                f"{repository_name} is classified as a {category} project primarily written in {language}."
+                f"The repository describes itself as: {description}"
+            )
+        else:
+            introduccion = (
+                f"{repository_name} is classified as a {category} project primarily written in {language}."
+            )
 
 
 
