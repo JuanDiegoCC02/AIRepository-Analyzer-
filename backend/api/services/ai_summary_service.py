@@ -302,4 +302,37 @@ class AISummaryService:
             )
 
 
+        score_summary = (f"The repository currently has an overall score of {overall_score}/100.")
 
+        technology_summary = cls.technology_summary(technologies)
+
+        popularity_summary = cls.popularity_summary(popularity_score, stars)
+
+        activity_summary = cls.activity_summary(activity_score)
+
+        documentation_summary = cls.documentation_summary(documentation_score)
+
+        maintainability_summary = cls.maintainability_summary(maintainability_score)
+
+        code_quality_summary = cls.code_quality_summary(code_quality_score)
+
+        community_summary = cls.community_summary(community_score)
+
+        evolution_summary = cls.evolution_summary(evolution)
+
+        summary = " ".join(
+        [
+            introduction,
+            score_summary,
+            technology_summary,
+            popularity_summary,
+            activity_summary,
+            documentation_summary,
+            maintainability_summary,
+            code_quality_summary,
+            community_summary,
+            evolution_summary,
+        ]
+    )
+
+        return summary
