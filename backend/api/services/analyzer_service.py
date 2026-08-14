@@ -24,7 +24,7 @@ from api.services.analysis_score_service import AnalysisScoreService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
 from api.services.analysis_result_service import AnalysisResultService
 from api.services.analysis_evaluation_service import AnalysisEvaluationService
-
+from api.services.analysis_evaluation_service import AnalysisEvolutionService
 
 
 
@@ -341,6 +341,12 @@ class AnalyzerService:
             analysis_scores
         )
 
+        # calculate evolution
+        evolution = AnalysisEvolutionService.generate(
+            repository,
+            analysis,
+        )
+
         # repository health
         health = RepositoryHealthService.generate(
             analysis_scores
@@ -357,6 +363,7 @@ class AnalyzerService:
             category,
             technologies,
             analysis_scores,
+            evolution,
         )
 
         analysis, created = AnalysisPersistenceService.save(
