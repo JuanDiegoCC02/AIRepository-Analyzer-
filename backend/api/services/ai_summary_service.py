@@ -3,84 +3,223 @@
 
 
 class AISummaryService:
+
+    # score level
     @staticmethod
-    def generate(
-        repository,
-        category,
-        technologies,
-        scores,
-        ):
+    def score_level(score):
+        if score >= 90:
+            return "excellent"
+        
+        if score >= 80:
 
-        main_language = "Unknown"
+            return "very goood"
+        if score >= 70:
+            return "good"
+        
+        if score >= 50:
+            return "average"
+        
+        return "needs improvement"
 
-        if technologies:
-            main_language = technologies[0]["language"]
 
-        overall = scores["overall_score"]
-        popularity = scores["popularity_score"]
-        activity = scores["activity_score"]
-        documentation = scores["documentation_score"]
-        maintainability = scores["maintainability_score"]
-        community = scores["community_score"]
-
-#popularity short phrases 
-        if popularity >= 90:
-            popularity_text = (
-                "The project has exceptional community adoption."
-            )
-        elif popularity >= 70: 
-            popularity_text =(
-                "The repository has solid popularity on GitHub."
-            )
-        else:
-            popularity_text = ( 
-                "The repository is still growing winthin the community."
+    # tecnology
+    @staticmethod
+    def technology_summary(technolohies):
+        if not technolohies:
+            return (
+                "The repository's primary technolohy could not be determined."
             )
 
-#activity short phrases
-        if activity >= 80:
-            activity_text = (
-                "Development activity remains very active."
-            )
-        elif activity >= 60:
-            activity_text = (
-                "Documentation is adequate."
-            )
-        else:
-            documentation_text = (
-                "Documentation could be significantly improved."
-            )
+        main = technolohies [0]
 
-#maintainability short phrases
-        if maintainability >= 80:
-            maintainability_text = (
-                "The codebase appears be well organized and maintainable."
-            )
-        else:
-            maintainability_text = (
-                "Maintainability could be improved."
-            )
+        language = main.get(
+            "language",
+            "Unknown"
+        )
 
-#popularity short phrases
-        if community >= 80:
-            community_text = (
-                "THe repository benefits from a healthy open-source community."
-            )
-        else:
-            community_text = (
-                "Community engagement is moderate."
+        percentage = main.get(
+            "percentage",
+            0
+        )
+
+        return (
+            f"The repository is primarily written in {language}, wich represents approximately {percentage}& of the detected code." 
+        )
+
+
+    # popularity
+    @staticmethod
+    def popularity_summary(score, stars):
+
+        level = AISummaryService.score_level(score)
+
+        if stars is None:
+            return (
+                f"The repository demonstrates {level} community popularity."
             )
 
         return (
-            f"{repository['name']} is a "
-            f"{category} project primarily written in "
-            f"{main_language}"
-            f"{popularity_text}"
-            f"{activity_text}"
-            f"{documentation_text}"
-            f"{maintainability_text}"
-            f"{community_text}"
-            f"The overall repository quality score is "
-            f"{overall}/100."      
+            f"The repository demostrates {level} community popularity with {stars:,} GitHub stars."
         )
-            
+
+
+    # activity
+    @staticmethod
+    def activity_summary(score):
+
+        level = AISummaryService.score_level(
+            score
+        )
+
+        if score >= 80:
+            return (
+                "Development activity is high, indicating that the project receives regular development attention."
+            )
+
+        if score >= 60:
+            return ( 
+                "Development activity is relatively consistent, although there is room for increased development activity."
+            )
+
+        return(
+            "Development activity  is relatively low and may indicate reduced maintenance activity."
+        )
+
+
+    # documentation
+    @staticmethod 
+    def documentation_summary(score):
+        if score >= 90:
+            return(
+                 "Documentation quality is excellent and provides strong support for understanding the project."
+            )
+
+        if score >= 70:
+            return (
+                "Documentation quality is good although some areas could still be expanded."
+            )
+
+        if score >= 50:
+            return (
+                "Documentation is acceptable but could be improved to make the project easier to understand."
+            )
+
+        return (
+            "Documentation quality is limited and should be significantly improved."
+        )
+
+
+    @staticmethod
+    def maintainability_summary(score):
+        if score >= 90:
+            return  (
+                "The repository demonstrates excellent maintainability characteristics."
+            )
+
+        if score >= 70: 
+            return (
+                "The repository appears realtively easy to maintain."
+            )
+
+        if score >= 50:
+            return (
+                "Maintainability is acceptable but there are areas that could be imrproved."
+            )
+
+        return (
+            "The repository may present maintainability challenges and would benefit from structural improvements."
+        ) 
+
+
+    # code quality
+    @staticmethod
+    def code_quality_summary(score):
+        if score >= 90:
+            return (
+                "Code quality indicators are excellent."
+            )
+
+        if score >= 70:
+            return (
+                "The repository demonstrates good code quality characteristics."
+            )
+
+        if score >= 50:
+            return (
+                "Code quality is moderate and could benedit from additional improvements."
+            )
+
+        return (
+            "Code quality requires significant improvements."
+        )
+
+
+    # community
+    @staticmethod
+    def community_summary(score):
+        if score >= 90:
+            return (
+                "Community participation is outstanding, "
+                "indicating strong engagement around "
+                "the project."
+            )
+
+        if score >= 70:
+            return (
+                "Community engagement is strong."
+            )
+
+        if score >= 50:
+            return (
+                "Community activity is moderate."
+            )
+        
+        return (
+            "Community engagement is currently limited."
+        )
+
+  
+    # evolution
+    @staticmethod
+    def evolution_summary(evolution):
+        if not evolution:
+            return (
+                "Historical repository evolution "
+                "is not available."
+            )
+        
+        if not evolution.get("available"):
+            return (
+                "There is not enough historical data "
+                "to determine the repository's evolution."
+            )
+        trend = evolution.get(
+            "overall_trend"
+        )
+        difference = evolution.get(
+            "overall_difference",
+            0
+        )
+
+        if trend == "Improving":
+            return (
+                f"The repository is showing an improving "
+                f"overall trend, with the score increasing "
+                f"by {difference} points compared with "
+                f"the previous analysis."
+            )
+
+        if trend == "Declining":
+            return (
+                f"The repository is showing a declining "
+                f"overall trend, with the score decreasing "
+                f"by {abs(difference)} points compared "
+                f"with the previous analysis."
+            )
+
+        return (
+            "The repository's overall quality remains "
+            "relatively stable compared with the "
+            "previous analysis."
+        )
+
