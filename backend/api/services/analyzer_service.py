@@ -352,16 +352,6 @@ class AnalyzerService:
             analysis_scores
         )
 
-
-        # generate AI summary
-        summary = AISummaryService.generate(
-            github_repository,
-            category,
-            technologies,
-            analysis_scores,
-            evolution,
-        )
-
         analysis, created = AnalysisPersistenceService.save(
             repository=repository,
             category=category,
@@ -387,6 +377,15 @@ class AnalyzerService:
         recommendations = RecommendationService.generate(
             analysis_scores,
             evolution
+        )
+
+        # generate AI summary
+        summary = AISummaryService.generate(
+            github_repository,
+            category,
+            technologies,
+            analysis_scores,
+            evolution,
         )
 
         repository_serializer = RepositorySerializer(
