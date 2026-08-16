@@ -375,18 +375,18 @@ class AnalyzerService:
             analysis,
         )
 
-        # generate recommendations
-        recommendations = RecommendationService.generate(
-            analysis_scores,
-            evolution
-        )
-
         # generate insights
         insights = RepositoryInsightsService.generate(
             repository,
             analysis,
             technologies,
             evolution,
+        )
+
+        # generate recommendations
+        recommendations = RecommendationService.generate(
+            analysis_scores,
+            evolution
         )
 
         repository_serializer = RepositorySerializer(
