@@ -354,7 +354,8 @@ class AnalyzerService:
 
         # generate recommendations
         recommendations = RecommendationService.generate(
-            analysis_scores
+            analysis_scores,
+            evolution
         )
 
         # generate AI summary
