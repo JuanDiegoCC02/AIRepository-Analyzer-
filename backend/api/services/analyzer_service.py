@@ -352,11 +352,6 @@ class AnalyzerService:
             analysis_scores
         )
 
-        # generate recommendations
-        recommendations = RecommendationService.generate(
-            analysis_scores,
-            evolution
-        )
 
         # generate AI summary
         summary = AISummaryService.generate(
@@ -380,6 +375,12 @@ class AnalyzerService:
             analysis,
         )
 
+        # generate recommendations
+        recommendations = RecommendationService.generate(
+            analysis_scores,
+            evolution
+        )
+
         # generate insights
         insights = RepositoryInsightsService.generate(
             repository,
@@ -387,7 +388,6 @@ class AnalyzerService:
             technologies,
             evolution,
         )
-
 
         repository_serializer = RepositorySerializer(
             repository
