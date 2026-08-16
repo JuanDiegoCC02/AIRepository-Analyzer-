@@ -213,80 +213,86 @@ class AnalyzerService:
 
     # new structure for the analyzer that will help in the division of responsibilities.
      @staticmethod
-     def load_external_resources(
-            repository,
-            github_repository,
-        ):
+     def load_external_resources(repository, github_repository):
 
-            languages = TechnologiesService.get_languages(
-                repository.owner,
-                repository.name,
-            )
+        # technologies
+        languages = TechnologiesService.get_languages(
+            repository.owner,
+            repository.name,
+        )
+        technologies = TechnologiesService.calculate_percentages(
+            languages
+        )
 
-            technologies = TechnologiesService.calculate_percentages(
-                languages
-            )
 
-            readme = ReadmeService.get_readme(
-                repository.owner,
-                repository.name,
-            )
+        # readme
+        readme = ReadmeService.get_readme(
+            repository.owner,
+            repository.name,
+        )
+        readme_analysis = ReadmeService.analyze(
+            readme
+        )
 
-            readme_analysis = ReadmeService.analyze(
-                readme
-            )
 
-            contributors = ContributorsService.get_contributors(
-                repository.owner,
-                repository.name,
-            )
+        # contributors
+        contributors = ContributorsService.get_contributors(
+            repository.owner,
+            repository.name,
+        )
+        contributors_summary = ContributorsService.summarize(
+            contributors
+        )
 
-            contributors_summary = ContributorsService.summarize(
-                contributors
-            )
 
-            statistics = RepositoryStatisticsService.generate(
-                github_repository
-            )
+        # repository  statustucs
+        statistics = RepositoryStatisticsService.generate(
+            github_repository
+        )
 
-            topics = RepositoryTopicsService.analyze(
+
+        # topics
+        topics = RepositoryTopicsService.analyze(
             github_repository.get(
                 "topics",
                 []
-             )
             )
+        )
 
-            maturity = RepositoryMaturityService.calculate(
-                github_repository
-            )
 
-            releases = ReleaseAnalysisService.get_releases(
-                repository.owner,
-                repository.name,
-            )
+        # repository maturity
+        maturity = RepositoryMaturityService.calculate(
+            github_repository
+        )
 
-            releases_summary = ReleaseAnalysisService.summarize(
-                releases
-            )
 
-            return {
+        # releases
+        releases = ReleaseAnalysisService.get_releases(
+            repository.owner,
+            repository.name,
+        )
 
-                "technologies": technologies,
+        releases_summary = ReleaseAnalysisService.summarize(
+            releases
+        )
 
-                "readme": readme_analysis,
+        return {
 
-                "contributors": contributors_summary,
+            "technologies": technologies,
 
-                "statistics": statistics,
+            "readme": readme_analysis,
 
-                "topics": topics,
+            "contributors": contributors_summary,
 
-                "maturity": maturity,
+            "statistics": statistics,
 
-                "releases": releases_summary,
+            "topics": topics,
+
+            "maturity": maturity,
+
+            "releases": releases_summary,
 
         }
-
 
      # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
      @classmethod
