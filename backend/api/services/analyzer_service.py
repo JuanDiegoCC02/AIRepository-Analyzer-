@@ -24,7 +24,7 @@ from api.services.analysis_score_service import AnalysisScoreService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
 from api.services.analysis_result_service import AnalysisResultService
 from api.services.analysis_evaluation_service import AnalysisEvaluationService
-from api.services.analysis_evaluation_service import AnalysisEvolutionService
+
 
 
 
@@ -315,18 +315,15 @@ class AnalyzerService:
         )
 
         # load external resources
-        resources = cls.load_external_resources(
-            repository,
-            github_repository,
-        )
+        resources = cls.load_external_resources(repository, github_repository )
 
         technologies = resources["technologies"]
-        statistics = resources["statistics"]
-        contributors_summary = resources["contributors"]
         readme_analysis = resources["readme"]
-        release_summary = resources["releases"]
+        contributors_summary = resources["contributors"]
+        statistics = resources["statistics"]
         topics = resources["topics"]
         maturity = resources["maturity"]
+        release_summary = resources["releases"]
 
         # classify repository
         category = RepositoryClassifier.classify(
@@ -347,12 +344,6 @@ class AnalyzerService:
             analysis_scores
         )
 
-        # calculate evolution
-        evolution = AnalysisEvolutionService.generate(
-            repository,
-            analysis,
-        )
-
         # repository health
         health = RepositoryHealthService.generate(
             analysis_scores
@@ -366,13 +357,8 @@ class AnalyzerService:
             recommendations=recommendations,
         )
 
+        # calculate evaluation
         evaluation = AnalysisEvaluationService.generate(
-            repository,
-            analysis,
-        )
-
-        # calculate evolution
-        evolution = AnalysisEvolutionService.generate(
             repository,
             analysis,
         )
@@ -382,13 +368,13 @@ class AnalyzerService:
             repository,
             analysis,
             technologies,
-            evolution,
+            evaluation,
         )
 
         # generate recommendations
         recommendations = RecommendationService.generate(
             analysis_scores,
-            evolution
+            evaluation
         )
 
         # generate AI summary
@@ -397,7 +383,7 @@ class AnalyzerService:
             category,
             technologies,
             analysis_scores,
-            evolution,
+            evaluation,
         )
 
         repository_serializer = RepositorySerializer(
