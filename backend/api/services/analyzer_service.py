@@ -365,6 +365,12 @@ class AnalyzerService:
             analysis,
         )
 
+        # calculate evolution
+        evolution = AnalysisEvolutionService.generate(
+            repository,
+            analysis,
+        )
+
         # generate insights
         insights = RepositoryInsightsService.generate(
             repository,
