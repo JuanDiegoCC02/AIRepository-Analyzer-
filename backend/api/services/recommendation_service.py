@@ -237,5 +237,156 @@ class RecommendationService:
                     f"improvements in this area."
                 )
 
+   
+    # MAIN GENERATOR
+    @classmethod
+    def generate( cls, analysis_scores, evolution=None):
+
+        recommendations = []
+
+     
+        # extract scores
+
+        popularity_score = analysis_scores.get(
+            "popularity_score",
+            0
+        )
+
+        activity_score = analysis_scores.get(
+            "activity_score",
+            0
+        )
+
+        documentation_score = analysis_scores.get(
+            "documentation_score",
+            0
+        )
+
+        maintainability_score = analysis_scores.get(
+            "maintainability_score",
+            0
+        )
+
+        code_quality_score = analysis_scores.get(
+            "code_quality_score",
+            0
+        )
+
+        community_score = analysis_scores.get(
+            "community_score",
+            0
+        )
+
+        overall_score = analysis_scores.get(
+            "overall_score",
+            0
+        )
+
+
+       
+        # generate recommendations
+
+        recommendation = cls.popularity(
+            popularity_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.activity(
+            activity_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.documentation(
+            documentation_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.maintainability(
+            maintainability_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.code_quality(
+            code_quality_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.community(
+            community_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        recommendation = cls.overall(
+            overall_score
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+       
+        # historical evolution
+        recommendation = cls.evolution(
+            evolution
+        )
+
+        if recommendation:
+            recommendations.append(
+                recommendation
+            )
+
+
+        
+        # significant score changes
+        recommendations.extend(
+            cls.score_changes(
+                evolution
+            )
+        )
+
+
+    
+        # fallback
+        if not recommendations:
+
+            recommendations.append(
+                "No major improvements are currently required. "
+                "Continue monitoring repository quality and "
+                "maintaining regular development activity."
+            )
+
+
         return recommendations
 
