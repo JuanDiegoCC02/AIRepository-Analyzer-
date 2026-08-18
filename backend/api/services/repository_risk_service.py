@@ -30,4 +30,64 @@ class GitHubService:
         return headers
 
 
-            
+    classmethod
+    def request(
+            cls,
+            endpoint,
+            params=None,
+    ):
+
+        url = ( 
+            f"{cls.BASE_URL}" 
+            f"{endpoint}"
+        )
+
+        try: 
+
+            response = requests.get(
+                url,
+                headers=cls.get_headers(),
+                params=params,
+                timeout=cls.TIMEOUT,
+            )
+
+        except requests.Timeout as error:
+            raise GitHubRequestError(
+                "GitHub API request timed out."
+            ) from error
+
+        except requests.RequestException as error:
+            raise GitHubRequestError(
+                 "Unable to connect to GitHub API."
+            ) from error
+
+        if response.status_code == 404:
+            raise GitHubNotFoundError(
+                "GitHub resource was not found."
+            )
+
+        if response.status_code == 401:
+            raise GitHubAuthenticationError(
+                "GitHub authentication failed."
+            )
+
+        if response.status_code == 403:
+            remaining = response.headers.get(
+                "X-RateLimit-Remaining"
+            )
+            if remaining == "0":
+                raise GitHubRateLimitError(
+                 "GitHub API rate limit exceeded."
+                )
+            raise GitHubAuthenticationError(
+                "GitHub API access forbidden."
+            )
+
+        if response.status_code >= 400:
+            raise GitHubRequestError(
+                f"GitHub API returned "
+                f"{response.status_code}"
+            )
+        return response.json()
+
+    
