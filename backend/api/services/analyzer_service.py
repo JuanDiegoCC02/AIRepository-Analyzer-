@@ -410,5 +410,6 @@ class AnalyzerService:
             health,
             maturity,
             release_summary,
+            evaluation,
         )
      
