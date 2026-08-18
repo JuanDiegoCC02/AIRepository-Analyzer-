@@ -30,7 +30,7 @@ class GitHubService:
         return headers
 
 
-    classmethod
+    @classmethod
     def request(
             cls,
             endpoint,
@@ -89,5 +89,21 @@ class GitHubService:
                 f"{response.status_code}"
             )
         return response.json()
+
+
+    @classmethod
+    def get_repository(
+            cls,
+            repository_url,
+    ):
+
+        owner, repository = (
+            cls.extract_owner_repo(
+                repository_url
+            )
+        )
+        return cls.request(
+            f"/repos/{owner}/{repository}"
+        )
 
     
