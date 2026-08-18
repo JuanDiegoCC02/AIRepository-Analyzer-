@@ -106,4 +106,26 @@ class GitHubService:
             f"/repos/{owner}/{repository}"
         )
 
-    
+
+    @staticmethod
+    def extract_owner_repo(
+        repository_url,
+    ):
+
+        clean_url = (
+            repository_url
+            .rstrip("/")
+        )
+
+        parts = clean_url.split("/")
+
+        if len(parts) < 2:
+            raise ValueError(
+                "Invalid GitHub repository URL."
+            )
+
+        owner = parts[-2]
+
+        repository = parts[-1]
+
+        return owner, repository
