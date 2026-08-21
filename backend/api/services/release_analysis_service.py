@@ -156,7 +156,7 @@ class ReleaseAnalysisService:
                 "days_since_release": None,
 
                 "release_status": "No Releases",
-                
+
                 "stability": "Unknown",
             }
 
@@ -186,10 +186,10 @@ class ReleaseAnalysisService:
                 "published_at",
                 "",
             ),
-
         )
 
         days = cls.days_since_release( latest["published_at"])
+
 
 
         return {
