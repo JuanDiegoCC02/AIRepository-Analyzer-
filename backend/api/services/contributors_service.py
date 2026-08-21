@@ -1,40 +1,82 @@
-import requests
+from api.services.github_service import GitHubService
 
 
 class ContributorsService:
 
-    BASE_URL = "https://api.github.com/repos"
+    """
+        Retrieves contributors from a GitHub repository.
+
+        GitHub API communication is delegated to GitHubService 
+        so that authentication, timeout and error handling
+        remain centralized.
+     """
 
     @classmethod
     def get_contributors(cls, owner, repository):
 
-        url = (
-            f"{cls.BASE_URL}/"
+        endpoint = (
+            f"/repos/"
             f"{owner}/"
             f"{repository}/contributors"
         )
 
-        response = requests.get(url)
-
-        if response .status_code == 404:
-            raise Exception ("Repository contributors not found")
-
-        if response.status_code != 200:
-            raise Exception(
-                f"GitHub API returned {response.status_code}"
+        try: 
+            contributors = GitHubService.request(
+                endpoint
             )
+        except Exception:
+            return[]
+        
+        return contributors
 
-        return response.json()
 
     @staticmethod
     def summarize(contributors):
-        return{
-            "total_contributors": len(contributors),
-            "top_contributors": [
+
+        """
+        Generates a summary of repository contributors.
+        """
+
+        if not contributors:
+            return {
+                "total_contributors": 0,
+                "top_contributor": None,
+                "top_contributions": 0,
+                "contributors":[],
+            }
+
+        total_contributors = len(contributors)
+
+        sorted_contributors = sorted(
+            contributors,
+            key = lambda contributor: contributor.get(
+                "contributions",
+                0,
+            ),
+            reverse = True,
+        )
+
+        top_contributor = (sorted_contributors[0])
+
+        contributors_summary = []
+
+        for contributor in sorted_contributors:
+
+            contributors_summary.append(
                 {
-                    "username": contributor["login"],
-                    "contributions": contributor["contributions"]
+                "login": contributor.get("login"),
+
+                "contributions": contributor.get("contributions", 0),
+
+                "avatar_url": contributor.get("avatar_url"),
+
+                "html_url": contributor.get("html_ulr"),
                 }
-                for contributor in contributors[:10]
-            ]
+            )
+
+        return{
+            "total_contributors": total_contributors,
+            "top_contributors":top_contributor.get("login"),
+            "top_contributions": top_contributor.get("contributions", 0,),
+            "contributors": contributors_summary
         }
