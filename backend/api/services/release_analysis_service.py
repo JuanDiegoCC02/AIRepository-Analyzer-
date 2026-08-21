@@ -62,6 +62,15 @@ class ReleaseAnalysisService:
 
     @staticmethod
     def release_status(days):
+
+        """
+        Classifies repository release activity
+        according to the age of the latest release.
+        """ 
+
+        if days is None:
+            return "Unknown"
+
         if days <= 30:
             return "Very Active"
         
