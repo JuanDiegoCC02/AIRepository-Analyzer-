@@ -124,10 +124,15 @@ class ReleaseAnalysisService:
         if not releases: 
             return{
                 "total_releases": 0,
+
                 "published_at": None,
+
                 "latest_release": None,
+
                 "days_since_release": None,
+
                 "release_status": "No Releases",
+
                 "stability": "Unknown",
             }
 
@@ -143,10 +148,15 @@ class ReleaseAnalysisService:
         if not valid_releases:
             return{
                 "total_releases": 0,
+
                 "published_at": None,
+
                 "latest_release": None,
+
                 "days_since_release": None,
+
                 "release_status": "No Releases",
+                
                 "stability": "Unknown",
             }
 
@@ -159,22 +169,27 @@ class ReleaseAnalysisService:
         if not published_releases:
             return {
                 "total_releases": len(valid_releases),
+
                 "latest_releases": None,
+
                 "days_since_release": None,
+
                 "release_status": "Unknown",
+
                 "stability": cls.stability(len(valid_releases)),
             }
 
         latest =  max(
             published_releases,
+
             key=lambda release: release.get(
                 "published_at",
                 "",
             ),
+
         )
 
         days = cls.days_since_release( latest["published_at"])
-
 
 
         return {
