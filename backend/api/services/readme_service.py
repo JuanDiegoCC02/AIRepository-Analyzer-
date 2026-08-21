@@ -65,7 +65,7 @@ class ReadmeService:
         sections = sum(
             1
             for line in content.splitlines()
-            if line.strip().starsith('#')
+            if line.strip().startswith('#')
         )
 
         return {
