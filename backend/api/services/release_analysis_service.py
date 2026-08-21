@@ -1,30 +1,39 @@
 from datetime import datetime, timezone 
-import requests 
+from api.services.github_service import GitHubService 
 
 class ReleaseAnalysisService:
 
-    BASE_URL = "https://api.github.com/repos"
-
+    """
+    Service responsible for retrieving and analyzing GitHub repository releases.
+    """
 
     @classmethod
     def get_releases(cls, owner, repository):
-        url = (
-            f"{cls.BASE_URL}/"
+
+        """
+        Retrieves repository releases from GitHub.
+
+        GitHub communication is delegated to GitHubService so authentication, 
+        timeout and HTTP error handling remain centralized.
+        """
+
+        endpoint = (
+            f"/repos/"
             f"{owner}/"
             f"{repository}/releases"
         )
 
-        response = requests.get(url)
+        try:
+            releases = GitHubService.request(endpoint)
+        except Exception:
+            return[]
 
-        if response.status_code == 404:
-            return ["not found"]
+        if not isinstance(releases, list):
+            return []
 
-        if response.status_code != 200:
-            raise Exception(
-                f"Github API returned {response.status_code}"
-            )
+        return releases
 
-        return response.json()
+
 
 
     @staticmethod
@@ -42,6 +51,8 @@ class ReleaseAnalysisService:
         return (today - published).days
 
 
+
+
     @staticmethod
     def release_status(days):
         if days <= 30:
@@ -57,6 +68,8 @@ class ReleaseAnalysisService:
             return "Low Activity"
         
         return "Inactive"
+
+
     
 
     @staticmethod
@@ -75,6 +88,10 @@ class ReleaseAnalysisService:
 
         return "Low"
     
+
+
+
+
 
     @classmethod
     def summarize(cls, releases):
