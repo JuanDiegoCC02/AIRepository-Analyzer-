@@ -1,63 +1,76 @@
 import base64
-import requests
+
+from api.services.github_service import GitHubService
 
 class ReadmeService:
 
-    BASE_URL = "https://api.github.com/repos"
-
     @classmethod
-
     def get_readme(cls, owner, repository):
-        url= (
-            f"{cls.BASE_URL}/"
+
+        """
+        Retrivies the ReadMe file from a GitHub repository
+        using the centralized GitHubService
+        """
+
+        endpoint = (
+            f"/repos/"
             f"{owner}/"
             f"{repository}/readme"
         )
 
-        response = requests.get(url)
-
-        if response.status_code == 404:
-            return None
-        
-        if response.status_code != 200:
-            raise Exception(
-                f"GitHub API returned {response.status_code}"
+        try: 
+            data = GitHubService.request(
+                endpoint
             )
 
-        data = response.json()
+        except Exception: 
+            return None
 
         content = base64.b64decode(
             data["content"]
-        ).decode("utf-8", errors="ignore")
+        ).decode(
+            "utf-8",
+            errors = 'ignore',
+        )
 
         return{
             "name": data["name"],
             "path": data["path"],
             "size": data["size"],
-            "download_url": data["download_url"],
+            "download_url": data.get(
+                "download_url"
+            ),
             "content": content,
         }
 
 
     @staticmethod
-
     def analyze(readme):
-        if readme is None:
-            return 
-        {
-            "exists": False,
-            "size": 0, 
-            "word_count": 0,
-            "sections": 0,
-        }
+        """
+        Analyzes ReadMe content and returns basic documentation metrics.
+        """
 
-        content = readme["content"]
+        if readme is None:
+            return {
+                "exists": False,
+                "size": 0, 
+                "word_count": 0,
+                "sections": 0,
+            }
+
+        content = readme.get("content", "")
+
         words = len(content.split())
-        sections = content.count("#")
+
+        sections = sum(
+            1
+            for line in content.splitlines()
+            if line.strip().starsith('#')
+        )
 
         return {
             "exists": True,
-            "size": readme["size"],
+            "size": readme.get("size", 0),
             "word_count": words,
             "sections": sections,
         }
