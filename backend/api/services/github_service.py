@@ -20,7 +20,7 @@ class GitHubService:
         }
 
         token = os.getenv(
-            "HITHUB_TOKEN"
+            "GITHUB_TOKEN"
         )
 
         if token:
