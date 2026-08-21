@@ -64,8 +64,7 @@ class ReleaseAnalysisService:
     def release_status(days):
 
         """
-        Classifies repository release activity
-        according to the age of the latest release.
+        Classifies repository release activity according to the age of the latest release.
         """ 
 
         if days is None:
@@ -86,31 +85,42 @@ class ReleaseAnalysisService:
         return "Inactive"
 
 
-    
-
     @staticmethod
     def stability(total_releases):
-        if total_releases >= 100:
-            return "Excellent"
+
+        """
+        Provides a simple stability classification based on the amount of release history
+        available.
+
+        This is an indicative metric and does not represent software stability in the strict
+        engineering sense.
+        """
+
+        if total_releases == 0:
+            return "Unknown"
 
         if total_releases >= 50:
-            return "High"
+            return "Highly Established"
 
         if total_releases >= 20:
-            return "Good"
+            return "Established"
+
+        if total_releases >= 10:
+            return "Stable"
 
         if total_releases >= 5:
-            return "Moderate"
+            return "Developing"
 
-        return "Low"
+        return "Limited History"
     
-
-
-
-
 
     @classmethod
     def summarize(cls, releases):
+
+        """
+        Generates a structured summary of repository releases.
+        """
+
         if not releases: 
             return{
                 "total_releases": 0,
@@ -121,21 +131,62 @@ class ReleaseAnalysisService:
                 "stability": "Unknown",
             }
 
-        latest = releases [0]
+        valid_releases = [
+            release
+            for release in releases
+            if isinstance(
+                release,
+                dict
+            )
+        ]
 
-        days = cls.days_since_release(
-            latest["published_at"]
+        if not valid_releases:
+            return{
+                "total_releases": 0,
+                "published_at": None,
+                "latest_release": None,
+                "days_since_release": None,
+                "release_status": "No Releases",
+                "stability": "Unknown",
+            }
+
+        published_releases = [
+            release
+            for release in valid_releases
+            if release.get("published_at")
+        ]
+
+        if not published_releases:
+            return {
+                "total_releases": len(valid_releases),
+                "latest_releases": None,
+                "days_since_release": None,
+                "release_status": "Unknown",
+                "stability": cls.stability(len(valid_releases)),
+            }
+
+        latest =  max(
+            published_releases,
+            key=lambda release: release.get(
+                "published_at",
+                "",
+            ),
         )
 
+        days = cls.days_since_release( latest["published_at"])
+
+
+
         return {
-            "total_releases": len(releases),
-            "published_at": latest["published_at"],
-            "latest_release": latest["tag_name"],
+            "total_releases": len(valid_releases),
+
+            "published_at": latest.get("published_at"),
+
+            "latest_release": latest.get("tag_name"),
+
             "days_since_release": days,
-            "release_status": cls.release_status(
-                days
-            ),
-            "stability": cls.stability(
-                len(releases)
-            ),
+
+            "release_status": cls.release_status(days),
+
+            "stability": cls.stability(len(valid_releases)),
         }
