@@ -34,23 +34,30 @@ class ReleaseAnalysisService:
         return releases
 
 
-
-
     @staticmethod
     def days_since_release(date_string):
-        published = datetime.strptime(
-            date_string,
-            "%Y-%m-%dT%H:%M:%SZ"
-        )
-        published = published.replace(
-            tzinfo=timezone.utc
-        )
+
+        """
+        Calculates the number of days elapsed
+        since a release was published.
+        """
+
+        if not date_string:
+            return None
+        
+        try:
+            published = datetime.strptime(
+                date_string,
+                "%Y-%m-%dT%H:%M:%SZ"
+            )
+        except ValueError:
+            return None
+        
+        published = published.replace( tzinfo=timezone.utc)
 
         today = datetime.now(timezone.utc)
 
         return (today - published).days
-
-
 
 
     @staticmethod
