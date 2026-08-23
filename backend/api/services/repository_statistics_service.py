@@ -7,7 +7,7 @@ class RepositoryStatisticsService:
     Servicce reponsible for generating structured statiscs for a GitHub Repository.
     """
 
-    classmethod 
+    @classmethod 
     def get_repository_data(cls, owner, repository,):
 
         """
@@ -17,7 +17,7 @@ class RepositoryStatisticsService:
 
         endpoint = (
             f"/repos/" 
-            f"{owner}" 
+            f"{owner}/" 
             f"{repository}"
         )
 
@@ -61,7 +61,7 @@ class RepositoryStatisticsService:
 
         return{
             "stars": repository_data.get(
-                "stargazers_sount",
+                "stargazers_count",
                 0
             ),
 
@@ -91,7 +91,7 @@ class RepositoryStatisticsService:
             ),
 
             "network_count": repository_data.get(
-                "networks_count",
+                "network_count",
                 0
             ),
             
@@ -106,7 +106,7 @@ class RepositoryStatisticsService:
             ),
 
             "is_fork": repository_data.get(
-                "is_fork",
+                "fork",
                 False
             ),
 
@@ -131,6 +131,6 @@ class RepositoryStatisticsService:
 
         return cls.generate( 
             repository_data
-              )
+        )
     
     
