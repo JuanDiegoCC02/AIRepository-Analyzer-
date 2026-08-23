@@ -38,35 +38,82 @@ class RepositoryStatisticsService:
     
 
     @staticmethod
-    def generate (repository):
+    def generate (repository_data,):
+
+        """
+        Generates a normalized statistics object from GitHub repository data.
+        """
+
+        if not repository_data:
+            return{
+                "stars": 0,
+                "forks": 0,
+                "watchers": 0,
+                "open_issues": 0,
+                "size": 0,
+                "subscribers": 0,
+                "network_count": 0,
+                "has_wiki": False,
+                "has_page": False,
+                "is_fork": False,
+                "archived": False,
+            }
 
         return{
-
-            "repository_size": repository.get("size", 0),
-
-            "default_branch": repository.get("default_branch"),
-            
-            "license":(
-                repository["license"]["name"]
-                if repository.get("license")
-                else None
+            "stars": repository_data.get(
+                "stargazers_sount",
+                0
             ),
 
-            "visibility": repository.get("visibility"),
+            "forks": repository_data.get(
+                "forks_count",
+                0
+            ),
 
-            "has_issues": repository.get("has_issues"),
+            "watchers": repository_data.get(
+                "watchers_count",
+                0
+            ),
 
-            "has_projects": repository.get("has_projects"),
+            "open_issues": repository_data.get(
+                "open_issues_count",
+                0
+            ),
 
-            "has_wiki": repository.get("has_wiki"),
+            "size": repository_data.get(
+                "size",
+                0
+            ),
 
-            "has_discussions": repository.get(
-                "has_discussions", 
-                "False,"
-                ),
+            "subscribers": repository_data.get(
+                "subscribers_count",
+                0
+            ),
 
-            "archived": repository.get("archived"),
+            "network_count": repository_data.get(
+                "networks_count",
+                0
+            ),
+            
+            "has_wiki": repository_data.get(
+                "has_wiki",
+                False,
+            ),
 
-            "disabled": repository.get("disabled"),
+            "has_pages": repository_data.get(
+                "has_pages",
+                False
+            ),
 
+            "is_fork": repository_data.get(
+                "is_fork",
+                False
+            ),
+
+            "archived": repository_data.get(
+                "archived",
+                False
+            ),
         }
+
+    
