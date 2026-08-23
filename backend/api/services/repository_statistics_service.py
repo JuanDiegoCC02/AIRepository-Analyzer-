@@ -116,4 +116,21 @@ class RepositoryStatisticsService:
             ),
         }
 
+
+    @classmethod
+    def analyze(cls, owner, repository,):
+
+        """
+        Retrieves repository info from GitHub and generates its statistics.
+        """
+
+        repository_data = cls.get_repository_data(
+            owner,
+            repository,
+        )
+
+        return cls.generate( 
+            repository_data
+              )
+    
     
