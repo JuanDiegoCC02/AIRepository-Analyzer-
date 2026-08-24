@@ -96,9 +96,18 @@ class TechnologiesService:
 
     @staticmethod
     def get_main_stack(technologies):
+
+        """
+        Returns programming languages representing at least 5% of the repository codebase.
+        """
+
+        if not technologies:
+            return []
         
         return[
             technology["language"]
             for technology in technologies
             if technology ["percentage"] >=5
         ]
+
+    
