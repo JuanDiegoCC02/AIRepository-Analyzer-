@@ -41,9 +41,8 @@ class TechnologiesService:
     def calculate_percentages(languages):
 
         """
-        Calculates the percentage of each programming
-        language based on the number of bytes reported
-        by GitHub.
+        Calculates the percentage of each programming language based on the number 
+        of bytes reported by GitHub.
         """
 
         if not languages:
@@ -81,12 +80,16 @@ class TechnologiesService:
     @staticmethod
     def primary_language(technologies):
 
+        """
+        Returns the programming language with the highest percentage.
+        """
+
         if not technologies:
             return None
 
         return max(
             technologies,
-            key=lambda technology: technology["percentage"]
+            key=lambda technology: technology["percentage"],
         )["language"]
     
 
