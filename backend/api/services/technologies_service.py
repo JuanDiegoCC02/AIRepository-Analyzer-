@@ -110,4 +110,30 @@ class TechnologiesService:
             if technology ["percentage"] >=5
         ]
 
-    
+    @classmethod
+    def analyze(cls, owner, repository):
+
+        """
+        Complete technology analysis pipeline:
+        1 Retrieves language statistics from GitHub.
+        2 Calculates language percentages.
+        3 Determines the primary language.
+        4 Determines the main technology stack.
+        """
+
+        languages = cls.get_languages(
+            owner,
+            repository,
+        )
+
+        technolohies = cls.calculate_percentages(languages)
+
+        primary_language = cls.primary_language(technolohies)
+
+        main_stack = cls.get_main_stack(technolohies)
+
+        return {
+            "languages": technolohies,
+            "primary_language": primary_language,
+            "main_stack": main_stack
+        }
