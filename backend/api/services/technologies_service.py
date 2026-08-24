@@ -40,9 +40,18 @@ class TechnologiesService:
     @staticmethod
     def calculate_percentages(languages):
 
-        total = sum(languages.values())
+        """
+        Calculates the percentage of each programming
+        language based on the number of bytes reported
+        by GitHub.
+        """
 
-        if total == 0:
+        if not languages:
+            return []
+
+        total = sum( languages.values() )
+
+        if not total <= 0:
             return []
 
         results = []
@@ -57,12 +66,17 @@ class TechnologiesService:
             results.append({
                 "language": language,
                 "bytes": bytes_count,
-                "percentage": percentage
+                "percentage": percentage,
             })
 
-        return results
-    
+        results.sort(
+            key=lambda technology: technology["percentage"],
+            reverse=True
+        )
 
+        return results
+
+    
 
     @staticmethod
     def primary_language(technologies):
