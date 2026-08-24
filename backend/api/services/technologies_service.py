@@ -1,31 +1,39 @@
-import requests
+from api.services.github_service import GitHubService
 
 
 class TechnologiesService:
-    BASE_URL = "https://api.github.com/repos"
+
+    """
+    Service responsible for retrieving and analtzing programming languages 
+    used by a GitHub repository.
+    """
 
     @classmethod
     def get_languages(cls, owner, repository):
 
-        url = f"{cls.BASE_URL}/{owner}/{repository}/languages"
+        """
+        Retrieves the programming languages used by a GitHub repository.
+        GitHub communication is delegated to GitHubService
+        """
 
-        response = requests.get(url)
+        endpoint = (
+            f"/repos/"
+            f"{owner}/"
+            f"{repository}/languages"
+        )
 
-        print("=" * 50)
-        print("URL:", url)
-        print("STATUS:", response.status_code)
-        print("BODY:", response.text)
-        print("=" * 50)
+        try: 
+            languages = GitHubService.request(endpoint)
+        except Exception:
+            return{}
 
-        if response.status_code == 404:
-            raise Exception("Repository languages not found.")
+        if not isinstance(
+            languages,
+            dict
+        ):
+            return {}
 
-        if response.status_code != 200:
-            raise Exception(
-                f"GitHub API returned {response.status_code}"
-            )
-
-        return response.json()
+        return languages
 
 
 
