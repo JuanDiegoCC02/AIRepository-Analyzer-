@@ -24,6 +24,7 @@ class TechnologiesService:
 
         try: 
             languages = GitHubService.request(endpoint)
+
         except Exception:
             return{}
 
@@ -50,7 +51,7 @@ class TechnologiesService:
 
         total = sum( languages.values() )
 
-        if not total <= 0:
+        if total <= 0:
             return []
 
         results = []
