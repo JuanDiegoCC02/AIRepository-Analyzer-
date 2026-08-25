@@ -156,7 +156,7 @@ class AnalyzerService:
         github_repository,
         analysis,
         analysis_result,
-        technologies,
+        technology_analysis,
         topics,
         statistics,
         insights,
@@ -176,7 +176,7 @@ class AnalyzerService:
 
             "analysis_result": analysis_result,
 
-            "technologies": technologies,
+            "technologies": technology_analysis,
 
             "topics": topics,
 
@@ -315,13 +315,17 @@ class AnalyzerService:
         # load external resources
         resources = cls.load_external_resources(repository, github_repository )
 
-        technologies = resources["technologies"]
-        readme_analysis = resources["readme"]
-        contributors_summary = resources["contributors"]
+        technology_analysis = resources["technologies"]
+        technologies = technology_analysis["languages"]
+        primary_language = technology_analysis["primary_language"]
+        main_stack = technology_analysis["main_stack"]
         statistics = resources["statistics"]
+        contributors_summary = resources["contributors"]
+        readme_analysis = resources["readme"]
+        release_summary = resources["releases"]
         topics = resources["topics"]
         maturity = resources["maturity"]
-        release_summary = resources["releases"]
+
 
         # classify repository
         category = RepositoryClassifier.classify(
@@ -399,7 +403,7 @@ class AnalyzerService:
             github_repository,
             analysis,
             analysis_result,
-            technologies,
+            technology_analysis,
             topics,
             statistics,
             insights,
