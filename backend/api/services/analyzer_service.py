@@ -221,8 +221,6 @@ class AnalyzerService:
             repository.name,
         )
 
-        technologies = technology_analysis["languages"]
-
         # readme
         readme = ReadmeService.get_readme(
             repository.owner,
@@ -276,7 +274,7 @@ class AnalyzerService:
 
         return {
 
-            "technologies": technologies,
+            "technologies": technology_analysis,
 
             "readme": readme_analysis,
 
