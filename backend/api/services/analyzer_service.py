@@ -216,14 +216,12 @@ class AnalyzerService:
      def load_external_resources(repository, github_repository):
 
         # technologies
-        languages = TechnologiesService.get_languages(
+        technology_analysis = TechnologiesService.analyze(
             repository.owner,
             repository.name,
         )
-        technologies = TechnologiesService.calculate_percentages(
-            languages
-        )
 
+        technologies = technology_analysis["languages"]
 
         # readme
         readme = ReadmeService.get_readme(
