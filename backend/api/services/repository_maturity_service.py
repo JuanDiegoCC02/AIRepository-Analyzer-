@@ -7,10 +7,10 @@ class RepositoryMaturityService:
     def calculate(repository):
 
         created = datetime.fromisoformat(
-            repository["crated_at"].replace("Z", "+00:00")
+            repository["created_at"].replace("Z", "+00:00")
         )
 
-        updated = datetime.fromisonformat(
+        updated = datetime.fromisoformat(
             repository["updated_at"].replace("Z", "+00:00")
         )
 
@@ -29,7 +29,7 @@ class RepositoryMaturityService:
             confidence += 30
 
         elif years >= 2:
-            condifence += 20
+            confidence += 20
 
         else :
             confidence += 10
@@ -81,7 +81,7 @@ class RepositoryMaturityService:
         if years >= 8:
             stability = "High"
 
-        elif years >= 8: 
+        elif years >= 4: 
             stability = "Medium"
 
         else: 
