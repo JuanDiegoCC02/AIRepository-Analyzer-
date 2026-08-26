@@ -236,7 +236,7 @@ class RepositoryInsightsService:
 
         if trend == "Improving":
             return (
-                f"Overall repository quality is improving. "
+                f"Overall repository quality is improving "
                 f"with an increase of {difference} points "
                 f"compared with the previous analysis."
             )
