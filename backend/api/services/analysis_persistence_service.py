@@ -19,24 +19,24 @@ class AnalysisPersistenceService:
 
                 project_type=category, 
                 
-                    popularity_score = scores["popularity_score"],
-    
-                    activity_score = scores["activity_score"],
-    
-                    documentation_score = scores["documentation_score"],
-    
-                    maintainability_score = scores["maintainability_score"],
+                popularity_score = scores["popularity_score"],
 
-                    code_quality_score = scores["code_quality_score"],
-    
-                    community_score = scores["community_score"],
-                    
-                    overall_score = scores["overall_score"],
-    
-                    ai_summary = summary,
-    
-                    recommendations = "\n".join(recommendations),
-                    
+                activity_score = scores["activity_score"],
+
+                documentation_score = scores["documentation_score"],
+
+                maintainability_score = scores["maintainability_score"],
+
+                code_quality_score = scores["code_quality_score"],
+
+                community_score = scores["community_score"],
+                
+                overall_score = scores["overall_score"],
+
+                ai_summary = summary,
+
+                recommendations = "\n".join(recommendations),
+                
             )
 
             return analysis 
