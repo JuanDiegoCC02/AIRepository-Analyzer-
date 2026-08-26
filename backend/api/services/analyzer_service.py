@@ -27,54 +27,52 @@ from api.services.analysis_evaluation_service import AnalysisEvaluationService
 
 
 
+class AnalyzerService:
 
-class AnalyzerService: 
+    # format repository data
+    @staticmethod
+    def format_repository_data(repository):
 
-    # formats the repository data from GitHub API response to match the Repository model fields
-     @staticmethod
-     def format_repository_data(repository):
+        return {
+            "github_id": repository["id"],
 
-          return {
-               
-               "github_id": repository["id"],
+            "owner": repository["owner"]["login"],
 
-               "owner": repository["owner"]["login"],
+            "name": repository["name"],
 
-               "name": repository["name"],
+            "full_name": repository["full_name"],
 
-               "full_name": repository["full_name"],
+            "description": repository["description"],
 
-               "description": repository["description"],
+            "html_url": repository["html_url"],
 
-               "html_url": repository["html_url"],
+            "language": repository["language"],
 
-               "language": repository["language"],
+            "license_name": (
+                repository["license"]["name"]
+                if repository["license"]
+                else None
+            ),
 
-               "license_name": (repository["license"]["name"] 
-                           if repository["license"]
-                           else None
-                           ),
+            "default_branch": repository["default_branch"],
 
-                "default_branch": repository["default_branch"],
+            "stars": repository["stargazers_count"],
 
-                "stars": repository["stargazers_count"],
+            "forks": repository["forks_count"],
 
-                "forks": repository["forks_count"],
+            "watchers": repository["watchers_count"],
 
-                "watchers": repository["watchers_count"],
+            "open_issues": repository["open_issues_count"],
 
-                "open_issues": repository["open_issues_count"],
+            "github_created_at": repository["created_at"],
 
-                "github_created_at": repository["created_at"],
+            "github_updated_at": repository["updated_at"],
+        }
 
-                "github_updated_at": repository["updated_at"],
 
-          }
-     
-
-    # build of the metrics
-     @staticmethod
-     def build_metrics(repository, github_repository):
+    # build metrics
+    @staticmethod
+    def build_metrics(repository, github_repository):
 
         return {
             "stars": repository.stars,
@@ -89,16 +87,19 @@ class AnalyzerService:
 
             "size": github_repository.get("size"),
 
-            "subscribers": github_repository.get("subscribers_count"),
+            "subscribers": github_repository.get(
+                "subscribers_count"
+            ),
 
-            "network_count": github_repository.get("network_count"),
-             
+            "network_count": github_repository.get(
+                "network_count"
+            ),
         }
-     
 
-    # build_response of the score
-     @staticmethod
-     def build_scores(analysis):
+
+    # build scores
+    @staticmethod
+    def build_scores(analysis):
 
         if analysis.overall_score >= 90:
             level = "Excellent"
@@ -109,7 +110,7 @@ class AnalyzerService:
         elif analysis.overall_score >= 50:
             level = "Average"
 
-        else: 
+        else:
             level = "Needs Improvement"
 
         return {
@@ -129,11 +130,11 @@ class AnalyzerService:
 
             "level": level,
         }
-     
 
-    # build_response of the classification
-     @staticmethod
-     def build_classification(repository, analysis):
+
+    # build classification
+    @staticmethod
+    def build_classification(repository, analysis):
 
         return {
             "project_type": analysis.project_type,
@@ -144,11 +145,11 @@ class AnalyzerService:
 
             "owner": repository.owner,
         }
-     
+    
 
-    # build_respone of the data
-     @classmethod
-     def build_response(
+    # build reponse 
+    @classmethod
+    def build_response(
         cls,
         repository_serializer,
         analysis_serializer,
@@ -169,7 +170,6 @@ class AnalyzerService:
     ):
 
         return {
-
             "repository": repository_serializer.data,
 
             "analysis": analysis_serializer.data,
@@ -185,35 +185,39 @@ class AnalyzerService:
             "metrics": cls.build_metrics(
                 repository,
                 github_repository,
-                ),
+            ),
 
-            "scores": cls.build_scores(analysis),
+            "scores": cls.build_scores(
+                analysis
+            ),
 
             "classification": cls.build_classification(
                 repository,
                 analysis,
             ),
-            
-             "insights": insights,
 
-             "contributors": contributors,
+            "insights": insights,
 
-             "readme": readme,
+            "contributors": contributors,
 
-             "health": health,
+            "readme": readme,
 
-             "maturity": maturity, 
+            "health": health,
 
-             "releases": releases,
+            "maturity": maturity,
 
-             "evaluation": evaluation,
+            "releases": releases,
 
+            "evaluation": evaluation,
         }
 
 
-    # new structure for the analyzer that will help in the division of responsibilities.
-     @staticmethod
-     def load_external_resources(repository, github_repository):
+    # load external resouerces
+    @staticmethod
+    def load_external_resources(
+        repository,
+        github_repository
+    ):
 
         # technologies
         technology_analysis = TechnologiesService.analyze(
@@ -221,11 +225,13 @@ class AnalyzerService:
             repository.name,
         )
 
+
         # readme
         readme = ReadmeService.get_readme(
             repository.owner,
             repository.name,
         )
+
         readme_analysis = ReadmeService.analyze(
             readme
         )
@@ -236,12 +242,13 @@ class AnalyzerService:
             repository.owner,
             repository.name,
         )
+
         contributors_summary = ContributorsService.summarize(
             contributors
         )
 
 
-        # repository  statustucs
+        # statistics
         statistics = RepositoryStatisticsService.generate(
             github_repository
         )
@@ -256,7 +263,7 @@ class AnalyzerService:
         )
 
 
-        # repository maturity
+        # maturity
         maturity = RepositoryMaturityService.calculate(
             github_repository
         )
@@ -287,105 +294,182 @@ class AnalyzerService:
             "maturity": maturity,
 
             "releases": releases_summary,
-
         }
 
-     # analyzes a GitHub repository by fetching its data, formatting it, and saving it to the database.
-     @classmethod
-     def analyze_repository(cls, repository_url):
+    # analyze repository
+    @classmethod
+    def analyze_repository(cls, repository_url):
 
-        # fetch repository from GitHub
+        # fetch repository github
         github_repository = GitHubService.get_repository(
             repository_url
         )
+
 
         # format repository data
         repository_data = cls.format_repository_data(
             github_repository
         )
 
-        # create or update repository
+
+        # created o updated repository
         repository, created = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
         )
 
+
         # load external resources
-        resources = cls.load_external_resources(repository, github_repository )
+        resources = cls.load_external_resources(
+            repository,
+            github_repository
+        )
 
+
+        # technology analysis
         technology_analysis = resources["technologies"]
-        technologies = technology_analysis["languages"]
-        primary_language = technology_analysis["primary_language"]
-        main_stack = technology_analysis["main_stack"]
+
+        technologies = technology_analysis.get(
+            "languages",
+            []
+        )
+
+        primary_language = technology_analysis.get("primary_language")
+
+        main_stack = technology_analysis.get("main_stack")
+
+
+        # other resources
         statistics = resources["statistics"]
-        contributors_summary = resources["contributors"]
-        readme_analysis = resources["readme"]
-        release_summary = resources["releases"]
-        topics = resources["topics"]
-        maturity = resources["maturity"]
 
+        contributors_summary = resources[
+            "contributors"
+        ]
 
+        readme_analysis = resources[
+            "readme"
+        ]
+
+        release_summary = resources[
+            "releases"
+        ]
+
+        topics = resources[
+            "topics"
+        ]
+
+        maturity = resources[
+            "maturity"
+        ]
+
+       
         # classify repository
         category = RepositoryClassifier.classify(
+
             repository.name,
+
             repository.language,
+
             repository.description,
+
             repository.topics
         )
 
+      
         # calculate analysis scores
         analysis_scores = AnalysisScoreService.calculate_scores(
             repository,
             github_repository,
         )
 
-        # build structured analysis result
+
+        # build structured result
         analysis_result = AnalysisResultService.build(
             analysis_scores
         )
 
-        # repository health
+      
+        # repository healt
         health = RepositoryHealthService.generate(
             analysis_scores
         )
 
-        analysis, created = AnalysisPersistenceService.save(
+        
+        # analysis
+        analysis = AnalysisPersistenceService.save_analysis(
+
             repository=repository,
+
             category=category,
-            analysis_scores=analysis_scores,
-            summary=summary,
-            recommendations=recommendations,
+
+            scores=analysis_scores,
+
+            summary="",
+
+            recommendations=[],
         )
 
-        # calculate evaluation
+
+        # historical evaluation
         evaluation = AnalysisEvaluationService.generate(
+
             repository,
+
             analysis,
         )
 
+    
         # generate recommendations
         recommendations = RecommendationService.generate(
+
             analysis_scores,
+
             evaluation
         )
 
-        # generate AI summary
+        
+        # generate ai summary
         summary = AISummaryService.generate(
+
             github_repository,
+
             category,
+
             technologies,
+
             analysis_scores,
+
             evaluation,
         )
 
-        # generate insights
+       
+        # update anaylsis with ai data 
+        analysis.ai_summary = summary
+
+        analysis.recommendations = "\n".join(
+            recommendations
+        )
+
+        analysis.save(
+            update_fields=[
+                "ai_summary",
+                "recommendations",
+            ]
+        )
+
+        # generate insights 
         insights = RepositoryInsightsService.generate(
             repository,
+
             analysis,
+
             technologies,
+
             evaluation,
         )
 
+        
+        # serializers
         repository_serializer = RepositorySerializer(
             repository
         )
@@ -394,22 +478,38 @@ class AnalyzerService:
             analysis
         )
 
+
+        # final build response
         return cls.build_response(
             repository_serializer,
+
             analysis_serializer,
+
             repository,
+
             github_repository,
+
             analysis,
+
             analysis_result,
+
             technology_analysis,
+
             topics,
+
             statistics,
+
             insights,
+
             contributors_summary,
+
             readme_analysis,
+
             health,
+
             maturity,
+
             release_summary,
+
             evaluation,
         )
-     
