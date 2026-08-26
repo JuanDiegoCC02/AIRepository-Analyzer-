@@ -166,7 +166,8 @@ class AnalyzerService:
         health,
         maturity,
         releases,
-        evaluation
+        evaluation,
+        recommendations,
     ):
 
         return {
@@ -209,6 +210,8 @@ class AnalyzerService:
             "releases": releases,
 
             "evaluation": evaluation,
+
+            "recommendations": recommendations,
         }
 
 
@@ -512,4 +515,6 @@ class AnalyzerService:
             release_summary,
 
             evaluation,
+
+            recommendations
         )
