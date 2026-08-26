@@ -24,13 +24,13 @@ class AISummaryService:
 
     # tecnology
     @staticmethod
-    def technology_summary(technolohies):
-        if not technolohies:
+    def technology_summary(technologies):
+        if not technologies:
             return (
-                "The repository's primary technolohy could not be determined."
+                "The repository's primary technology could not be determined."
             )
 
-        main = technolohies [0]
+        main = technologies [0]
 
         language = main.get(
             "language",
@@ -43,7 +43,7 @@ class AISummaryService:
         )
 
         return (
-            f"The repository is primarily written in {language}, wich represents approximately {percentage}& of the detected code." 
+            f"The repository is primarily written in {language}, which represents approximately {percentage}% of the detected code." 
         )
 
 
@@ -59,7 +59,7 @@ class AISummaryService:
             )
 
         return (
-            f"The repository demostrates {level} community popularity with {stars:,} GitHub stars."
+            f"The repository demonstrates {level} community popularity with {stars:,} GitHub stars."
         )
 
 
@@ -118,12 +118,12 @@ class AISummaryService:
 
         if score >= 70: 
             return (
-                "The repository appears realtively easy to maintain."
+                "The repository appears relatively easy to maintain."
             )
 
         if score >= 50:
             return (
-                "Maintainability is acceptable but there are areas that could be imrproved."
+                "Maintainability is acceptable but there are areas that could be improved."
             )
 
         return (
@@ -146,7 +146,7 @@ class AISummaryService:
 
         if score >= 50:
             return (
-                "Code quality is moderate and could benedit from additional improvements."
+                "Code quality is moderate and could benefit from additional improvements."
             )
 
         return (
@@ -179,24 +179,24 @@ class AISummaryService:
         )
 
   
-    # evolution
+    # evaluation
     @staticmethod
-    def evolution_summary(evolution):
-        if not evolution:
+    def evaluation_summary(evaluation):
+        if not evaluation:
             return (
-                "Historical repository evolution "
+                "Historical repository evaluation "
                 "is not available."
             )
         
-        if not evolution.get("available"):
+        if not evaluation.get("available"):
             return (
                 "There is not enough historical data "
-                "to determine the repository's evolution."
+                "to determine the repository's evaluation."
             )
-        trend = evolution.get(
+        trend = evaluation.get(
             "overall_trend"
         )
-        difference = evolution.get(
+        difference = evaluation.get(
             "overall_difference",
             0
         )
@@ -225,14 +225,14 @@ class AISummaryService:
 
 
     # main summary generator
-    @ classmethod
+    @classmethod
     def generate ( 
         cls, 
         github_repository,
         category,
         technologies,
         analysis_scores,
-        evolution=None
+        evaluation=None
         ): 
 
         repository_name = github_repository.get(
@@ -255,7 +255,7 @@ class AISummaryService:
         )
 
         overall_score = analysis_scores.get(
-            "activity_score",
+            "overall_score",
             0
         )
 
@@ -270,7 +270,7 @@ class AISummaryService:
         )
 
         maintainability_score = analysis_scores.get(
-            "maintainability",
+            "maintainability_score",
             0
         )
 
@@ -297,8 +297,10 @@ class AISummaryService:
                 f"The repository describes itself as: {description}"
             )
         else:
-            introduccion = (
-                f"{repository_name} is classified as a {category} project primarily written in {language}."
+            introduction = (
+                f"{repository_name} is classified as a "
+                f"{category} project primarily written in "
+                f"{language}."
             )
 
 
@@ -318,7 +320,7 @@ class AISummaryService:
 
         community_summary = cls.community_summary(community_score)
 
-        evolution_summary = cls.evolution_summary(evolution)
+        evaluation_summary = cls.evaluation_summary(evaluation)
 
         summary = " ".join(
         [
@@ -331,7 +333,7 @@ class AISummaryService:
             maintainability_summary,
             code_quality_summary,
             community_summary,
-            evolution_summary,
+            evaluation_summary,
         ]
     )
 
