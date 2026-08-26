@@ -212,42 +212,56 @@ class RecommendationService:
         if not evaluation.get("available"):
             return []
 
-        changes = evaluation.get(
+        comparison = evaluation.get(
             "comparison",
             {}
         )
 
+        if not comparison:
+            return []
+
         recommendations = []
 
-        for score_name, difference in changes.items():
+        for score_name, data in comparison.items():
 
-            if difference <= -10:
+            if not isinstance(data, dict):
+                continue
 
-                readable_name = score_name.replace(
-                    "_score",
-                    ""
-                ).replace(
-                    "_",
-                    " "
-                )
+            difference = data.get(
+                "difference",
+                0
+            )
 
-                recommendations.append(
-                    f"{readable_name.capitalize()} has declined "
-                    f"by {abs(difference)} points. Prioritize "
-                    f"improvements in this area."
-                )
+            trend = data.get("trend")
+
+            if trend != "Declining":
+                continue
+
+            if difference > -10:
+                continue
+
+            readable_name = (
+                score_name
+                .replace("_score", "")
+                .replace("_", " ")
+            )
+
+            recommendations.append(
+                f"{readable_name.capitalize()} has declined "
+                f"by {abs(difference)} points. Prioritize "
+                f"improvements in this area."
+            )
+
         return recommendations
 
    
-    # MAIN GENERATOR
+    # generator
     @classmethod
     def generate( cls, analysis_scores, evaluation=None):
 
         recommendations = []
-
      
         # extract scores
-
         popularity_score = analysis_scores.get(
             "popularity_score",
             0
@@ -286,7 +300,6 @@ class RecommendationService:
 
        
         # generate recommendations
-
         recommendation = cls.popularity(
             popularity_score
         )
