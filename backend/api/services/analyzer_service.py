@@ -349,26 +349,10 @@ class AnalyzerService:
             analysis_scores
         )
 
-        analysis, created = AnalysisPersistenceService.save(
-            repository=repository,
-            category=category,
-            analysis_scores=analysis_scores,
-            summary=summary,
-            recommendations=recommendations,
-        )
-
         # calculate evaluation
         evaluation = AnalysisEvaluationService.generate(
             repository,
             analysis,
-        )
-
-        # generate insights
-        insights = RepositoryInsightsService.generate(
-            repository,
-            analysis,
-            technologies,
-            evaluation,
         )
 
         # generate recommendations
@@ -383,6 +367,22 @@ class AnalyzerService:
             category,
             technologies,
             analysis_scores,
+            evaluation,
+        )
+
+        analysis, created = AnalysisPersistenceService.save(
+            repository=repository,
+            category=category,
+            analysis_scores=analysis_scores,
+            summary=summary,
+            recommendations=recommendations,
+        )
+
+        # generate insights
+        insights = RepositoryInsightsService.generate(
+            repository,
+            analysis,
+            technologies,
             evaluation,
         )
 
