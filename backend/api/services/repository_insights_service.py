@@ -215,21 +215,21 @@ class RepositoryInsightsService:
 
 
     @staticmethod
-    def evaluation(evoluation_data):
-        if not evoluation_data:
+    def evaluation(evaluation_data):
+        if not evaluation_data:
             return None
 
-        if not evoluation_data.get("available"):
+        if not evaluation_data.get("available"):
             return (
-                "Historical evolution is not available "
+                "Historical evaluation is not available "
                 "because there is not enough analysis data."
             )
         
-        trend = evoluation_data.get(
+        trend = evaluation_data.get(
             "overall_trend"
         )
 
-        difference = evoluation_data.get(
+        difference = evaluation_data.get(
             "overall_difference",
             0
         )
@@ -247,14 +247,14 @@ class RepositoryInsightsService:
 
 
     @staticmethod
-    def evolution_details(evolution_data):
-        if not evolution_data:
+    def evaluation_details(evaluation_data):
+        if not evaluation_data:
             return []
 
-        if not evolution_data.get("available"):
+        if not evaluation_data.get("available"):
             return []
 
-        comparison = evolution_data.get(
+        comparison = evaluation_data.get(
             "comparison"
         )
 
@@ -319,7 +319,7 @@ class RepositoryInsightsService:
         repository,
         analysis,
         technologies,
-        evolution=None,
+        evaluation=None,
     ):
 
         insights = []
@@ -408,24 +408,24 @@ class RepositoryInsightsService:
                 technology
             )
 
-        # evolution summary
-        evolution_insight = cls.evolution(
-            evolution
+        # evaluation summary
+        evaluation_insight = cls.evaluation(
+            evaluation
         )
 
-        if evolution_insight:
+        if evaluation_insight:
             insights.append(
-                evolution_insight
+                evaluation_insight
             )
 
 
-        # detailed evolution
-        evolution_details = cls.evolution_details(
-            evolution
+        # detailed evaluation
+        evaluation_details = cls.evaluation_details(
+            evaluation
         )
 
         insights.extend(
-            evolution_details
+            evaluation_details
         )
 
         return insights
