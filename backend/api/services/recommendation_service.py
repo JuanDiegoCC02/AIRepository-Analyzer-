@@ -164,21 +164,21 @@ class RecommendationService:
 
 
 
-    # evolution
+    # evaluation
     @staticmethod
-    def evolution(evolution):
+    def evaluation(evaluation):
 
-        if not evolution:
+        if not evaluation:
             return None
 
-        if not evolution.get("available"):
+        if not evaluation.get("available"):
             return None
 
-        trend = evolution.get(
+        trend = evaluation.get(
             "overall_trend"
         )
 
-        difference = evolution.get(
+        difference = evaluation.get(
             "overall_difference",
             0
         )
@@ -204,16 +204,16 @@ class RecommendationService:
     
     # score differences
     @staticmethod
-    def score_changes(evolution):
+    def score_changes(evaluation):
 
-        if not evolution:
+        if not evaluation:
             return []
 
-        if not evolution.get("available"):
+        if not evaluation.get("available"):
             return []
 
-        changes = evolution.get(
-            "score_changes",
+        changes = evaluation.get(
+            "comparison",
             {}
         )
 
@@ -236,11 +236,12 @@ class RecommendationService:
                     f"by {abs(difference)} points. Prioritize "
                     f"improvements in this area."
                 )
+        return recommendations
 
    
     # MAIN GENERATOR
     @classmethod
-    def generate( cls, analysis_scores, evolution=None):
+    def generate( cls, analysis_scores, evaluation=None):
 
         recommendations = []
 
@@ -357,9 +358,9 @@ class RecommendationService:
 
 
        
-        # historical evolution
-        recommendation = cls.evolution(
-            evolution
+        # historical evaluation
+        recommendation = cls.evaluation(
+            evaluation
         )
 
         if recommendation:
@@ -372,7 +373,7 @@ class RecommendationService:
         # significant score changes
         recommendations.extend(
             cls.score_changes(
-                evolution
+                evaluation
             )
         )
 
