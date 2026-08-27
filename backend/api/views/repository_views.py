@@ -25,7 +25,7 @@ class RepositoryAnalyzerView(APIView):
             return Response(
                 {
                     "error": "repository URL must be a string."
-                }
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -35,7 +35,7 @@ class RepositoryAnalyzerView(APIView):
             return Response(
                 {
                     "error": "repository URL cannot be empty."
-                }
+                },
             )
         
         try:
