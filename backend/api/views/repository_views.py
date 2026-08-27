@@ -61,6 +61,29 @@ class RepositoryAnalyzerView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
-      
+
+           
+class RepositoryListView(APIView):
+
+    def get(self, request):
+
+        return Response(
+            {
+                "message": "Repository list endpoint."
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+class RepositoryDetailView(APIView):
+
+    def get(self, request, repository_id):
+
+        return Response(
+            {
+                "message": "Repository detail endpoint.",
+                "repository_id": repository_id
+            },
+            status=status.HTTP_200_OK
+        )
 
