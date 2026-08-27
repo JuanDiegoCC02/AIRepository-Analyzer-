@@ -1,16 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import status
-
-from api.models.repository import Repository
-
-from api.serializers.repository_serializer import RepositorySerializer
 
 from api.services.analyzer_service import AnalyzerService
 
 
 class RepositoryAnalyzerView(APIView):
+
+    """
+    API endpoint respomsible for analyzing a GitHub repository.
+    """
 
     def post(self, request):
 
@@ -18,37 +17,50 @@ class RepositoryAnalyzerView(APIView):
 
         if not repository_url:
             return Response(
-                {"error": "Repository URL is required. "},
+                {"error": "repository URL is required. "},
                 status = status.HTTP_400_BAD_REQUEST    
             ) 
-        
-        try:
-            
-            data = AnalyzerService.analyze_repository(repository_url)
 
-            return Response(data)
-        
-        except Exception as e: 
-
+        if not isinstance(repository_url, str):
             return Response(
-                {"error": str(e)},
-                status = status.HTTP_400_BAD_REQUEST    
+                {
+                    "error": "repository URL must be a string."
+                }
+                status=status.HTTP_400_BAD_REQUEST
             )
 
+        repository_url = repository_url.strip()
 
+        if not repository_url:
+            return Response(
+                {
+                    "error": "repository URL cannot be empty."
+                }
+            )
+        
+        try:
+            result = AnalyzerService.analyze_repository(repository_url)
 
-class RepositoryListView(ListAPIView):
+            return Response(
+                result,
+                status=status.HTTP_200_OK
+            )
 
-    queryset = Repository.objects.all().order_by("-updated_at")
-    serializer_class = RepositorySerializer
+        except ValueError as error:
+            return Response(
+                {
+                    "error": str(error)
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        except Exception as error:
+            return Response(
+                {
+                    "error": str(error)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+      
 
-
-class RepositoryDetailView(RetrieveAPIView):
-
-    queryset = Repository.objects.all()
-    serializer_class = RepositorySerializer
-
-
-
-    
