@@ -303,6 +303,13 @@ class AnalyzerService:
     @classmethod
     def analyze_repository(cls, repository_url):
 
+        # extract identification
+        owner, repository_name = (
+            GitHubService.extract_owner_repo(
+                repository_url
+            )
+        )
+
         # fetch repository github
         github_repository = GitHubService.get_repository(
             repository_url
