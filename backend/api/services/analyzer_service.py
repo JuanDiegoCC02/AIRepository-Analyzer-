@@ -303,6 +303,7 @@ class AnalyzerService:
     @classmethod
     def analyze_repository(cls, repository_url):
 
+
         # fetch repository github
         github_repository = GitHubService.get_repository(
             repository_url
@@ -336,10 +337,6 @@ class AnalyzerService:
             "languages",
             []
         )
-
-        primary_language = technology_analysis.get("primary_language")
-
-        main_stack = technology_analysis.get("main_stack")
 
 
         # other resources
