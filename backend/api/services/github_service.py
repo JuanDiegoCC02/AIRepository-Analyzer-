@@ -1,5 +1,6 @@
 import os 
 import requests
+from urllib.parse import urlparse
 
 from api.exceptions.github_exceptions import (
     GitHubNotFoundError,
@@ -109,22 +110,24 @@ class GitHubService:
 
     @staticmethod
     def extract_owner_repo(repository_url):
+        # Asegurar que tenga un esquema para que urlparse funcione bien si viene sin https://
+        if not repository_url.startswith(("http://", "https://")):
+            repository_url = "https://" + repository_url
 
-        clean_url = repository_url.split("?")[0].split("#")[0]
+        parsed = urlparse(repository_url)
         
-        parts = [segment for segment in clean_url.strip("/").split("/") if segment]
+        # Obtenemos los segmentos del path (ej: ['facebook', 'react'])
+        segments = [seg for seg in parsed.path.strip("/").split("/") if seg]
 
-        if "github.com" in parts:
-            try:
-                idx = parts.index("github.com")
-                if len(parts) >= idx + 2:
-                    return parts[idx + 1], parts[idx + 2]
-            except (ValueError, IndexError):
-                pass
-
-        if len(parts) >= 2:
-            return parts[0], parts[1]
+        # Si viene de una URL de GitHub completa (ej: github.com/facebook/react)
+        if "github.com" in parsed.netloc:
+            if len(segments) >= 2:
+                return segments[0], segments[1]
+        
+        # Si se pasa en formato plano "owner/repo"
+        if len(segments) >= 2:
+            return segments[0], segments[1]
 
         raise ValueError(
-            "Invalid GitHub repository URL format. Expected 'owner/repo' or full GitHub URL."
+            f"Invalid GitHub repository URL format: '{repository_url}'. Expected 'owner/repo' or full GitHub URL."
         )
