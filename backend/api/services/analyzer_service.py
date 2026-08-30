@@ -29,7 +29,7 @@ from api.services.analysis_evaluation_service import AnalysisEvaluationService
 
 class AnalyzerService:
 
-    # format repository data
+    # repository data
     @staticmethod
     def format_repository_data(repository):
 
@@ -70,149 +70,6 @@ class AnalyzerService:
         }
 
 
-    # build metrics
-    @staticmethod
-    def build_metrics(repository, github_repository):
-
-        return {
-            "stars": repository.stars,
-
-            "forks": repository.forks,
-
-            "watchers": repository.watchers,
-
-            "open_issues": repository.open_issues,
-
-            "default_branch": repository.default_branch,
-
-            "size": github_repository.get("size"),
-
-            "subscribers": github_repository.get(
-                "subscribers_count"
-            ),
-
-            "network_count": github_repository.get(
-                "network_count"
-            ),
-        }
-
-
-    # build scores
-    @staticmethod
-    def build_scores(analysis):
-
-        if analysis.overall_score >= 90:
-            level = "Excellent"
-
-        elif analysis.overall_score >= 75:
-            level = "Good"
-
-        elif analysis.overall_score >= 50:
-            level = "Average"
-
-        else:
-            level = "Needs Improvement"
-
-        return {
-            "popularity": analysis.popularity_score,
-
-            "activity": analysis.activity_score,
-
-            "documentation": analysis.documentation_score,
-
-            "maintainability": analysis.maintainability_score,
-
-            "code_quality": analysis.code_quality_score,
-
-            "community": analysis.community_score,
-
-            "overall": analysis.overall_score,
-
-            "level": level,
-        }
-
-
-    # build classification
-    @staticmethod
-    def build_classification(repository, analysis):
-
-        return {
-            "project_type": analysis.project_type,
-
-            "main_language": repository.language,
-
-            "license": repository.license_name,
-
-            "owner": repository.owner,
-        }
-    
-
-    # build reponse 
-    @classmethod
-    def build_response(
-        cls,
-        repository_serializer,
-        analysis_serializer,
-        repository,
-        github_repository,
-        analysis,
-        analysis_result,
-        technology_analysis,
-        topics,
-        statistics,
-        insights,
-        contributors,
-        readme,
-        health,
-        maturity,
-        releases,
-        evaluation,
-        recommendations,
-    ):
-
-        return {
-            "repository": repository_serializer.data,
-
-            "analysis": analysis_serializer.data,
-
-            "analysis_result": analysis_result,
-
-            "technologies": technology_analysis,
-
-            "topics": topics,
-
-            "statistics": statistics,
-
-            "metrics": cls.build_metrics(
-                repository,
-                github_repository,
-            ),
-
-            "scores": cls.build_scores(
-                analysis
-            ),
-
-            "classification": cls.build_classification(
-                repository,
-                analysis,
-            ),
-
-            "insights": insights,
-
-            "contributors": contributors,
-
-            "readme": readme,
-
-            "health": health,
-
-            "maturity": maturity,
-
-            "releases": releases,
-
-            "evaluation": evaluation,
-
-            "recommendations": recommendations,
-        }
 
 
     # load external resouerces
@@ -298,6 +155,162 @@ class AnalyzerService:
 
             "releases": releases_summary,
         }
+    
+    
+
+
+    # build metrics
+    @staticmethod
+    def build_metrics(repository, github_repository):
+
+        return {
+            "stars": repository.stars,
+
+            "forks": repository.forks,
+
+            "watchers": repository.watchers,
+
+            "open_issues": repository.open_issues,
+
+            "default_branch": repository.default_branch,
+
+            "size": github_repository.get("size"),
+
+            "subscribers": github_repository.get(
+                "subscribers_count"
+            ),
+
+            "network_count": github_repository.get(
+                "network_count"
+            ),
+        }
+
+
+
+
+    # build scores
+    @staticmethod
+    def build_scores(analysis):
+
+        if analysis.overall_score >= 90:
+            level = "Excellent"
+
+        elif analysis.overall_score >= 75:
+            level = "Good"
+
+        elif analysis.overall_score >= 50:
+            level = "Average"
+
+        else:
+            level = "Needs Improvement"
+
+        return {
+            "popularity": analysis.popularity_score,
+
+            "activity": analysis.activity_score,
+
+            "documentation": analysis.documentation_score,
+
+            "maintainability": analysis.maintainability_score,
+
+            "code_quality": analysis.code_quality_score,
+
+            "community": analysis.community_score,
+
+            "overall": analysis.overall_score,
+
+            "level": level,
+        }
+
+
+
+
+    # build classification
+    @staticmethod
+    def build_classification(repository, analysis):
+
+        return {
+            "project_type": analysis.project_type,
+
+            "main_language": repository.language,
+
+            "license": repository.license_name,
+
+            "owner": repository.owner,
+        }
+
+
+    
+
+    # build reponse 
+    @classmethod
+    def build_response(
+        cls,
+        repository_serializer,
+        analysis_serializer,
+        repository,
+        github_repository,
+        analysis,
+        analysis_result,
+        technology_analysis,
+        topics,
+        statistics,
+        insights,
+        contributors,
+        readme,
+        health,
+        maturity,
+        releases,
+        evaluation,
+        recommendations,
+    ):
+
+        return {
+            "repository": repository_serializer.data,
+
+            "analysis": analysis_serializer.data,
+
+            "analysis_result": analysis_result,
+
+            "technologies": technology_analysis,
+
+            "topics": topics,
+
+            "statistics": statistics,
+
+            "metrics": cls.build_metrics(
+                repository,
+                github_repository,
+            ),
+
+            "scores": cls.build_scores(
+                analysis
+            ),
+
+            "classification": cls.build_classification(
+                repository,
+                analysis,
+            ),
+
+            "insights": insights,
+
+            "contributors": contributors,
+
+            "readme": readme,
+
+            "health": health,
+
+            "maturity": maturity,
+
+            "releases": releases,
+
+            "evaluation": evaluation,
+
+            "recommendations": recommendations,
+        }
+
+
+
 
     # analyze repository
     @classmethod
