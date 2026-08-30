@@ -174,14 +174,19 @@ class AnalyzerService:
 
             "default_branch": repository.default_branch,
 
-            "size": github_repository.get("size"),
+            "size": github_repository.get(
+                "size",
+                0
+            ),
 
             "subscribers": github_repository.get(
-                "subscribers_count"
+                "subscribers_count",
+                0
             ),
 
             "network_count": github_repository.get(
-                "network_count"
+                "network_count",
+                0
             ),
         }
 
