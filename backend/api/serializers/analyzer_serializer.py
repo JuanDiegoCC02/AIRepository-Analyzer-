@@ -18,7 +18,7 @@ class RepositoryAnalyzerSerializer(serializers.Serializer):
             )
 
         if value.endswith("/"):
-            vlaue = value.rstrip("/")
+            value = value.rstrip("/")
 
         parts = value.split("/")
 
