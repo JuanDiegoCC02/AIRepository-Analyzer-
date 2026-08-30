@@ -108,24 +108,23 @@ class GitHubService:
 
 
     @staticmethod
-    def extract_owner_repo(
-        repository_url,
-    ):
+    def extract_owner_repo(repository_url):
 
-        clean_url = (
-            repository_url
-            .rstrip("/")
+        clean_url = repository_url.split("?")[0].split("#")[0]
+        
+        parts = [segment for segment in clean_url.strip("/").split("/") if segment]
+
+        if "github.com" in parts:
+            try:
+                idx = parts.index("github.com")
+                if len(parts) >= idx + 2:
+                    return parts[idx + 1], parts[idx + 2]
+            except (ValueError, IndexError):
+                pass
+
+        if len(parts) >= 2:
+            return parts[0], parts[1]
+
+        raise ValueError(
+            "Invalid GitHub repository URL format. Expected 'owner/repo' or full GitHub URL."
         )
-
-        parts = clean_url.split("/")
-
-        if len(parts) < 2:
-            raise ValueError(
-                "Invalid GitHub repository URL."
-            )
-
-        owner = parts[-2]
-
-        repository = parts[-1]
-
-        return owner, repository
