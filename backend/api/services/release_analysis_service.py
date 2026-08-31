@@ -170,7 +170,7 @@ class ReleaseAnalysisService:
             return {
                 "total_releases": len(valid_releases),
 
-                "latest_releases": None,
+                "latest_release": None,
 
                 "days_since_release": None,
 
