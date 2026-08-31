@@ -77,9 +77,9 @@ class RepositoryTopicsService:
             else: 
                 other.append(topic)
 
-            return {
-                "frameworks": frameworks,
-                "domains": domains,
-                "tools": tools,
-                "other": other,
-            }
+        return {
+            "frameworks": frameworks,
+            "domains": domains,
+            "tools": tools,
+            "other": other,
+        }
