@@ -110,21 +110,17 @@ class GitHubService:
 
     @staticmethod
     def extract_owner_repo(repository_url):
-        # Asegurar que tenga un esquema para que urlparse funcione bien si viene sin https://
         if not repository_url.startswith(("http://", "https://")):
             repository_url = "https://" + repository_url
 
         parsed = urlparse(repository_url)
         
-        # Obtenemos los segmentos del path (ej: ['facebook', 'react'])
         segments = [seg for seg in parsed.path.strip("/").split("/") if seg]
 
-        # Si viene de una URL de GitHub completa (ej: github.com/facebook/react)
         if "github.com" in parsed.netloc:
             if len(segments) >= 2:
                 return segments[0], segments[1]
         
-        # Si se pasa en formato plano "owner/repo"
         if len(segments) >= 2:
             return segments[0], segments[1]
 
