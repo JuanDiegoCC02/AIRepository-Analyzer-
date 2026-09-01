@@ -15,9 +15,9 @@ class AnalysisPersistenceService:
        # save analysis
             analysis = Analysis.objects.create(
                   
-                repository=repository,
+                    repository=repository,
 
-                project_type=category, 
+                    project_type=category, 
                 
                     popularity_score = scores["popularity_score"],
     
