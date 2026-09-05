@@ -321,24 +321,43 @@ class AnalyzerService:
     @classmethod
     def analyze_repository(cls, repository_url):
 
-
-        # fetch repository github
+        # 1 test fetch repository from GitHub
         github_repository = GitHubService.get_repository(
             repository_url
         )
 
+        print("\n========== STEP 1: GITHUB RESPONSE ==========")
+        print("INPUT URL:", repository_url)
+        print("GITHUB OWNER:", github_repository["owner"]["login"])
+        print("GITHUB NAME:", github_repository["name"])
+        print("GITHUB FULL_NAME:", github_repository["full_name"])
 
-        # format repository data
+
+        # 2 test format repository data
         repository_data = cls.format_repository_data(
             github_repository
         )
 
+        print("\n========== STEP 2: FORMATTED DATA ==========")
+        print("DATA OWNER:", repository_data["owner"])
+        print("DATA NAME:", repository_data["name"])
+        print("DATA FULL_NAME:", repository_data["full_name"])
 
-        # created o updated repository
+
+        # 3 test create or update repository
         repository, created = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
         )
+
+        print("\n========== STEP 3: DATABASE OBJECT ==========")
+        print("CREATED:", created)
+        print("DATABASE OWNER:", repository.owner)
+        print("DATABASE NAME:", repository.name)
+        print("DATABASE FULL_NAME:", repository.full_name)
+        print("DATABASE ID:", repository.id)
+        print("DATABASE GITHUB ID:", repository.github_id)
+        print("=============================================\n")
 
 
         # load external resources
