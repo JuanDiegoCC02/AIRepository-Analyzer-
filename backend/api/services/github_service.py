@@ -93,21 +93,28 @@ class GitHubService:
 
 
     @classmethod
-    def get_repository(
-            cls,
-            repository_url,
-    ):
+    def get_repository(cls, repository_url):
 
-        owner, repository = (
-            cls.extract_owner_repo(
-                repository_url
-            )
+        owner, repository = cls.extract_owner_repo(
+            repository_url
         )
+
+        print("\n========== GITHUB SERVICE ==========")
+        print("INPUT:", repository_url)
+        print("EXTRACTED OWNER:", owner)
+        print("EXTRACTED REPOSITORY:", repository)
+        print(
+            "ENDPOINT:",
+            f"/repos/{owner}/{repository}"
+        )
+        print("====================================\n")
+
         return cls.request(
             f"/repos/{owner}/{repository}"
         )
 
 
+    
     @staticmethod
     def extract_owner_repo(repository_url):
         if not repository_url.startswith(("http://", "https://")):
@@ -127,3 +134,4 @@ class GitHubService:
         raise ValueError(
             f"Invalid GitHub repository URL format: '{repository_url}'. Expected 'owner/repo' or full GitHub URL."
         )
+    
