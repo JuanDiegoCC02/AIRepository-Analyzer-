@@ -50,7 +50,7 @@ class RepositoryMaturityService:
             confidence += 25
 
         elif inactive_days <= 180:
-            connfidence += 15
+            confidence += 15
 
         if repository["open_issues_count"] <= 100:
             confidence += 10
