@@ -70,13 +70,13 @@ class ContributorsService:
 
                 "avatar_url": contributor.get("avatar_url"),
 
-                "html_url": contributor.get("html_ulr"),
+                "html_url": contributor.get("html_url"),
                 }
             )
 
         return{
             "total_contributors": total_contributors,
-            "top_contributors":top_contributor.get("login"),
+            "top_contributor":top_contributor.get("login"),
             "top_contributions": top_contributor.get("contributions", 0,),
             "contributors": contributors_summary
         }
