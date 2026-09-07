@@ -90,9 +90,24 @@ class GitHubService:
             repository_url
         )
 
-        return cls.request(
-            f"/repos/{owner}/{repository}"
-        )
+        response = requests.get(
+        "https://api.github.com/repos/react/react",
+        headers={
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        timeout=10,
+    )
+
+        print("STATUS:", response.status_code)
+        print("URL:", response.url)
+
+        data = response.json()
+
+        print("OWNER:", data.get("owner", {}).get("login"))
+        print("NAME:", data.get("name"))
+        print("FULL NAME:", data.get("full_name"))
+        print("ID:", data.get("id"))
 
     @staticmethod
     def extract_owner_repo(repository_url):
