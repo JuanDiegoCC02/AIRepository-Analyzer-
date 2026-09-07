@@ -173,7 +173,6 @@ class GitHubService:
 
         data = response.json()
 
-        # Preserve the repository identity requested by the user.
         data["owner"]["login"] = owner
         data["full_name"] = f"{owner}/{repository}"
 

@@ -33,18 +33,21 @@ class AnalyzerService:
     @staticmethod
     def format_repository_data(repository):
 
+        owner = repository["owner"]["login"]
+        name = repository["name"]
+
         return {
             "github_id": repository["id"],
 
-            "owner": repository["owner"]["login"],
+            "owner": owner,
 
-            "name": repository["name"],
+            "name": name,
 
-            "full_name": repository["full_name"],
+            "full_name": f"{owner}/{name}",
 
             "description": repository["description"],
 
-            "html_url": repository["html_url"],
+            "html_url": f"https://github.com/{owner}/{name}",
 
             "language": repository["language"],
 
@@ -68,7 +71,6 @@ class AnalyzerService:
 
             "github_updated_at": repository["updated_at"],
         }
-
 
 
 
