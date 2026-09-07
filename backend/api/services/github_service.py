@@ -10,6 +10,7 @@ from api.exceptions.github_exceptions import (
 )
 
 
+
 class GitHubService:
     BASE_URL = "https://api.github.com"
     TIMEOUT = 10
@@ -27,6 +28,7 @@ class GitHubService:
             headers["Authorization"] = f"Bearer {token}"
 
         return headers
+
 
     @classmethod
     def request(cls, endpoint, params=None):
@@ -88,15 +90,95 @@ class GitHubService:
 
         return response.json()
 
+
     @classmethod
     def get_repository(cls, repository_url):
-        owner, repository = cls.extract_owner_repo(
-            repository_url
-        )
+        owner, repository = cls.extract_owner_repo(repository_url)
 
-        return cls.request(
-            f"/repos/{owner}/{repository}"
-        )
+        endpoint = f"/repos/{owner}/{repository}"
+
+        url = f"{cls.BASE_URL}{endpoint}"
+
+        try:
+            response = requests.get(
+                url,
+                headers=cls.get_headers(),
+                timeout=cls.TIMEOUT,
+                allow_redirects=False,
+            )
+
+        except requests.Timeout as error:
+            raise GitHubRequestError(
+                "GitHub API request timed out."
+            ) from error
+
+        except requests.RequestException as error:
+            raise GitHubRequestError(
+                "Unable to connect to GitHub API."
+            ) from error
+
+        if response.status_code in (301, 302, 307, 308):
+            redirect_url = response.headers.get("Location")
+
+            if not redirect_url:
+                raise GitHubRequestError(
+                    "GitHub returned a redirect without a location."
+                )
+
+            try:
+                response = requests.get(
+                    redirect_url,
+                    headers=cls.get_headers(),
+                    timeout=cls.TIMEOUT,
+                )
+
+            except requests.Timeout as error:
+                raise GitHubRequestError(
+                    "GitHub redirected request timed out."
+                ) from error
+
+            except requests.RequestException as error:
+                raise GitHubRequestError(
+                    "Unable to connect to redirected GitHub resource."
+                ) from error
+
+        if response.status_code == 404:
+            raise GitHubNotFoundError(
+                "GitHub resource was not found."
+            )
+
+        if response.status_code == 401:
+            raise GitHubAuthenticationError(
+                "GitHub authentication failed."
+            )
+
+        if response.status_code == 403:
+            remaining = response.headers.get(
+                "X-RateLimit-Remaining"
+            )
+
+            if remaining == "0":
+                raise GitHubRateLimitError(
+                    "GitHub API rate limit exceeded."
+                )
+
+            raise GitHubAuthenticationError(
+                "GitHub API access forbidden."
+            )
+
+        if response.status_code >= 400:
+            raise GitHubRequestError(
+                f"GitHub API returned {response.status_code}"
+            )
+
+        data = response.json()
+
+        # Preserve the repository identity requested by the user.
+        data["owner"]["login"] = owner
+        data["full_name"] = f"{owner}/{repository}"
+
+        return data
+
 
     @staticmethod
     def extract_owner_repo(repository_url):
