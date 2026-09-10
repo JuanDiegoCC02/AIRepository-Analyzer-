@@ -49,6 +49,8 @@ class AnalyzerService:
 
             "html_url": f"https://github.com/{owner}/{name}",
 
+            "topics": repository.get("topics", []),
+
             "language": repository["language"],
 
             "license_name": (
