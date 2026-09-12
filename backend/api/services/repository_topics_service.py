@@ -2,10 +2,12 @@
 
 
 class RepositoryTopicsService:
+
+    @staticmethod
     def analyze(topics):
 
         if not topics:
-            return{
+            return {
                 "frameworks": ["not found"],
                 "domains": ["not found"],
                 "tools": ["not found"],
@@ -28,7 +30,7 @@ class RepositoryTopicsService:
             "laravel",
             "nextjs",
             "nuxt",
-        } 
+        }
 
         domain_keywords = {
             "machine-learning",
@@ -63,7 +65,7 @@ class RepositoryTopicsService:
         }
 
         for topic in topics:
-            value = topic.lower()
+            value = topic.lower().strip()
 
             if value in framework_keywords:
                 frameworks.append(topic)
@@ -74,7 +76,7 @@ class RepositoryTopicsService:
             elif value in tool_keywords:
                 tools.append(topic)
 
-            else: 
+            else:
                 other.append(topic)
 
         return {
