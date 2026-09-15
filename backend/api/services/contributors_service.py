@@ -1,41 +1,29 @@
 from api.services.github_service import GitHubService
 
 
+
 class ContributorsService:
-
-    """
-        Retrieves contributors from a GitHub repository.
-
-        GitHub API communication is delegated to GitHubService 
-        so that authentication, timeout and error handling
-        remain centralized.
-     """
 
     @classmethod
     def get_contributors(cls, owner, repository):
 
-        endpoint = (
-            f"/repos/"
-            f"{owner}/"
-            f"{repository}/contributors"
-        )
+        endpoint = f"/repos/{owner}/{repository}/contributors"
 
         try: 
-            contributors = GitHubService.request(
-                endpoint
-            )
+            contributors = GitHubService.request(endpoint)
+
         except Exception:
             return[]
+
+        if not isinstance(contributors, list):
+            return []
         
         return contributors
 
 
+
     @staticmethod
     def summarize(contributors):
-
-        """
-        Generates a summary of repository contributors.
-        """
 
         if not contributors:
             return {
