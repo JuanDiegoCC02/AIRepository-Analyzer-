@@ -33,23 +33,20 @@ class ContributorsService:
                 "contributors":[],
             }
 
-        total_contributors = len(contributors)
-
         sorted_contributors = sorted(
             contributors,
-            key = lambda contributor: contributor.get(
+            key=lambda contributor: contributor.get(
                 "contributions",
                 0,
             ),
             reverse = True,
         )
 
-        top_contributor = (sorted_contributors[0])
+        top_contributor = sorted_contributors[0]
 
         contributors_summary = []
 
         for contributor in sorted_contributors:
-
             contributors_summary.append(
                 {
                 "login": contributor.get("login"),
@@ -63,7 +60,7 @@ class ContributorsService:
             )
 
         return{
-            "total_contributors": total_contributors,
+            "total_contributors": len(contributors),
             "top_contributor":top_contributor.get("login"),
             "top_contributions": top_contributor.get("contributions", 0,),
             "contributors": contributors_summary
