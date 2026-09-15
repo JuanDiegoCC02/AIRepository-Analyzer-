@@ -29,9 +29,7 @@ class ReleaseAnalysisService:
         if not releases: 
             return{
                 "total_releases": 0,
-
                 "latest_release": None,
-
                 "releases": [],
             }
 
@@ -65,5 +63,9 @@ class ReleaseAnalysisService:
         }
 
 
+
+    @classmethod
+    def analyze(cls, owner, repository):
+        releases = cls.get_releases(owner, repository)
 
         return cls.summarize(releases)
