@@ -1,30 +1,18 @@
 from datetime import datetime, timezone 
 from api.services.github_service import GitHubService 
 
-class ReleaseAnalysisService:
 
-    """
-    Service responsible for retrieving and analyzing GitHub repository releases.
-    """
+
+class ReleaseAnalysisService:
 
     @classmethod
     def get_releases(cls, owner, repository):
 
-        """
-        Retrieves repository releases from GitHub.
-
-        GitHub communication is delegated to GitHubService so authentication, 
-        timeout and HTTP error handling remain centralized.
-        """
-
-        endpoint = (
-            f"/repos/"
-            f"{owner}/"
-            f"{repository}/releases"
-        )
+        endpoint = f"/repos/{owner}/{repository}/releases"
 
         try:
             releases = GitHubService.request(endpoint)
+
         except Exception:
             return[]
 
@@ -32,6 +20,7 @@ class ReleaseAnalysisService:
             return []
 
         return releases
+
 
 
     @staticmethod
