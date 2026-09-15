@@ -25,12 +25,8 @@ class RepositoryStatisticsService:
     @staticmethod
     def generate (repository_data,):
 
-        """
-        Generates a normalized statistics object from GitHub repository data.
-        """
-
         if not repository_data:
-            return{
+            return {
                 "stars": 0,
                 "forks": 0,
                 "watchers": 0,
@@ -39,7 +35,7 @@ class RepositoryStatisticsService:
                 "subscribers": 0,
                 "network_count": 0,
                 "has_wiki": False,
-                "has_page": False,
+                "has_pages": False,
                 "is_fork": False,
                 "archived": False,
             }
