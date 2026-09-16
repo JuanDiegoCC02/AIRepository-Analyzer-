@@ -1,20 +1,11 @@
 from api.services.github_service import GitHubService
 
 
-class TechnologiesService:
 
-    """
-    Service responsible for retrieving and analtzing programming languages 
-    used by a GitHub repository.
-    """
+class TechnologiesService:
 
     @classmethod
     def get_languages(cls, owner, repository):
-
-        """
-        Retrieves the programming languages used by a GitHub repository.
-        GitHub communication is delegated to GitHubService
-        """
 
         endpoint = (
             f"/repos/"
@@ -28,10 +19,7 @@ class TechnologiesService:
         except Exception:
             return{}
 
-        if not isinstance(
-            languages,
-            dict
-        ):
+        if not isinstance(languages, dict,):
             return {}
 
         return languages
