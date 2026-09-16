@@ -29,43 +29,50 @@ class TechnologiesService:
     @staticmethod
     def calculate_percentages(languages):
 
-        """
-        Calculates the percentage of each programming language based on the number 
-        of bytes reported by GitHub.
-        """
-
         if not languages:
             return []
 
-        total = sum( languages.values() )
-
-        if total <= 0:
-            return []
-
-        results = []
+        valid_languages = {}
 
         for language, bytes_count in languages.items():
 
-            percentage = round(
-                (bytes_count / total) * 100,
-                2
-            )
+            if not isinstance(language, str):
+                continue
 
-            results.append({
-                "language": language,
-                "bytes": bytes_count,
-                "percentage": percentage,
-            })
+            if not isinstance(bytes_count, int):
+                continue
 
-        results.sort(
-            key=lambda technology: technology["percentage"],
-            reverse=True
-        )
+            if bytes_count < 0:
+                continue
 
-        return results
+            total = sum(valid_languages.values())
+
+            if total <= 0:
+                return[]
+
+            results = []
+
+            for language, bytes_count in valid_languages.items():
+
+                percentage = round((bytes_count / total) * 100, 2)
+
+                results.append(
+                    {
+                        "language": language,
+                        "bytes": bytes_count,
+                        "percentage": percentage,
+                    }
+                )
+
+                results.sort(
+                    key=lambda technology: technology["percentage"],
+                    reverse=True
+                )
+
+                return results
+
 
     
-
     @staticmethod
     def primary_language(technologies):
 
