@@ -45,31 +45,36 @@ class TechnologiesService:
             if bytes_count < 0:
                 continue
 
-            total = sum(valid_languages.values())
+            valid_languages[language] = bytes_count
 
-            if total <= 0:
-                return[]
+        if not valid_languages:
+            return []
 
-            results = []
+        total = sum(valid_languages.values())
 
-            for language, bytes_count in valid_languages.items():
+        if total <= 0:
+            return[]
 
-                percentage = round((bytes_count / total) * 100, 2)
+        results = []
 
-                results.append(
-                    {
-                        "language": language,
-                        "bytes": bytes_count,
-                        "percentage": percentage,
-                    }
-                )
+        for language, bytes_count in valid_languages.items():
 
-                results.sort(
-                    key=lambda technology: technology["percentage"],
-                    reverse=True
-                )
+            percentage = round((bytes_count / total) * 100, 2)
 
-                return results
+            results.append(
+                {
+                    "language": language,
+                    "bytes": bytes_count,
+                    "percentage": percentage,
+                }
+            )
+
+        results.sort(
+            key=lambda technology: technology["percentage"],
+            reverse=True
+        )
+
+        return results
 
 
     
