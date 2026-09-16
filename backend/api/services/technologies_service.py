@@ -76,10 +76,6 @@ class TechnologiesService:
     @staticmethod
     def primary_language(technologies):
 
-        """
-        Returns the programming language with the highest percentage.
-        """
-
         if not technologies:
             return None
 
@@ -93,29 +89,19 @@ class TechnologiesService:
     @staticmethod
     def get_main_stack(technologies):
 
-        """
-        Returns programming languages representing at least 5% of the repository codebase.
-        """
-
         if not technologies:
             return []
         
         return[
             technology["language"]
             for technology in technologies
-            if technology ["percentage"] >=5
+            if technology ["percentage"] >= 5
         ]
+
+
 
     @classmethod
     def analyze(cls, owner, repository):
-
-        """
-        Complete technology analysis pipeline:
-        1 Retrieves language statistics from GitHub.
-        2 Calculates language percentages.
-        3 Determines the primary language.
-        4 Determines the main technology stack.
-        """
 
         languages = cls.get_languages(
             owner,
