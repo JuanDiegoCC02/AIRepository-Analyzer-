@@ -33,6 +33,60 @@ Backend in active development — React frontend planned for a future phase.
 The current implementation focuses exclusively on the backend and its core analysis infrastructure.
 
 
+<br>
+
+
+Architecture
+
+The backend follows a modular service-oriented approach in which each component has a clearly defined responsibility.
+
+                         ┌──────────────────────┐
+                         │   GitHub Repository  │
+                         │        URL           │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │     REST API         │
+                         │   Django REST        │
+                         │     Framework        │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │    Analyzer Service  │
+                         │   Analysis Pipeline  │
+                         └──────────┬───────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+      ┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+      │ GitHub        │     │ Repository    │     │ Technology    │
+      │ Service       │     │ Statistics    │     │ Analysis      │
+      │               │     │ Service       │     │               │
+      └───────┬───────┘     └───────┬───────┘     └───────┬───────┘
+              │                     │                     │
+              └─────────────────────┼─────────────────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │      PostgreSQL      │
+                         │     Persistence      │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │   Structured API     │
+                         │      Response        │
+                         └──────────────────────┘
+
+This architecture makes it possible to introduce additional analysis engines and AI capabilities without coupling them directly to the HTTP layer.
+
+
+<br>
+
+
 Author
 
 <div align="center">
