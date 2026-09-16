@@ -127,14 +127,14 @@ class TechnologiesService:
             repository,
         )
 
-        technolohies = cls.calculate_percentages(languages)
+        technologies = cls.calculate_percentages(languages)
 
-        primary_language = cls.primary_language(technolohies)
+        primary_language = cls.primary_language(technologies)
 
-        main_stack = cls.get_main_stack(technolohies)
+        main_stack = cls.get_main_stack(technologies)
 
         return {
-            "languages": technolohies,
+            "languages": technologies,
             "primary_language": primary_language,
             "main_stack": main_stack
         }
