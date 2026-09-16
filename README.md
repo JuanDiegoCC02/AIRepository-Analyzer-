@@ -18,7 +18,7 @@ Analyze repository architecture, technologies, statistics, and development chara
 
 </div>
 
-Overview
+Overview:
 
 AI Repository Analyzer is a backend-oriented platform designed to programmatically inspect GitHub repositories and transform repository data into structured technical insights.
 
@@ -36,7 +36,7 @@ The current implementation focuses exclusively on the backend and its core analy
 <br>
 
 
-Architecture
+Architecture:
 
 The backend follows a modular service-oriented approach in which each component has a clearly defined responsibility.
 
@@ -87,7 +87,7 @@ This architecture makes it possible to introduce additional analysis engines and
 <br>
 
 
-Technology Analysis
+Technology Analysis:
 
 The backend is designed to identify and organize technologies associated with a repository.
 
@@ -101,7 +101,11 @@ Application Domains
 
 This information contributes to the identification of the repository's primary technology stack.
 
-Repository Statistics
+
+<br>
+
+
+Repository Statistics:
 
 Repository statistics are processed through a dedicated service rather than directly inside the API layer.
 
@@ -121,7 +125,7 @@ Contribution-related metrics
 <br>
 
 
-Author
+Author:
 
 <div align="center">
 
