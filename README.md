@@ -125,27 +125,6 @@ Contribution-related metrics
 <br>
 
 
-Technology Stack:
-Backend
-Technology	Purpose
-Python	Core programming language
-Django	Backend framework
-Django REST Framework	REST API development
-PostgreSQL	Persistent relational database
-drf-spectacular	OpenAPI schema generation
-GitHub API	Repository data acquisition
-Development
-Tool	Purpose
-Git	Version control
-GitHub	Source code hosting and repository integration
-Postman	API testing
-Swagger / OpenAPI	API documentation
-VS Code	Development environment
-
-
-<br>
-
-
 Author:
 
 <div align="center">
