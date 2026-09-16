@@ -87,6 +87,40 @@ This architecture makes it possible to introduce additional analysis engines and
 <br>
 
 
+Technology Analysis
+
+The backend is designed to identify and organize technologies associated with a repository.
+
+Technology information can be categorized into areas such as:
+
+Languages
+Frameworks
+Libraries
+Development Tools
+Application Domains
+
+This information contributes to the identification of the repository's primary technology stack.
+
+Repository Statistics
+
+Repository statistics are processed through a dedicated service rather than directly inside the API layer.
+
+This separation allows statistical calculations and repository metrics to evolve independently from request handling.
+
+Potential analysis dimensions include:
+
+Repository size
+Stars and forks
+Language distribution
+Commit activity
+Repository age
+Development activity
+Contribution-related metrics
+
+
+<br>
+
+
 Author
 
 <div align="center">
