@@ -12,7 +12,7 @@ class AISummaryService:
         
         if score >= 80:
 
-            return "very goood"
+            return "very good"
         if score >= 70:
             return "good"
         
