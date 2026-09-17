@@ -32,6 +32,9 @@ class AISummaryService:
 
         main = technologies [0]
 
+        if not isinstance(main, dict):
+            return ("The repository's primary technology could not be determined.")
+
         language = main.get(
             "language",
             "Unknown"
@@ -43,7 +46,9 @@ class AISummaryService:
         )
 
         return (
-            f"The repository is primarily written in {language}, which represents approximately {percentage}% of the detected code." 
+            f"The repository is primarily written in {language}, "
+            f"which represents approximately {percentage}% "
+            f"of the detected code."
         )
 
 
@@ -293,7 +298,8 @@ class AISummaryService:
         #introduction
         if description:
             introduction = (
-                f"{repository_name} is classified as a {category} project primarily written in {language}."
+                f"{repository_name} is classified as a "
+                f"{category} project primarily written in {language}. "
                 f"The repository describes itself as: {description}"
             )
         else:
