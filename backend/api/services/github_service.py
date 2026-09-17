@@ -54,15 +54,36 @@ class GitHubService:
             ) from error
 
         if response.status_code in (301, 302, 307, 308):
-            raise GitHubRequestError(
-                f"GitHub redirected the request: "
-                f"{response.headers.get('Location')}"
-            )
+            redirect_url = response.headers.get("Location")
+
+            if not redirect_url: 
+                raise GitHubRequestError(
+                    "GitHub returned a redirect without a location."
+                )
+
+            try: 
+                response = requests.get(
+                    redirect_url,
+                    headers=cls.get_headers(),
+                    params=params,
+                    timeout=cls.TIMEOUT,
+                    allow_redirects=False,
+                )
+
+            except requests.Timeout as error: 
+                raise GitHubRequestError(
+                     "GitHub redirected request timed out."
+                ) from error
+
+            except requests.RequestException as error:
+                raise GitHubRequestError(
+                    "Unable to connect to redirected GitHub resource."
+                ) from error
 
         if response.status_code == 404:
-            raise GitHubNotFoundError(
+            raise GitHubRequestError(
                 "GitHub resource was not found."
-            )
+            ) 
 
         if response.status_code == 401:
             raise GitHubAuthenticationError(
@@ -80,7 +101,7 @@ class GitHubService:
                 )
 
             raise GitHubAuthenticationError(
-                "GitHub API access forbidden."
+                    "GitHub API access forbidden."
             )
 
         if response.status_code >= 400:
@@ -89,7 +110,6 @@ class GitHubService:
             )
 
         return response.json()
-
 
     @classmethod
     def get_repository(cls, repository_url):
