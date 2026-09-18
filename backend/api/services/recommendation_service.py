@@ -76,22 +76,22 @@ class RecommendationService:
 
 
     
-    # maintainability
     @staticmethod
     def maintainability(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Improve maintainability by reviewing project "
                 "structure, reducing code complexity and separating "
                 "responsibilities between components and services."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Consider improving project structure and reducing "
                 "unnecessary complexity to make future maintenance easier."
             )
+
         return None
 
 
