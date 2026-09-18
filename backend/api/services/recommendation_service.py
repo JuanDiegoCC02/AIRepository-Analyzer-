@@ -222,7 +222,7 @@ class RecommendationService:
             {}
         )
 
-        if not comparison:
+        if not isinstance(comparison, dict):
             return []
 
         recommendations = []
@@ -242,7 +242,7 @@ class RecommendationService:
             if trend != "Declining":
                 continue
 
-            if difference > -10:
+            if difference >= -RecommendationService.SIGNIFICANT_DECLINE:
                 continue
 
             readable_name = (
