@@ -26,25 +26,26 @@ class RecommendationService:
                 "and regular project updates."
             )
 
+        return None
 
 
 
-    # activity
     @staticmethod
     def activity(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Repository activity is low. Consider making "
                 "more frequent commits and maintaining a regular "
                 "development cycle."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Consider increasing development activity through "
                 "regular updates, maintenance and feature improvements."
             )
+
         return None
 
 
