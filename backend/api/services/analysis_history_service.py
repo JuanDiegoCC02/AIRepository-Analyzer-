@@ -5,12 +5,17 @@ class AnalysisHistoryService:
 
     @staticmethod
     def get_history(repository):
-        analyses = Analysis.objects.filter(
-            repository=repository
-        ).order_by(
-            "-created_at"
+        """
+        Return all analyses for a repository,
+        ordered from newest to oldest.
+        """
+
+        return (
+            Analysis.objects
+            .filter(repository=repository)
+            .order_by("-created_at", "-id")
         )
-        return analyses
+
 
 
     @staticmethod
