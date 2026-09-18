@@ -144,28 +144,28 @@ class RecommendationService:
 
 
     
-    # overall
     @staticmethod
     def overall(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "The repository requires significant improvements "
-                "across multiple quality dimensions before it can "
-                "be considered production ready."
+                "across multiple quality dimensions before it "
+                "can be considered production ready."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "The repository would benefit from improvements "
                 "across several quality dimensions before production use."
             )
 
-        if score < 85:
+        if score < RecommendationService.GOOD_SCORE:
             return (
                 "The repository is in good condition but still has "
                 "several opportunities for improvement."
             )
+
         return None
 
 
