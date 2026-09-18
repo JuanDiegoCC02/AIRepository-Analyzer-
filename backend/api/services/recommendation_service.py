@@ -50,28 +50,28 @@ class RecommendationService:
 
 
     
-    # documentation
     @staticmethod
     def documentation(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Improve the project documentation by expanding "
                 "the README with installation instructions, usage "
                 "examples, project structure and development guidelines."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Improve the README and project documentation by "
                 "adding more detailed usage instructions and examples."
             )
 
-        if score < 85:
+        if score < RecommendationService.GOOD_SCORE:
             return (
                 "Consider expanding the documentation with additional "
                 "examples and development guidelines."
             )
+
         return None
 
 
