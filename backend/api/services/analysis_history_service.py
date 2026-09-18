@@ -69,6 +69,24 @@ class AnalysisHistoryService:
         )
 
 
+
+    @staticmethod
+    def get_worst(repository):
+        """
+        Return the analysis with the lowest overall score.
+
+        When multiple analyses have the same score,
+        the most recent one is returned.
+        """
+
+        return (
+            Analysis.objects
+            .filter(repository=repository)
+            .order_by("overall_score", "-created_at", "-id")
+            .first()
+        )
+
+
     # comparison structure
     @staticmethod
     def compare_latest(repository):
