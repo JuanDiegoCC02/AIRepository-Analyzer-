@@ -20,24 +20,17 @@ class AnalysisHistoryService:
 
     @staticmethod
     def get_latest(repository):
-        return Analysis.objects.filter(
-            repository=repository
-        ).order_by(
-            "-created_at"
-        ).first()
-    
+        """
+        Return the most recent analysis for a repository.
+        """
 
-    @staticmethod
-    def get_previous(repository):
-        analyses = Analysis.objects.filter(
-            repository=repository
-        ).order_by(
-            "-created_at"
+        return (
+            Analysis.objects
+            .filter(repository=repository)
+            .order_by("-created_at", "-id")
+            .first()
         )
 
-        if analyses.count() < 2:
-            return None
-        return analyses[1]
 
 
     @staticmethod
