@@ -123,23 +123,23 @@ class RecommendationService:
 
 
 
-    # community
     @staticmethod
     def community(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Community engagement is limited. Consider improving "
                 "project documentation, contribution guidelines and "
                 "issue management to encourage external contributions."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Improve community engagement by maintaining clear "
                 "contribution guidelines and responding regularly to "
                 "issues and discussions."
             )
+
         return None
 
 
