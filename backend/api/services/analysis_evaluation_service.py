@@ -54,5 +54,11 @@ class AnalysisEvaluationService:
             "overall_difference": difference,
         }
 
-    
+    @staticmethod
+    def _unavailable_response():
+        return {
+            "available": False,
+            "message": "Not enough historical data for comparison.",
+            "comparison": None,
+        }
         
