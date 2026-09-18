@@ -170,7 +170,6 @@ class RecommendationService:
 
 
 
-    # evaluation
     @staticmethod
     def evaluation(evaluation):
 
@@ -261,152 +260,63 @@ class RecommendationService:
         return recommendations
 
    
-    # generator
     @classmethod
-    def generate( cls, analysis_scores, evaluation=None):
+    def generate(cls, analysis_scores, evaluation=None):
+
+        if not isinstance(analysis_scores, dict):
+            analysis_scores = {}
 
         recommendations = []
-     
-        # extract scores
-        popularity_score = analysis_scores.get(
-            "popularity_score",
-            0
-        )
 
-        activity_score = analysis_scores.get(
-            "activity_score",
-            0
-        )
+        score_methods = [
+            ("popularity", "popularity_score"),
+            ("activity", "activity_score"),
+            ("documentation", "documentation_score"),
+            ("maintainability", "maintainability_score"),
+            ("code_quality", "code_quality_score"),
+            ("community", "community_score"),
+            ("overall", "overall_score"),
+        ]
 
-        documentation_score = analysis_scores.get(
-            "documentation_score",
-            0
-        )
+        for method_name, score_name in score_methods:
 
-        maintainability_score = analysis_scores.get(
-            "maintainability_score",
-            0
-        )
-
-        code_quality_score = analysis_scores.get(
-            "code_quality_score",
-            0
-        )
-
-        community_score = analysis_scores.get(
-            "community_score",
-            0
-        )
-
-        overall_score = analysis_scores.get(
-            "overall_score",
-            0
-        )
-
-
-       
-        # generate recommendations
-        recommendation = cls.popularity(
-            popularity_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
+            score = analysis_scores.get(
+                score_name,
+                0
             )
 
-
-        recommendation = cls.activity(
-            activity_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
+            method = getattr(
+                cls,
+                method_name
             )
 
+            recommendation = method(score)
 
-        recommendation = cls.documentation(
-            documentation_score
-        )
+            if recommendation:
+                recommendations.append(
+                    recommendation
+                )
 
-        if recommendation:
-            recommendations.append(
-                recommendation
-            )
-
-
-        recommendation = cls.maintainability(
-            maintainability_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
-            )
-
-
-        recommendation = cls.code_quality(
-            code_quality_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
-            )
-
-
-        recommendation = cls.community(
-            community_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
-            )
-
-
-        recommendation = cls.overall(
-            overall_score
-        )
-
-        if recommendation:
-            recommendations.append(
-                recommendation
-            )
-
-
-       
-        # historical evaluation
-        recommendation = cls.evaluation(
+        evaluation_recommendation = cls.evaluation(
             evaluation
         )
 
-        if recommendation:
+        if evaluation_recommendation:
             recommendations.append(
-                recommendation
+                evaluation_recommendation
             )
 
-
-        
-        # significant score changes
         recommendations.extend(
             cls.score_changes(
                 evaluation
             )
         )
 
-
-    
-        # fallback
         if not recommendations:
-
             recommendations.append(
                 "No major improvements are currently required. "
                 "Continue monitoring repository quality and "
                 "maintaining regular development activity."
             )
 
-
         return recommendations
-
