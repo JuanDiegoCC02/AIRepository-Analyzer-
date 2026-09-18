@@ -3,24 +3,29 @@
 
 class RecommendationService:
 
-    # popularity
+    LOW_SCORE = 50
+    MODERATE_SCORE = 70
+    GOOD_SCORE = 85
+    SIGNIFICANT_DECLINE = 10
+
+
     @staticmethod
     def popularity(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Increase project visibility by improving the "
                 "README, project description, documentation and "
                 "community engagement."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Consider improving project visibility and "
                 "community adoption through better documentation "
                 "and regular project updates."
             )
-        return None
+
 
 
 
