@@ -34,6 +34,25 @@ class AnalysisHistoryService:
 
 
     @staticmethod
+    def get_previous(repository):
+        """
+        Return the analysis immediately preceding
+        the latest analysis.
+
+        Returns None when fewer than two analyses exist.
+        """
+
+        analyses = (
+            Analysis.objects
+            .filter(repository=repository)
+            .order_by("-created_at", "-id")[1:2]
+        )
+
+        return analyses[0] if analyses else None
+
+
+
+    @staticmethod
     def get_best(repository):
         return Analysis.objects.filter(
             repository=repository
