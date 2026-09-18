@@ -95,30 +95,30 @@ class RecommendationService:
         return None
 
 
-    # code quality
     @staticmethod
     def code_quality(score):
 
-        if score < 50:
+        if score < RecommendationService.LOW_SCORE:
             return (
                 "Code quality requires significant improvement. "
                 "Consider introducing automated testing, improving "
                 "code organization and applying consistent coding standards."
             )
 
-        if score < 70:
+        if score < RecommendationService.MODERATE_SCORE:
             return (
                 "Improve code quality by increasing test coverage, "
                 "reducing duplicated code and maintaining consistent "
                 "coding practices."
             )
 
-        if score < 85:
+        if score < RecommendationService.GOOD_SCORE:
             return (
                 "Consider increasing automated test coverage and "
                 "reviewing areas of the codebase that may contain "
                 "unnecessary complexity."
             )
+
         return None
 
 
