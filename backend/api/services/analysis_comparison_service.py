@@ -73,8 +73,12 @@ class AnalysisComparisonService:
         }
 
 
+
     @classmethod
     def compare(cls, current_analysis, previous_analysis):
+
+        if current_analysis is None or previous_analysis is None:
+            return {}
 
         comparison = {}
 
@@ -83,11 +87,13 @@ class AnalysisComparisonService:
             current_score = getattr(
                 current_analysis,
                 field,
+                None,
             )
 
             previous_score = getattr(
                 previous_analysis,
                 field,
+                None,
             )
 
             comparison[name] = cls.compare_score(
