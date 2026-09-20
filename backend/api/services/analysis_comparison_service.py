@@ -5,23 +5,36 @@ class AnalysisComparisonService:
 
     SCORE_FIELDS = {
         "popularity": "popularity_score",
+
         "activity": "activity_score",
+
         "documentation": "documentation_score",
+
         "maintainability": "maintainability_score",
+
         "code_quality": "code_quality_score",
+
         "community": "community_score",
+
         "overall": "overall_score",
+
     }
 
+
     STABLE_THRESHOLD = 1
+
 
 
     @classmethod
     def calculate_difference(cls, current_score, previous_score):
 
-        difference = (current_score - previous_score)
+        if current_score is None or previous_score is None:
+            return None
+
+        difference = current_score - previous_score
 
         return round(difference, 2,)
+
 
 
     @classmethod
