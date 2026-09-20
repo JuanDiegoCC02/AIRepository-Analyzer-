@@ -40,6 +40,9 @@ class AnalysisComparisonService:
     @classmethod
     def determine_trend(cls, difference):
 
+        if difference is None:
+            return "Unavailable"
+
         if difference > cls.STABLE_THRESHOLD:
             return "Improving"
 
@@ -47,6 +50,7 @@ class AnalysisComparisonService:
             return "Declining"
 
         return "Stable"
+
 
 
     @classmethod
