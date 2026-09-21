@@ -22,6 +22,16 @@ class RecommendationService:
 
 
     @staticmethod
+    def _normalize_score(score):
+
+        if not isinstance(score, (int, float)):
+            return 0
+
+        return max(0, min(score, 100))
+
+
+
+    @staticmethod
     def popularity(score):
 
         if score < RecommendationService.LOW_SCORE:
