@@ -117,6 +117,7 @@ class RecommendationService:
         return None
 
 
+
     @staticmethod
     def code_quality(score):
 
