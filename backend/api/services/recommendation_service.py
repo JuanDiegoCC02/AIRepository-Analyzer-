@@ -6,7 +6,19 @@ class RecommendationService:
     LOW_SCORE = 50
     MODERATE_SCORE = 70
     GOOD_SCORE = 85
+
     SIGNIFICANT_DECLINE = 10
+    MAX_RECOMMENDATIONS = 7
+
+    SCORE_METHODS = [
+        ("popularity", "popularity_score"),
+        ("activity", "activity_score"),
+        ("documentation", "documentation_score"),
+        ("maintainability", "maintainability_score"),
+        ("code_quality", "code_quality_score"),
+        ("community", "community_score"),
+        ("overall", "overall_score"),
+    ]
 
 
     @staticmethod
