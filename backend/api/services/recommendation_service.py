@@ -290,34 +290,18 @@ class RecommendationService:
 
         recommendations = []
 
-        score_methods = [
-            ("popularity", "popularity_score"),
-            ("activity", "activity_score"),
-            ("documentation", "documentation_score"),
-            ("maintainability", "maintainability_score"),
-            ("code_quality", "code_quality_score"),
-            ("community", "community_score"),
-            ("overall", "overall_score"),
-        ]
+        for method_name, score_name in cls.SCORE_METHODS:
 
-        for method_name, score_name in score_methods:
-
-            score = analysis_scores.get(
-                score_name,
-                0
+            score = cls._normalize_score(
+                analysis_scores.get(score_name)
             )
 
-            method = getattr(
-                cls,
-                method_name
-            )
+            method = getattr(cls, method_name)
 
             recommendation = method(score)
 
             if recommendation:
-                recommendations.append(
-                    recommendation
-                )
+                recommendations.append(recommendation)
 
         evaluation_recommendation = cls.evaluation(
             evaluation
@@ -329,9 +313,7 @@ class RecommendationService:
             )
 
         recommendations.extend(
-            cls.score_changes(
-                evaluation
-            )
+            cls.score_changes(evaluation)
         )
 
         if not recommendations:
@@ -341,4 +323,4 @@ class RecommendationService:
                 "maintaining regular development activity."
             )
 
-        return recommendations
+        return recommendations[:cls.MAX_RECOMMENDATIONS]
