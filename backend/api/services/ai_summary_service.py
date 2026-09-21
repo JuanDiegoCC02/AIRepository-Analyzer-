@@ -14,6 +14,19 @@ class AISummaryService:
     }
 
 
+    # normalize score
+    @classmethod
+    def normalize_score(cls, score):
+
+        if not isinstance(score, (int, float)):
+            return 0
+
+        return max(
+            cls.MIN_SCORE,
+            min(score, cls.MAX_SCORE)
+        )
+
+
     # score level
     @staticmethod
     def score_level(cls, score):
