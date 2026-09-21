@@ -4,6 +4,13 @@ from api.services.analysis_comparison_service import AnalysisComparisonService
 
 class AnalysisEvaluationService:
 
+    VALID_TRENDS = {
+        "Improving",
+        "Declining",
+        "Stable",
+    }
+
+
     @classmethod
     def generate(cls, repository, current_analysis):
 
