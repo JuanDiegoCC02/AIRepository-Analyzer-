@@ -66,10 +66,13 @@ class AnalysisEvaluationService:
 
 
     @staticmethod
-    def _unavailable_response():
+    def _unavailable_response(
+        message="Not enough historical data for comparison."
+    ):
+        
         return {
             "available": False,
-            "message": "Not enough historical data for comparison.",
+            "message": message,
             "comparison": None,
         }
         
