@@ -4,9 +4,22 @@
 
 class AISummaryService:
 
+    MIN_SCORE = 0
+    MAX_SCORE = 100
+
+    VALID_TRENDS = {
+        "Improving",
+        "Declining",
+        "Stable",
+    }
+
+
     # score level
     @staticmethod
-    def score_level(score):
+    def score_level(cls, score):
+
+        score = cls.normalize_score(score)
+
         if score >= 90:
             return "excellent"
         
