@@ -233,16 +233,13 @@ class RecommendationService:
     @staticmethod
     def score_changes(evaluation):
 
-        if not evaluation:
+        if not isinstance(evaluation, dict):
             return []
 
         if not evaluation.get("available"):
             return []
 
-        comparison = evaluation.get(
-            "comparison",
-            {}
-        )
+        comparison = evaluation.get("comparison")
 
         if not isinstance(comparison, dict):
             return []
@@ -251,15 +248,17 @@ class RecommendationService:
 
         for score_name, data in comparison.items():
 
+            if score_name == "overall":
+                continue
+
             if not isinstance(data, dict):
                 continue
 
-            difference = data.get(
-                "difference",
-                0
-            )
-
+            difference = data.get("difference")
             trend = data.get("trend")
+
+            if not isinstance(difference, (int, float)):
+                continue
 
             if trend != "Declining":
                 continue
@@ -280,6 +279,7 @@ class RecommendationService:
             )
 
         return recommendations
+
 
    
     @classmethod
