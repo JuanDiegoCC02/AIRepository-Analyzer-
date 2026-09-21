@@ -196,23 +196,19 @@ class RecommendationService:
     @staticmethod
     def evaluation(evaluation):
 
-        if not evaluation:
+        if not isinstance(evaluation, dict):
             return None
 
         if not evaluation.get("available"):
             return None
 
-        trend = evaluation.get(
-            "overall_trend"
-        )
+        trend = evaluation.get("overall_trend")
+        difference = evaluation.get("overall_difference")
 
-        difference = evaluation.get(
-            "overall_difference",
-            0
-        )
+        if not isinstance(difference, (int, float)):
+            return None
 
         if trend == "Declining":
-
             return (
                 f"The repository's overall score has decreased "
                 f"by {abs(difference)} points. Review recent changes "
@@ -221,11 +217,14 @@ class RecommendationService:
             )
 
         if trend == "Stable":
-
             return (
                 "Repository quality has remained relatively stable. "
                 "Continue regular maintenance and monitor future analyses."
             )
+
+        if trend == "Improving":
+            return None
+
         return None
 
 
