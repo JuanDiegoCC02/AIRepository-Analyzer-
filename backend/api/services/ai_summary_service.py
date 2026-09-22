@@ -28,7 +28,7 @@ class AISummaryService:
 
 
     # score level
-    @staticmethod
+    @classmethod
     def score_level(cls, score):
 
         score = cls.normalize_score(score)
