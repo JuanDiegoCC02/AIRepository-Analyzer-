@@ -93,6 +93,27 @@ class AISummaryService:
             f"The repository demonstrates {level} community popularity with {stars:,} GitHub stars."
         )
 
+    
+    @staticmethod
+    def activity_summary(score):
+
+        if score >= 80:
+            return (
+                "Development activity is high, indicating that "
+                "the project receives regular development attention."
+            )
+
+        if score >= 60:
+            return (
+                "Development activity is relatively consistent, "
+                "although there is room for increased development activity."
+            )
+
+        return (
+            "Development activity is relatively low and may indicate "
+            "reduced maintenance activity."
+        )
+
 
     # documentation
     @staticmethod 
