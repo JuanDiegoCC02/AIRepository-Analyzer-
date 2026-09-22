@@ -79,7 +79,7 @@ class AISummaryService:
 
 
     # popularity
-    @staticmethod
+    @classmethod
     def popularity_summary(score, stars):
 
         level = AISummaryService.score_level(score)
@@ -93,7 +93,7 @@ class AISummaryService:
             f"The repository demonstrates {level} community popularity with {stars:,} GitHub stars."
         )
 
-    
+
     @staticmethod
     def activity_summary(score):
 
