@@ -80,7 +80,7 @@ class AISummaryService:
 
     # popularity
     @classmethod
-    def popularity_summary(score, stars):
+    def popularity_summary(cls, score, stars):
 
         level = AISummaryService.score_level(score)
 
@@ -93,7 +93,7 @@ class AISummaryService:
             f"The repository demonstrates {level} community popularity with {stars:,} GitHub stars."
         )
 
-
+    # activity summary
     @staticmethod
     def activity_summary(score):
 
@@ -138,6 +138,7 @@ class AISummaryService:
         )
 
 
+    # maintainability summary
     @staticmethod
     def maintainability_summary(score):
         if score >= 90:
@@ -319,7 +320,7 @@ class AISummaryService:
         )
 
 
-        #introduction
+        # introduction
         if description:
             introduction = (
                 f"{repository_name} is classified as a "
