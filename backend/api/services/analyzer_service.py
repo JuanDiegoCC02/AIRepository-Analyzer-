@@ -1,5 +1,4 @@
 from api.models.repository import Repository
-from api.models.analysis import Analysis
 
 from api.serializers.repository_serializer import RepositorySerializer
 from api.serializers.analysis_serializer import AnalysisSerializer
