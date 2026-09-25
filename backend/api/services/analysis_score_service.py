@@ -12,7 +12,7 @@ class AnalysisScoreService:
 
     @staticmethod
     def normalize_score(score):
-        "Ensures that a score is always a valid numberbetween 0 and 100"
+        """Ensures that a score is always a valid number between 0 and 100."""
 
         if score is None:
             return 0
