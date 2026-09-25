@@ -16,7 +16,7 @@ class AnalysisResultService:
         )
 
         if not level:
-            level = cls.get_level(
+            level = AnalysisScoreService.get_score_level(
                 overall_score
             )
 
