@@ -201,19 +201,6 @@ class AnalyzerService:
     # build scores
     @staticmethod
     def build_scores(analysis):
-
-        if analysis.overall_score >= 90:
-            level = "Excellent"
-
-        elif analysis.overall_score >= 75:
-            level = "Good"
-
-        elif analysis.overall_score >= 50:
-            level = "Average"
-
-        else:
-            level = "Needs Improvement"
-
         return {
             "popularity": analysis.popularity_score,
 
@@ -228,8 +215,6 @@ class AnalyzerService:
             "community": analysis.community_score,
 
             "overall": analysis.overall_score,
-
-            "level": level,
         }
 
 
