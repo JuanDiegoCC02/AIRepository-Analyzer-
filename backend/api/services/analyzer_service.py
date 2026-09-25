@@ -339,7 +339,7 @@ class AnalyzerService:
 
 
         # test create or update repository
-        repository, created = Repository.objects.update_or_create(
+        repository, _ = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
         )
