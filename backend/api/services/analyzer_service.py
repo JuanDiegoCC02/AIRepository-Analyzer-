@@ -33,6 +33,14 @@ class AnalyzerService:
         owner = repository["owner"]["login"]
         name = repository["name"]
 
+        license_data = repository.get("license")
+
+        license_name = (
+            license_data.get("name")
+            if isinstance(license_data, dict)
+            else None
+        )
+
         return {
             "github_id": repository["id"],
 
@@ -42,29 +50,25 @@ class AnalyzerService:
 
             "full_name": f"{owner}/{name}",
 
-            "description": repository["description"],
+            "description": repository.get["description"],
 
             "html_url": f"https://github.com/{owner}/{name}",
 
             "topics": repository.get("topics", []),
 
-            "language": repository["language"],
+            "language": repository.get["language"],
 
-            "license_name": (
-                repository["license"]["name"]
-                if repository["license"]
-                else None
-            ),
+            "license_name": license_name,
 
-            "default_branch": repository["default_branch"],
+            "default_branch": repository.get["default_branch"],
 
-            "stars": repository["stargazers_count"],
+            "stars": repository.get["stargazers_count"],
 
-            "forks": repository["forks_count"],
+            "forks": repository.get["forks_count"],
 
-            "watchers": repository["watchers_count"],
+            "watchers": repository.get["watchers_count"],
 
-            "open_issues": repository["open_issues_count"],
+            "open_issues": repository.get["open_issues_count"],
 
             "github_created_at": repository["created_at"],
 
