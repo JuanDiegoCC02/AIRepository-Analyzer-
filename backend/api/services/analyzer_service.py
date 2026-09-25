@@ -215,6 +215,11 @@ class AnalyzerService:
             "community": analysis.community_score,
 
             "overall": analysis.overall_score,
+
+            "level": AnalysisScoreService.get_score_level(
+                
+                analysis.overall_score
+            ),
         }
 
 
