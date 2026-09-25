@@ -1,28 +1,26 @@
 from api.models.repository import Repository
 
-from api.serializers.repository_serializer import RepositorySerializer
 from api.serializers.analysis_serializer import AnalysisSerializer
+from api.serializers.repository_serializer import RepositorySerializer
 
 from api.utils.repository_classifier import RepositoryClassifier
 
-from api.services.github_service import GitHubService
-
-from api.services.technologies_service import TechnologiesService
-from api.services.recommendation_service import RecommendationService
 from api.services.ai_summary_service import AISummaryService
-from api.services.repository_insights_service import RepositoryInsightsService
-
-from api.services.repository_statistics_service import RepositoryStatisticsService
-from api.services.contributors_service import ContributorsService
-from api.services.readme_service import ReadmeService
-from api.services.repository_health_service import RepositoryHealthService
-from api.services.repository_topics_service import RepositoryTopicsService
-from api.services.repository_maturity_service import RepositoryMaturityService
-from api.services.release_analysis_service import ReleaseAnalysisService
-from api.services.analysis_score_service import AnalysisScoreService
+from api.services.analysis_evaluation_service import AnalysisEvaluationService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
 from api.services.analysis_result_service import AnalysisResultService
-from api.services.analysis_evaluation_service import AnalysisEvaluationService
+from api.services.analysis_score_service import AnalysisScoreService
+from api.services.contributors_service import ContributorsService
+from api.services.github_service import GitHubService
+from api.services.readme_service import ReadmeService
+from api.services.recommendation_service import RecommendationService
+from api.services.release_analysis_service import ReleaseAnalysisService
+from api.services.repository_health_service import RepositoryHealthService
+from api.services.repository_insights_service import RepositoryInsightsService
+from api.services.repository_maturity_service import RepositoryMaturityService
+from api.services.repository_statistics_service import RepositoryStatisticsService
+from api.services.repository_topics_service import RepositoryTopicsService
+from api.services.technologies_service import TechnologiesService
 
 
 
