@@ -3,20 +3,6 @@ from api.services.analysis_score_service import AnalysisScoreService
 
 class AnalysisResultService:
 
-    @staticmethod
-    def get_level (overall_score):
-
-        if overall_score >= 90:
-            return "Excellent"
-
-        if overall_score >= 75:
-            return "Good"
-
-        if overall_score >= 50:
-            return "Average"
-        return "Needs Improvement"
-
-
     @classmethod
     def build (cls, analysis_scores):
 
