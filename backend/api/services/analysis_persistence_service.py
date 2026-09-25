@@ -3,8 +3,9 @@ from api.models.analysis import Analysis
 
 class AnalysisPersistenceService:
 
+    # saved analysis 
     @staticmethod
-    def save_analysis (
+    def save_analysis(
         repository,
         category,
         scores,
@@ -12,9 +13,7 @@ class AnalysisPersistenceService:
         recommendations,
     ):
 
-       # save analysis
             analysis = Analysis.objects.create(
-                  
                     repository=repository,
 
                     project_type=category, 
