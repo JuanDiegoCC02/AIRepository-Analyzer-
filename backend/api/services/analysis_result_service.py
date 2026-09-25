@@ -1,4 +1,4 @@
-
+from api.services.analysis_score_service import AnalysisScoreService
 
 
 class AnalysisResultService:
@@ -30,7 +30,7 @@ class AnalysisResultService:
         )
 
         if not level:
-            level + cls.get_level(
+            level = cls.get_level(
                 overall_score
             )
 
