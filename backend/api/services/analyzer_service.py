@@ -50,25 +50,25 @@ class AnalyzerService:
 
             "full_name": f"{owner}/{name}",
 
-            "description": repository.get["description"],
+            "description": repository.get("description"),
 
             "html_url": f"https://github.com/{owner}/{name}",
 
             "topics": repository.get("topics", []),
 
-            "language": repository.get["language"],
+            "language": repository.get("language"),
 
             "license_name": license_name,
 
-            "default_branch": repository.get["default_branch"],
+            "default_branch": repository.get("default_branch"),
 
-            "stars": repository.get["stargazers_count"],
+            "stars": repository.get("stargazers_count"),
 
-            "forks": repository.get["forks_count"],
+            "forks": repository.get("forks_count"),
 
-            "watchers": repository.get["watchers_count"],
+            "watchers": repository.get("watchers_count"),
 
-            "open_issues": repository.get["open_issues_count"],
+            "open_issues": repository.get("open_issues_count"),
 
             "github_created_at": repository["created_at"],
 
