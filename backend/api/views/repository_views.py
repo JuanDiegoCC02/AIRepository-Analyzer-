@@ -13,9 +13,6 @@ from api.serializers.analysis_serializer import (AnalysisSerializer)
 
 
 class RepositoryAnalyzerView(APIView):
-    """
-    API endpoint responsible for analyzing a GitHub repository.
-    """
 
     def post(self, request):
 
@@ -23,20 +20,20 @@ class RepositoryAnalyzerView(APIView):
             data=request.data
         )
 
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(
+            raise_exception=True
+        )
 
         repository_url = serializer.validated_data[
             "repository_url"
         ]
 
         try:
-
             result = AnalyzerService.analyze_repository(
                 repository_url
             )
 
         except ValueError as error:
-
             return Response(
                 {
                     "error": str(error)
@@ -44,15 +41,8 @@ class RepositoryAnalyzerView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        except Exception as error:
-
-            return Response(
-                {
-                    "error": "Repository analysis failed.",
-                    "details": str(error),
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        except Exception:
+            raise
 
         return Response(
             result,
