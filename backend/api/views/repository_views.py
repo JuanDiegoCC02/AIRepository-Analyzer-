@@ -12,6 +12,57 @@ from api.serializers.repository_serializer import (RepositorySerializer)
 from api.serializers.analysis_serializer import (AnalysisSerializer)
 
 
+"""
+            ---- Correction of Wrong Testing ----
+
+class RepositoryAnalyzerView(APIView):
+    
+    API endpoint responsible for analyzing a GitHub repository.
+    
+
+    def post(self, request):
+
+        serializer = RepositoryAnalyzerSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        repository_url = serializer.validated_data[
+            "repository_url"
+        ]
+
+        try:
+
+            result = AnalyzerService.analyze_repository(
+                repository_url
+            )
+
+        except ValueError as error:
+
+            return Response(
+                {
+                    "error": str(error)
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        except Exception as error:
+
+            return Response(
+                {
+                    "error": "Repository analysis failed.",
+                    "details": str(error),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response(
+            result,
+            status=status.HTTP_200_OK
+        )
+"""
+
 class RepositoryAnalyzerView(APIView):
 
     def post(self, request):
