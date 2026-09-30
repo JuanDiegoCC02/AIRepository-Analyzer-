@@ -6,7 +6,7 @@ class RepositoryAnalyzerSerializer(serializers.Serializer):
 
     repository_url = serializers.URLField(
         required=True,
-        allow_blank=True,
+        allow_blank=False,
     )
 
     def validate_repository_url(self, value):
@@ -53,4 +53,4 @@ class RepositoryAnalyzerSerializer(serializers.Serializer):
                 "GitHub owner and repository are required."
             )
 
-        return f'https://github.com{owner}/{repository}'
+        return f'https://github.com/{owner}/{repository}'
