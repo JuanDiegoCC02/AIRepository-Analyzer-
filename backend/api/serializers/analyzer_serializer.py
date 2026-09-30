@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from rest_framework import serializers
 
 
@@ -12,28 +13,44 @@ class RepositoryAnalyzerSerializer(serializers.Serializer):
 
         value = value.strip()
 
-        if "github.com/" not in value:
+        parsed_url = urlparse(value)
+
+
+        if parsed_url.scheme !=  "https":
             raise serializers.ValidationError(
                 "The URL must belong to GitHub."
             )
 
-        if value.endswith("/"):
-            value = value.rstrip("/")
-
-        parts = value.split("/")
-
-        if len(parts) < 2:
+        if parsed_url.netloc.lower() not in {
+            "github.com",
+            "www.github.com",
+        }:
             raise serializers.ValidationError(
-                "Invalid GitHub repository URL."
+                "The URL must belong to GitHub."
             )
 
-        owner = parts[-2]
+        if parsed_url.query or parsed_url.fragment:
+            raise serializers.ValidationError(
+                "The GitHub repository URL cannot contain query parameters or framents."
+            )
 
-        repository = parts[-1]
+
+        path = parsed_url.path.strip("/")
+
+        parts = path.split("/")
+
+
+        if len (parts) != 2:
+            raise serializers.ValidationError(
+                "The URL must contain a GitHub owner and repository."
+            )
+
+        owner, repository = parts
+
 
         if not owner or not repository:
             raise serializers.ValidationError(
                 "GitHub owner and repository are required."
             )
 
-        return value
+        return f'https://github.com{owner}/{repository}'
