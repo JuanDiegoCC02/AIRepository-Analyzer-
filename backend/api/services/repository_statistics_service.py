@@ -37,6 +37,7 @@ class RepositoryStatisticsService:
                 "has_pages": False,
                 "is_fork": False,
                 "archived": False,
+                "default_branch": None,
             }
 
         return{
@@ -93,6 +94,10 @@ class RepositoryStatisticsService:
             "archived": repository_data.get(
                 "archived",
                 False
+            ),
+
+            "default_branch": repository_data.get(
+                "default_branch",
             ),
         }
 
