@@ -253,7 +253,7 @@ class AnalyzerService:
         )
 
 
-        # test create or update repository
+        # test create or update repository  
         repository, _ = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
@@ -424,8 +424,6 @@ class AnalyzerService:
             analysis_serializer,
 
             repository,
-
-            github_repository,
 
             analysis,
 
