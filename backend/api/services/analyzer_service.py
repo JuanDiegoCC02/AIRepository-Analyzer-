@@ -197,34 +197,6 @@ class AnalyzerService:
 
 
 
-
-    # build scores
-    @staticmethod
-    def build_scores(analysis):
-        return {
-            "popularity": analysis.popularity_score,
-
-            "activity": analysis.activity_score,
-
-            "documentation": analysis.documentation_score,
-
-            "maintainability": analysis.maintainability_score,
-
-            "code_quality": analysis.code_quality_score,
-
-            "community": analysis.community_score,
-
-            "overall": analysis.overall_score,
-
-            "level": AnalysisScoreService.get_score_level(
-                
-                analysis.overall_score
-            ),
-        }
-
-
-
-
     # build classification
     @staticmethod
     def build_classification(repository, analysis):
@@ -241,7 +213,6 @@ class AnalyzerService:
 
 
     
-
     @classmethod
     def build_response(
         cls,
