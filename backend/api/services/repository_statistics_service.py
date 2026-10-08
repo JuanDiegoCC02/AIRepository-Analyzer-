@@ -5,8 +5,7 @@ from api.services.github_service import GitHubService
 class RepositoryStatisticsService:
 
     @classmethod 
-    def get_repository_data(cls, owner, repository,):
-
+    def get_repository_data(cls, owner, repository,):   
         endpoint = f"/repos/{owner}/{repository}"
 
         try:
