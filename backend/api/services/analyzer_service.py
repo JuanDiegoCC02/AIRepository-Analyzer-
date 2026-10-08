@@ -185,7 +185,6 @@ class AnalyzerService:
         repository_serializer,
         analysis_serializer,
         repository,
-        github_repository,
         analysis,
         analysis_result,
         technology_analysis,
@@ -213,11 +212,6 @@ class AnalyzerService:
             "topics": topics,
 
             "statistics": statistics,
-
-            """metrics": cls.build_metrics(
-                repository,
-                github_repository,
-            ),"""
 
             "classification": cls.build_classification(
                 repository,
