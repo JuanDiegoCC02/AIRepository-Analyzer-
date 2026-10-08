@@ -91,5 +91,68 @@ class RepositoryAnalyzerSerializerTests(SimpleTestCase):
         self.assertFalse(serializer.is_valid())
 
 
-    
+    def test_query_parameter_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={
+                "repository_url": (
+                    "https://github.com/facebook/react?test=123"
+                )
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+
+
+    def test_fragment_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={
+                "repository_url": (
+                    "https://github.com/facebook/react#readme"
+                )
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+
+
+    def test_missing_repository_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={
+                "repository_url": (
+                    "https://github.com/facebook"
+                )
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+
+
+    def test_extra_path_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={
+                "repository_url": (
+                    "https://github.com/facebook/react/issues"
+                )
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+
+
+    def test_empty_url_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={
+                "repository_url": ""
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+
+
+    def test_missing_url_is_rejected(self):
+        serializer = RepositoryAnalyzerSerializer(
+            data={}
+        )
+
+        self.assertFalse(serializer.is_valid())
         
