@@ -161,40 +161,6 @@ class AnalyzerService:
             "releases": releases_summary,
         }
     
-    
-
-
-    # build metrics
-    @staticmethod
-    def build_metrics(repository, github_repository):
-
-        return {
-            "stars": repository.stars,
-
-            "forks": repository.forks,
-
-            "watchers": repository.watchers,
-
-            "open_issues": repository.open_issues,
-
-            "default_branch": repository.default_branch,
-
-            "size": github_repository.get(
-                "size",
-                0
-            ),
-
-            "subscribers": github_repository.get(
-                "subscribers_count",
-                0
-            ),
-
-            "network_count": github_repository.get(
-                "network_count",
-                0
-            ),
-        }
-
 
 
     # build classification
@@ -248,10 +214,10 @@ class AnalyzerService:
 
             "statistics": statistics,
 
-            "metrics": cls.build_metrics(
+            """metrics": cls.build_metrics(
                 repository,
                 github_repository,
-            ),
+            ),"""
 
             "classification": cls.build_classification(
                 repository,
