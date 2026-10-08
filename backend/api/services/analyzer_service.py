@@ -242,7 +242,6 @@ class AnalyzerService:
 
     
 
-    # build reponse 
     @classmethod
     def build_response(
         cls,
@@ -283,10 +282,6 @@ class AnalyzerService:
                 github_repository,
             ),
 
-            "scores": cls.build_scores(
-                analysis
-            ),
-
             "classification": cls.build_classification(
                 repository,
                 analysis,
@@ -308,7 +303,6 @@ class AnalyzerService:
 
             "recommendations": recommendations,
         }
-
 
 
 
