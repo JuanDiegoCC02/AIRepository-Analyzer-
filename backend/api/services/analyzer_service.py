@@ -135,11 +135,6 @@ class AnalyzerService:
 
 
         # releases
-        releases = ReleaseAnalysisService.get_releases(
-            repository.owner,
-            repository.name,
-        )
-
         releases_summary = ReleaseAnalysisService.analyze(
             repository.owner,
             repository.name,
