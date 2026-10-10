@@ -140,8 +140,9 @@ class AnalyzerService:
             repository.name,
         )
 
-        releases_summary = ReleaseAnalysisService.summarize(
-            releases
+        releases_summary = ReleaseAnalysisService.analyze(
+            repository.owner,
+            repository.name,
         )
 
         return {
