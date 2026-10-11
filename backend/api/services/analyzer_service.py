@@ -23,10 +23,8 @@ from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
 
 
-
 class AnalyzerService:
 
-    # repository data
     @staticmethod
     def format_repository_data(repository):
 
@@ -43,55 +41,35 @@ class AnalyzerService:
 
         return {
             "github_id": repository["id"],
-
             "owner": owner,
-
             "name": name,
-
             "full_name": f"{owner}/{name}",
-
             "description": repository.get("description"),
-
             "html_url": f"https://github.com/{owner}/{name}",
-
             "topics": repository.get("topics", []),
-
             "language": repository.get("language"),
-
             "license_name": license_name,
-
             "default_branch": repository.get("default_branch"),
-
             "stars": repository.get("stargazers_count"),
-
             "forks": repository.get("forks_count"),
-
             "watchers": repository.get("watchers_count"),
-
             "open_issues": repository.get("open_issues_count"),
-
             "github_created_at": repository["created_at"],
-
             "github_updated_at": repository["updated_at"],
         }
 
 
-
-    # load external resouerces
     @staticmethod
     def load_external_resources(
         repository,
         github_repository
     ):
 
-        # technologies
         technology_analysis = TechnologiesService.analyze(
             repository.owner,
             repository.name,
         )
 
-
-        # readme
         readme = ReadmeService.get_readme(
             repository.owner,
             repository.name,
@@ -101,8 +79,6 @@ class AnalyzerService:
             readme
         )
 
-
-        # contributors
         contributors = ContributorsService.get_contributors(
             repository.owner,
             repository.name,
@@ -112,14 +88,10 @@ class AnalyzerService:
             contributors
         )
 
-
-        # statistics
         statistics = RepositoryStatisticsService.generate(
             github_repository
         )
 
-
-        # topics
         topics = RepositoryTopicsService.analyze(
             github_repository.get(
                 "topics",
@@ -127,52 +99,35 @@ class AnalyzerService:
             )
         )
 
-
-        # maturity
         maturity = RepositoryMaturityService.calculate(
             github_repository
         )
 
-
-        # releases
         releases_summary = ReleaseAnalysisService.analyze(
             repository.owner,
             repository.name,
         )
 
         return {
-
             "technologies": technology_analysis,
-
             "readme": readme_analysis,
-
             "contributors": contributors_summary,
-
             "statistics": statistics,
-
             "topics": topics,
-
             "maturity": maturity,
-
             "releases": releases_summary,
         }
     
 
-
-    # build classification
     @staticmethod
     def build_classification(repository, analysis):
 
         return {
             "project_type": analysis.project_type,
-
             "main_language": repository.language,
-
             "license": repository.license_name,
-
             "owner": repository.owner,
         }
-
 
     
     @classmethod
@@ -198,73 +153,47 @@ class AnalyzerService:
 
         return {
             "repository": repository_serializer.data,
-
             "analysis": analysis_serializer.data,
-
             "analysis_result": analysis_result,
-
             "technologies": technology_analysis,
-
             "topics": topics,
-
             "statistics": statistics,
-
             "classification": cls.build_classification(
                 repository,
                 analysis,
             ),
-
             "insights": insights,
-
             "contributors": contributors,
-
             "readme": readme,
-
             "health": health,
-
             "maturity": maturity,
-
             "releases": releases,
-
             "evaluation": evaluation,
-
             "recommendations": recommendations,
         }
 
 
-
-    # analyze repository
     @classmethod
     def analyze_repository(cls, repository_url):
 
-        # test fetch repository from GitHub
         github_repository = GitHubService.get_repository(
             repository_url
         )
 
-
-        # test format repository data
         repository_data = cls.format_repository_data(
             github_repository
         )
 
-
-        # test create or update repository  
         repository, _ = Repository.objects.update_or_create(
             github_id=repository_data["github_id"],
             defaults=repository_data
         )
 
-
-
-        # load external resources
         resources = cls.load_external_resources(
             repository,
             github_repository
         )
 
-
-        # technology analysis
         technology_analysis = resources["technologies"]
 
         technologies = technology_analysis.get(
@@ -273,111 +202,64 @@ class AnalyzerService:
         )
 
 
-        # other resources
         statistics = resources["statistics"]
 
-        contributors_summary = resources[
-            "contributors"
-        ]
+        contributors_summary = resources["contributors"]
 
-        readme_analysis = resources[
-            "readme"
-        ]
+        readme_analysis = resources["readme"]
 
-        release_summary = resources[
-            "releases"
-        ]
+        release_summary = resources["releases"]
 
-        topics = resources[
-            "topics"
-        ]
+        topics = resources["topics"]
 
-        maturity = resources[
-            "maturity"
-        ]
+        maturity = resources["maturity"]
 
-       
-        # classify repository
         category = RepositoryClassifier.classify(
-
             repository.name,
-
             repository.language,
-
             repository.description,
-
             repository.topics
         )
 
-      
-        # calculate analysis scores
         analysis_scores = AnalysisScoreService.calculate_scores(
             repository,
             github_repository,
         )
 
-
-        # build structured result
         analysis_result = AnalysisResultService.build(
             analysis_scores
         )
 
-      
-        # repository healt
         health = RepositoryHealthService.generate(
             analysis_scores
         )
 
-        
-        # analysis
         analysis = AnalysisPersistenceService.save_analysis(
-
             repository=repository,
-
             category=category,
-
             scores=analysis_scores,
-
             summary="",
-
             recommendations=[],
         )
 
-
-        # historical evaluation
         evaluation = AnalysisEvaluationService.generate(
-
             repository,
-
             analysis,
         )
 
-    
-        # generate recommendations
         recommendations = RecommendationService.generate(
-
             analysis_scores,
-
             evaluation
         )
 
-        
-        # generate ai summary
         summary = AISummaryService.generate(
-
             github_repository,
-
             category,
-
             technologies,
-
             analysis_scores,
-
             evaluation,
         )
 
-       
-        # update anaylsis with ai data 
         analysis.ai_summary = summary
 
         analysis.recommendations = "\n".join(
@@ -391,7 +273,6 @@ class AnalyzerService:
             ]
         )
 
-        # generate insights 
         insights = RepositoryInsightsService.generate(
             repository,
 
@@ -402,8 +283,6 @@ class AnalyzerService:
             evaluation,
         )
 
-        
-        # serializers
         repository_serializer = RepositorySerializer(
             repository
         )
@@ -412,38 +291,21 @@ class AnalyzerService:
             analysis
         )
 
-
-        # final build response
         return cls.build_response(
             repository_serializer,
-
             analysis_serializer,
-
             repository,
-
             analysis,
-
             analysis_result,
-
             technology_analysis,
-
             topics,
-
             statistics,
-
             insights,
-
             contributors_summary,
-
             readme_analysis,
-
             health,
-
             maturity,
-
             release_summary,
-
             evaluation,
-
             recommendations
         )
