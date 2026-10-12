@@ -1,3 +1,4 @@
 #imports tests for the analyzer repository
 
 from .test_analyzer_serializer import RepositoryAnalyzerSerializerTests
+from .test_repository_health_service import RepositoryHealthServiceTests
