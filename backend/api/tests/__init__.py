@@ -3,3 +3,4 @@
 from .test_analyzer_serializer import RepositoryAnalyzerSerializerTests
 from .test_repository_health_service import RepositoryHealthServiceTests
 from .test_release_analysis_service import ReleaseAnalysisServiceTests
+from .test_analysis_score_service import AnalysisScoreServiceTests
