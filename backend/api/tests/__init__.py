@@ -5,3 +5,5 @@ from .test_repository_health_service import RepositoryHealthServiceTests
 from .test_release_analysis_service import ReleaseAnalysisServiceTests
 from .test_analysis_score_service import AnalysisScoreServiceTests
 from .test_analysis_result_service import AnalysisResultServiceTests
+from .test_analysis_persistence_service import AnalysisPersistenceServiceTests
+
