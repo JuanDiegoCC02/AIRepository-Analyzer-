@@ -66,6 +66,7 @@ class AnalysisPersistenceService:
     # saved analysis 
     @staticmethod
     def save_analysis(
+        cls,
         repository,
         category,
         scores,
@@ -73,31 +74,23 @@ class AnalysisPersistenceService:
         recommendations,
     ):
 
-        analysis = Analysis.objects.create(
-                repository=repository,
-
-                project_type=category, 
-            
-                popularity_score = scores["popularity_score"],
-
-                activity_score = scores["activity_score"],
-
-                documentation_score = scores["documentation_score"],
-
-                maintainability_score = scores["maintainability_score"],
-
-                code_quality_score = scores["code_quality_score"],
-
-                community_score = scores["community_score"],
-                
-                overall_score = scores["overall_score"],
-
-                ai_summary = summary,
-
-                recommendations = "\n".join(recommendations),
-                
+        validated_scores = cls._validate_scores(scores)
+        formatted_recommendations = cls._format_recommendations(
+            recommendations
         )
 
-        return analysis 
+        return Analysis.objects.create(
+            repository=repository,
+            project_type=category,
+            popularity_score=validated_scores["popularity_score"],
+            activity_score=validated_scores["activity_score"],
+            documentation_score=validated_scores["documentation_score"],
+            maintainability_score=validated_scores["maintainability_score"],
+            code_quality_score=validated_scores["code_quality_score"],
+            community_score=validated_scores["community_score"],
+            overall_score=validated_scores["overall_score"],
+            ai_summary=summary,
+            recommendations=formatted_recommendations,
+        )
         
         
