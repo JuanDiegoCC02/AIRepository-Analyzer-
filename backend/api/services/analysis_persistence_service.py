@@ -1,7 +1,20 @@
+import math 
+
+from numbers import Real 
 from api.models.analysis import Analysis
 
 
 class AnalysisPersistenceService:
+
+    SCORE_FIELDS = (
+        "popularity_score", 
+        "activity_score", 
+        "documentation_score", 
+        "maintainability_score", 
+        "code_quality_score", 
+        "community_score", 
+        "overall_score",
+    )
 
     # saved analysis 
     @staticmethod
