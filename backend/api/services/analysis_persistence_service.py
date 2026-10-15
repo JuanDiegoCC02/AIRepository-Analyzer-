@@ -43,6 +43,25 @@ class AnalysisPersistenceService:
         return validated_scores
 
 
+    @staticmethod
+    def _format_recommendations(recommendations):
+        if recommendations is None:
+            return ""
+
+        if not isinstance(recommendations, (list, tuple)):
+            raise ValueError(
+                "Recommendations must be a list or tuple of strings."
+            )
+
+        if not all(
+            isinstance(item, str) for item in recommendations
+        ):
+            raise ValueError(
+                "Every recommendation must be a string."
+            )
+
+        return "\n".join(recommendations)
+
 
     # saved analysis 
     @staticmethod
