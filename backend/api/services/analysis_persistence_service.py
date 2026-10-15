@@ -16,6 +16,34 @@ class AnalysisPersistenceService:
         "overall_score",
     )
 
+    @classmethod
+    def _validate_scores(cls, scores):
+        if not isinstance(scores, dict):
+            raise ValueError("Scores must be a dictionary.")
+
+        validated_scores = {}
+
+        for field in cls.SCORE_FIELDS:
+            if field not in scores:
+                raise ValueError(f"Missing required score: {field}.")
+
+            score = scores[field]
+
+            if isinstance(score, bool) or not isinstance(score, Real):
+                raise ValueError(f"{field} must be a numeric value.")
+
+            if not math.isfinite(score) or not 0 <= score <= 100:
+                raise ValueError(f"{field} must be between 0 and 100.")
+
+            if not float(score).is_integer():
+                raise ValueError(f"{field} must be a whole number.")
+
+            validated_scores[field] = int(score)
+
+        return validated_scores
+
+
+
     # saved analysis 
     @staticmethod
     def save_analysis(
