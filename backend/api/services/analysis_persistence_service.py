@@ -13,31 +13,31 @@ class AnalysisPersistenceService:
         recommendations,
     ):
 
-            analysis = Analysis.objects.create(
-                    repository=repository,
+        analysis = Analysis.objects.create(
+                repository=repository,
 
-                    project_type=category, 
+                project_type=category, 
+            
+                popularity_score = scores["popularity_score"],
+
+                activity_score = scores["activity_score"],
+
+                documentation_score = scores["documentation_score"],
+
+                maintainability_score = scores["maintainability_score"],
+
+                code_quality_score = scores["code_quality_score"],
+
+                community_score = scores["community_score"],
                 
-                    popularity_score = scores["popularity_score"],
-    
-                    activity_score = scores["activity_score"],
-    
-                    documentation_score = scores["documentation_score"],
-    
-                    maintainability_score = scores["maintainability_score"],
+                overall_score = scores["overall_score"],
 
-                    code_quality_score = scores["code_quality_score"],
-    
-                    community_score = scores["community_score"],
-                    
-                    overall_score = scores["overall_score"],
-    
-                    ai_summary = summary,
-    
-                    recommendations = "\n".join(recommendations),
-                    
-            )
+                ai_summary = summary,
 
-            return analysis 
+                recommendations = "\n".join(recommendations),
+                
+        )
+
+        return analysis 
         
         
