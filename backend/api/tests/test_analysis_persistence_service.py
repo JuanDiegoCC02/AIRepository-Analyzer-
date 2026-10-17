@@ -98,3 +98,100 @@ class AnalysisPersistenceServiceTests(TestCase):
         self.assertEqual(analysis.recommendations, "")
         self.assertEqual(analysis.ai_summary, "")
 
+
+        
+    def test_save_analysis_rejects_missing_score(self):
+        scores = self.scores.copy()
+        del scores["activity_score"]
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "Missing required score: activity_score.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_score_outside_range(self):
+        scores = self.scores.copy()
+        scores["popularity_score"] = 101
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "popularity_score must be between 0 and 100.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_fractional_score(self):
+        scores = self.scores.copy()
+        scores["activity_score"] = 85.5
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "activity_score must be a whole number.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_accepts_integer_valued_float(self):
+        scores = self.scores.copy()
+        scores["activity_score"] = 80.0
+
+        analysis = AnalysisPersistenceService.save_analysis(
+            repository=self.repository,
+            category="Web Application",
+            scores=scores,
+            summary="Test",
+            recommendations=[],
+        )
+
+        self.assertEqual(analysis.activity_score, 80)
+
+    def test_save_analysis_handles_none_recommendations(self):
+        analysis = AnalysisPersistenceService.save_analysis(
+            repository=self.repository,
+            category="Web Application",
+            scores=self.scores,
+            summary="Test",
+            recommendations=None,
+        )
+
+        self.assertEqual(analysis.recommendations, "")
+
+    def test_save_analysis_rejects_non_string_recommendation(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Every recommendation must be a string.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=self.scores,
+                summary="Test",
+                recommendations=["Improve tests", 123],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+
