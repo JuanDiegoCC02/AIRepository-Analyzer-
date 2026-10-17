@@ -64,7 +64,7 @@ class AnalysisPersistenceService:
 
 
     # saved analysis 
-    @staticmethod
+    @classmethod
     def save_analysis(
         cls,
         repository,
