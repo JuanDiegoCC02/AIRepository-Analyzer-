@@ -9,24 +9,13 @@ from api.services.analyzer_service import AnalyzerService
 
 class AnalyzerServiceTests(TestCase):
 
-    @patch(
-        "api.services.analyzer_service.RepositoryInsightsService.generate"
-    )
-    @patch(
-        "api.services.analyzer_service.AISummaryService.generate"
-    )
-    @patch(
-        "api.services.analyzer_service.RecommendationService.generate"
-    )
-    @patch(
-        "api.services.analyzer_service.AnalysisEvaluationService.generate"
-    )
-    @patch(
-        "api.services.analyzer_service.AnalysisScoreService.calculate_scores"
-    )
-    @patch(
-        "api.services.analyzer_service.GitHubService.get_repository"
-    )
+    @patch("api.services.analyzer_service.RepositoryInsightsService.generate")
+    @patch("api.services.analyzer_service.AISummaryService.generate")
+    @patch("api.services.analyzer_service.RecommendationService.generate")
+    @patch("api.services.analyzer_service.AnalysisEvaluationService.generate")
+    @patch("api.services.analyzer_service.AnalysisScoreService.calculate_scores")
+    @patch("api.services.analyzer_service.GitHubService.get_repository")
+
     def test_analyze_repository_returns_expected_structure(
         self,
         mock_get_repository,
@@ -67,9 +56,7 @@ class AnalyzerServiceTests(TestCase):
         mock_get_repository.return_value = github_repository
         mock_calculate_scores.return_value = scores
         mock_generate_evaluation.return_value = {"status": "good"}
-        mock_generate_recommendations.return_value = [
-            "Improve test coverage",
-        ]
+        mock_generate_recommendations.return_value = ["Improve test coverage",]
         mock_generate_summary.return_value = "A React repository summary."
         mock_generate_insights.return_value = {"strengths": []}
 
