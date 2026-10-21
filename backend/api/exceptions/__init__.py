@@ -1,1 +1,3 @@
+## imports exceptions
+
 from .github_exceptions import GitHubServiceError, GitHubNotFoundError, GitHubRateLimitError, GitHubAuthenticationError, GitHubRequestError
