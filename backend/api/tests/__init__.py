@@ -7,3 +7,4 @@ from .test_analysis_score_service import AnalysisScoreServiceTests
 from .test_analysis_result_service import AnalysisResultServiceTests
 from .test_analysis_persistence_service import AnalysisPersistenceServiceTests
 from .test_analyzer_service import AnalyzerServiceTests
+from .test_github_exception_handler import GitHubExceptionHandlerTests
