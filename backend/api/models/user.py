@@ -1,3 +1,4 @@
+"""
 user = models.ForeignKey(
     settings.AUTH_USER_MODEL,
     on_delete=models.CASCADE,
@@ -5,3 +6,4 @@ user = models.ForeignKey(
     null=True,
     blank=True,
 )
+"""
