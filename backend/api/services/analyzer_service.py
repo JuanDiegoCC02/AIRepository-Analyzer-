@@ -174,7 +174,7 @@ class AnalyzerService:
 
 
     @classmethod
-    def analyze_repository(cls, repository_url):
+    def analyze_repository(cls, repository_url, user=None):
 
         github_repository = GitHubService.get_repository(
             repository_url
@@ -240,6 +240,7 @@ class AnalyzerService:
             scores=analysis_scores,
             summary="",
             recommendations=[],
+            user=user,
         )
 
         evaluation = AnalysisEvaluationService.generate(
