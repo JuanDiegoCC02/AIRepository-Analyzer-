@@ -72,6 +72,7 @@ class AnalysisPersistenceService:
         scores,
         summary,
         recommendations,
+        user=None,
     ):
 
         validated_scores = cls._validate_scores(scores)
@@ -81,6 +82,7 @@ class AnalysisPersistenceService:
 
         return Analysis.objects.create(
             repository=repository,
+            user=user,
             project_type=category,
             popularity_score=validated_scores["popularity_score"],
             activity_score=validated_scores["activity_score"],

@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 from .repository import Repository
 
 class Analysis(models.Model):
@@ -31,6 +31,13 @@ class Analysis(models.Model):
     recommendations = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="analyses",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
 
