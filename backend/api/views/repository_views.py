@@ -1,31 +1,30 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 from api.models.repository import Repository
 from api.models.analysis import Analysis
 
 from api.services.analyzer_service import AnalyzerService
 
-from api.serializers.analyzer_serializer import (RepositoryAnalyzerSerializer)
-from api.serializers.repository_serializer import (RepositorySerializer)
-from api.serializers.analysis_serializer import (AnalysisSerializer)
+from api.serializers.analyzer_serializer import (RepositoryAnalyzerSerializer,)
+from api.serializers.repository_serializer import (RepositorySerializer,)
+from api.serializers.analysis_serializer import (AnalysisSerializer,)
 
-
-"""
-            ---- Correction of Wrong Testing ----
 
 class RepositoryAnalyzerView(APIView):
-    
-    API endpoint responsible for analyzing a GitHub repository.
-    
+    """
+    Analyzes a GitHub repository for the authenticated user.
+    """
+
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
         serializer = RepositoryAnalyzerSerializer(
             data=request.data
         )
-
         serializer.is_valid(raise_exception=True)
 
         repository_url = serializer.validated_data[
@@ -33,173 +32,114 @@ class RepositoryAnalyzerView(APIView):
         ]
 
         try:
-
             result = AnalyzerService.analyze_repository(
-                repository_url
+                repository_url,
+                user=request.user,
             )
-
         except ValueError as error:
-
             return Response(
-                {
-                    "error": str(error)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        except Exception as error:
-
-            return Response(
-                {
-                    "error": "Repository analysis failed.",
-                    "details": str(error),
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         return Response(
             result,
-            status=status.HTTP_200_OK
-        )
-"""
-
-class RepositoryAnalyzerView(APIView):
-
-    def post(self, request):
-
-        serializer = RepositoryAnalyzerSerializer(
-            data=request.data
-        )
-
-        serializer.is_valid(
-            raise_exception=True
-        )
-
-        repository_url = serializer.validated_data[
-            "repository_url"
-        ]
-
-        try:
-            result = AnalyzerService.analyze_repository(
-                repository_url
-            )
-
-        except ValueError as error:
-            return Response(
-                {
-                    "error": str(error)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        except Exception:
-            raise
-
-        return Response(
-            result,
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
 class RepositoryListView(APIView):
     """
-    Returns all repositories analyzed and stored in the database.
+    Returns repositories analyzed by the authenticated user.
     """
 
-    def get(self, request):
+    permission_classes = [IsAuthenticated]
 
-        repositories = Repository.objects.all().order_by(
-            "-updated_at"
+    def get(self, request):
+        repositories = (
+            Repository.objects.filter(
+                analysis__user=request.user
+            )
+            .distinct()
+            .order_by("-updated_at")
         )
 
         serializer = RepositorySerializer(
             repositories,
-            many=True
+            many=True,
         )
 
         return Response(
             {
                 "count": repositories.count(),
-                "repositories": serializer.data
+                "repositories": serializer.data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
 class RepositoryDetailView(APIView):
     """
-    Returns detailed information about a stored repository.
+    Returns repository metadata and the current user's analyses.
     """
 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, repository_id):
-
-        try:
-
-            repository = Repository.objects.get(
-                id=repository_id
-            )
-
-        except Repository.DoesNotExist:
-
-            return Response(
-                {
-                    "error": "Repository not found."
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        repository_serializer = RepositorySerializer(
-            repository
+        repository = get_object_or_404(
+            Repository.objects.filter(
+                analysis__user=request.user
+            ).distinct(),
+            id=repository_id,
         )
 
         analyses = Analysis.objects.filter(
-            repository=repository
+            repository=repository,
+            user=request.user,
         ).order_by("-created_at")
+
+        repository_serializer = RepositorySerializer(
+            repository,
+        )
 
         analysis_serializer = AnalysisSerializer(
             analyses,
-            many=True
+            many=True,
         )
 
         return Response(
             {
                 "repository": repository_serializer.data,
                 "analyses_count": analyses.count(),
-                "analyses": analysis_serializer.data
+                "analyses": analysis_serializer.data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
 class RepositoryHistoryView(APIView):
     """
-    Returns the analysis history of a repository.
+    Returns only the authenticated user's analysis history.
     """
 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, repository_id):
-
-        try:
-
-            repository = Repository.objects.get(
-                id=repository_id
-            )
-
-        except Repository.DoesNotExist:
-
-            return Response(
-                {
-                    "error": "Repository not found."
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
+        repository = get_object_or_404(
+            Repository.objects.filter(
+                analysis__user=request.user
+            ).distinct(),
+            id=repository_id,
+        )
 
         analyses = Analysis.objects.filter(
-            repository=repository
+            repository=repository,
+            user=request.user,
         ).order_by("-created_at")
 
         serializer = AnalysisSerializer(
             analyses,
-            many=True
+            many=True,
         )
 
         return Response(
@@ -207,7 +147,7 @@ class RepositoryHistoryView(APIView):
                 "repository": repository.full_name,
                 "repository_id": repository.id,
                 "count": analyses.count(),
-                "history": serializer.data
+                "history": serializer.data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
