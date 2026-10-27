@@ -235,8 +235,6 @@ class AnalyzerService:
             analysis_scores
         )
 
-
-        # Save the analysis and its generated content atomically.
         with transaction.atomic():
 
             analysis = AnalysisPersistenceService.save_analysis(
