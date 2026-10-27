@@ -1,4 +1,5 @@
 from api.models.repository import Repository
+from django.db import transaction
 
 from api.serializers.analysis_serializer import AnalysisSerializer
 from api.serializers.repository_serializer import RepositorySerializer
@@ -234,45 +235,50 @@ class AnalyzerService:
             analysis_scores
         )
 
-        analysis = AnalysisPersistenceService.save_analysis(
-            repository=repository,
-            category=category,
-            scores=analysis_scores,
-            summary="",
-            recommendations=[],
-            user=user,
-        )
 
-        evaluation = AnalysisEvaluationService.generate(
-            repository,
-            analysis,
-        )
+        # Save the analysis and its generated content atomically.
+        with transaction.atomic():
 
-        recommendations = RecommendationService.generate(
-            analysis_scores,
-            evaluation
-        )
+            analysis = AnalysisPersistenceService.save_analysis(
+                repository=repository,
+                category=category,
+                scores=analysis_scores,
+                summary="",
+                recommendations=[],
+                user=user,
+            )
 
-        summary = AISummaryService.generate(
-            github_repository,
-            category,
-            technologies,
-            analysis_scores,
-            evaluation,
-        )
+            evaluation = AnalysisEvaluationService.generate(
+                repository,
+                analysis,
+            )
 
-        analysis.ai_summary = summary
+            recommendations = RecommendationService.generate(
+                analysis_scores,
+                evaluation,
+            )
 
-        analysis.recommendations = "\n".join(
-            recommendations
-        )
+            summary = AISummaryService.generate(
+                github_repository,
+                category,
+                technologies,
+                analysis_scores,
+                evaluation,
+            )
 
-        analysis.save(
-            update_fields=[
-                "ai_summary",
-                "recommendations",
-            ]
-        )
+            analysis.ai_summary = summary
+
+            analysis.recommendations = "\n".join(
+                recommendations
+            )
+
+            analysis.save(
+                update_fields=[
+                    "ai_summary",
+                    "recommendations",
+                ]
+            )
+
 
         insights = RepositoryInsightsService.generate(
             repository,
