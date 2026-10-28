@@ -9,4 +9,7 @@ from .test_analysis_persistence_service import AnalysisPersistenceServiceTests
 from .test_analyzer_service import AnalyzerServiceTests
 from .test_github_exception_handler import GitHubExceptionHandlerTests
 from .test_github_service import GitHubServiceTests
+from .test_analysis_comparison_service import AnalysisComparisonServiceTests
+
+
 
