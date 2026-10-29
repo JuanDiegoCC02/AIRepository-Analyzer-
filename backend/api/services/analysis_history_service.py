@@ -1,88 +1,54 @@
+
 from api.models.analysis import Analysis
 
 
 class AnalysisHistoryService:
 
     @staticmethod
-    def get_history(repository):
-        """
-        Return all analyses for a repository,
-        ordered from newest to oldest.
-        """
+    def _get_queryset(repository, user=None):
+        queryset = Analysis.objects.filter(repository=repository)
 
+        if user is not None:
+            queryset = queryset.filter(user=user)
+
+        return queryset
+
+    @classmethod
+    def get_history(cls, repository, user=None):
         return (
-            Analysis.objects
-            .filter(repository=repository)
+            cls._get_queryset(repository, user)
             .order_by("-created_at", "-id")
         )
 
-
-
-    @staticmethod
-    def get_latest(repository):
-        """
-        Return the most recent analysis for a repository.
-        """
-
+    @classmethod
+    def get_latest(cls, repository, user=None):
         return (
-            Analysis.objects
-            .filter(repository=repository)
+            cls._get_queryset(repository, user)
             .order_by("-created_at", "-id")
             .first()
         )
 
-
-
-    @staticmethod
-    def get_previous(repository):
-        """
-        Return the analysis immediately preceding
-        the latest analysis.
-
-        Returns None when fewer than two analyses exist.
-        """
-
+    @classmethod
+    def get_previous(cls, repository, user=None):
         analyses = (
-            Analysis.objects
-            .filter(repository=repository)
+            cls._get_queryset(repository, user)
             .order_by("-created_at", "-id")[1:2]
         )
 
         return analyses[0] if analyses else None
 
-
-
-    @staticmethod
-    def get_best(repository):
-        """
-        Return the analysis with the highest overall score.
-
-        When multiple analyses have the same score,
-        the most recent one is returned.
-        """
-
+    @classmethod
+    def get_best(cls, repository, user=None):
         return (
-            Analysis.objects
-            .filter(repository=repository)
+            cls._get_queryset(repository, user)
             .order_by("-overall_score", "-created_at", "-id")
             .first()
         )
 
-
-
-    @staticmethod
-    def get_worst(repository):
-        """
-        Return the analysis with the lowest overall score.
-
-        When multiple analyses have the same score,
-        the most recent one is returned.
-        """
-
+    @classmethod
+    def get_worst(cls, repository, user=None):
         return (
-            Analysis.objects
-            .filter(repository=repository)
+            cls._get_queryset(repository, user)
             .order_by("overall_score", "-created_at", "-id")
             .first()
         )
-
