@@ -1,6 +1,6 @@
 from api.services.analysis_history_service import AnalysisHistoryService
 from api.services.analysis_comparison_service import AnalysisComparisonService
-from backend.api.models import repository
+
 
 
 class AnalysisEvaluationService:
