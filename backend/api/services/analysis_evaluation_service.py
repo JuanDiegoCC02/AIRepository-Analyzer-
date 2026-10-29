@@ -1,5 +1,6 @@
 from api.services.analysis_history_service import AnalysisHistoryService
 from api.services.analysis_comparison_service import AnalysisComparisonService
+from backend.api.models import repository
 
 
 class AnalysisEvaluationService:
@@ -22,8 +23,9 @@ class AnalysisEvaluationService:
                 "The analysis does not belong to the specified repository."
             )
 
-        previous_analysis = (
-            AnalysisHistoryService.get_previous(repository)
+        previous_analysis = AnalysisHistoryService.get_previous(
+            repository,
+            user=current_analysis.user,
         )
 
         if previous_analysis is None:
