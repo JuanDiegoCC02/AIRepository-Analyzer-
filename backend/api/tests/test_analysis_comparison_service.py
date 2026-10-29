@@ -129,3 +129,54 @@ class AnalysisComparisonServiceTests(SimpleTestCase):
 
         self.assertIsNone(result["difference"])
         self.assertEqual(result["trend"], "Unavailable")
+
+    def test_calculate_difference_rejects_non_numeric_scores(self):
+        with self.assertRaises(ValueError):
+            AnalysisComparisonService.calculate_difference(
+                "80",
+                70,
+            )
+
+    def test_calculate_difference_rejects_scores_outside_range(self):
+        with self.assertRaises(ValueError):
+            AnalysisComparisonService.calculate_difference(
+                101,
+                70,
+            )
+
+        with self.assertRaises(ValueError):
+            AnalysisComparisonService.calculate_difference(
+                80,
+                -1,
+            )
+
+    def test_calculate_difference_rejects_non_finite_scores(self):
+        with self.assertRaises(ValueError):
+            AnalysisComparisonService.calculate_difference(
+                float("nan"),
+                70,
+            )
+
+        with self.assertRaises(ValueError):
+            AnalysisComparisonService.calculate_difference(
+                float("inf"),
+                70,
+            )
+
+    def test_compare_rejects_different_repositories(self):
+        current = SimpleNamespace(
+            repository_id=1,
+            overall_score=80,
+        )
+
+        previous = SimpleNamespace(
+            repository_id=2,
+            overall_score=70,
+        )
+
+        result = AnalysisComparisonService.compare(
+            current,
+            previous,
+        )
+
+        self.assertEqual(result, {})
