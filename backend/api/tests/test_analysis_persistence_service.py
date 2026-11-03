@@ -194,4 +194,137 @@ class AnalysisPersistenceServiceTests(TestCase):
 
         self.assertEqual(Analysis.objects.count(), 0)
 
+    
+    def test_save_analysis_rejects_boolean_score(self):
+        scores = self.scores.copy()
+        scores["overall_score"] = True
+
+        with self.assertRaises(ValueError):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_non_numeric_score(self):
+        scores = self.scores.copy()
+        scores["overall_score"] = "80"
+
+        with self.assertRaises(ValueError):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_non_finite_score(self):
+        scores = self.scores.copy()
+        scores["overall_score"] = float("nan")
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "overall_score must be a finite number.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_empty_category(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Category cannot be empty.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="   ",
+                scores=self.scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_non_string_category(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Category must be a string.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category=123,
+                scores=self.scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+    def test_save_analysis_accepts_none_summary(self):
+        analysis = AnalysisPersistenceService.save_analysis(
+            repository=self.repository,
+            category="Web Application",
+            scores=self.scores,
+            summary=None,
+            recommendations=[],
+        )
+
+        self.assertEqual(analysis.ai_summary, "")
+
+    def test_save_analysis_rejects_non_string_summary(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Summary must be a string.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=self.scores,
+                summary={"invalid": "summary"},
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_invalid_recommendations_format(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Recommendations must be a list or tuple of strings.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=self.repository,
+                category="Web Application",
+                scores=self.scores,
+                summary="Test",
+                recommendations="Invalid format",
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
+    def test_save_analysis_rejects_invalid_repository(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "A valid repository instance is required.",
+        ):
+            AnalysisPersistenceService.save_analysis(
+                repository=None,
+                category="Web Application",
+                scores=self.scores,
+                summary="Test",
+                recommendations=[],
+            )
+
+        self.assertEqual(Analysis.objects.count(), 0)
+
 
