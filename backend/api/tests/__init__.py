@@ -11,5 +11,5 @@ from .test_github_exception_handler import GitHubExceptionHandlerTests
 from .test_github_service import GitHubServiceTests
 from .test_analysis_comparison_service import AnalysisComparisonServiceTests
 from .test_analysis_history_service import AnalysisHistoryServiceTests
-
+from .test_analysis_evaluation_service import AnalysisEvaluationServiceTests
 
