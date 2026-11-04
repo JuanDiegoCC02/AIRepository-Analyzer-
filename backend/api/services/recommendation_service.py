@@ -1,4 +1,4 @@
-
+import math
 
 
 class RecommendationService:
@@ -24,7 +24,13 @@ class RecommendationService:
     @staticmethod
     def _normalize_score(score):
 
+        if isinstance(score, bool):
+            return 0
+
         if not isinstance(score, (int, float)):
+            return 0
+
+        if not math.isfinite(score):
             return 0
 
         return max(0, min(score, 100))
