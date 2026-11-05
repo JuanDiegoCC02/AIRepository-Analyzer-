@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase
-
 from api.serializers.analyzer_serializer import RepositoryAnalyzerSerializer
 
 
