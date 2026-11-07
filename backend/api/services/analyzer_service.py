@@ -277,16 +277,12 @@ class AnalyzerService:
                 ]
             )
 
-
-        insights = RepositoryInsightsService.generate(
-            repository,
-
-            analysis,
-
-            technologies,
-
-            evaluation,
-        )
+            insights = RepositoryInsightsService.generate(
+                repository,
+                analysis,
+                technologies,
+                evaluation,
+            )
 
         repository_serializer = RepositorySerializer(
             repository
