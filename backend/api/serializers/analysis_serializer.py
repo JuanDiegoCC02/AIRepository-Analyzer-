@@ -19,6 +19,7 @@ class AnalysisSerializer(serializers.ModelSerializer):
             "code_quality_score",
             "community_score",
             "overall_score",
+            "score_version",
             "ai_summary",
             "recommendations",
             "created_at",
