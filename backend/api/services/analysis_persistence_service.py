@@ -145,6 +145,7 @@ class AnalysisPersistenceService:
             code_quality_score=validated_scores["code_quality_score"],
             community_score=validated_scores["community_score"],
             overall_score=validated_scores["overall_score"],
+            score_version=Analysis.CURRENT_SCORE_VERSION,
             ai_summary=validated_summary,
             recommendations=formatted_recommendations,
         )
