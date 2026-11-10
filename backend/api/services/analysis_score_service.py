@@ -41,6 +41,9 @@ class AnalysisScoreService:
         cls,
         repository,
         github_repository,
+        commits_stats=None,
+        releases=None,
+
     ):
         "Calculates all repository analysis scores and returns a normalized result"
 
@@ -51,7 +54,9 @@ class AnalysisScoreService:
 
         # Activity
         activity_score = ActivityService.calculate(
-            github_repository
+            github_repository,
+            commits_stats=commits_stats,
+            releases=releases,
         )
 
         # Documentation
