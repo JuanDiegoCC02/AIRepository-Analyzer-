@@ -41,7 +41,7 @@ class AnalysisHistoryService:
     @classmethod
     def get_previous(cls, repository, user=_USER_NOT_PROVIDED, score_version=None,):
         analyses = (
-            cls._get_queryset(repository, user)
+            cls._get_queryset(repository, user),
             cls.get_queryset(repository, user, score_version)
             .order_by("-created_at", "-id")[1:2]
         )
