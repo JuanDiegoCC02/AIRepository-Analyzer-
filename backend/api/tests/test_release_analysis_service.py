@@ -158,6 +158,7 @@ class ReleaseAnalysisServiceTests(SimpleTestCase):
 
         mock_request.assert_called_once_with(
             "/repos/owner/repository/releases",
+            params={"per_page": 100},
         )
         self.assertEqual(result["total_releases"], 2)
         self.assertEqual(
