@@ -9,7 +9,7 @@ _USER_NOT_PROVIDED = object()
 class AnalysisHistoryService:
 
     @staticmethod
-    def _get_queryset(repository, user=_USER_NOT_PROVIDED):
+    def _get_queryset(repository, user=_USER_NOT_PROVIDED, score_version=None,):
         queryset = Analysis.objects.filter(repository=repository)
 
         if user is not _USER_NOT_PROVIDED:
@@ -17,6 +17,9 @@ class AnalysisHistoryService:
                 queryset = queryset.filter(user__isnull=True)
             else:
                 queryset = queryset.filter(user=user)
+
+        if score_version is not None: 
+            queryset =  queryset.filter(score_version=score_version)
 
         return queryset
 
@@ -36,9 +39,10 @@ class AnalysisHistoryService:
         )
 
     @classmethod
-    def get_previous(cls, repository, user=_USER_NOT_PROVIDED):
+    def get_previous(cls, repository, user=_USER_NOT_PROVIDED, score_version=None,):
         analyses = (
             cls._get_queryset(repository, user)
+            cls.get_queryset(repository, user, score_version)
             .order_by("-created_at", "-id")[1:2]
         )
 
