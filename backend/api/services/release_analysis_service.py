@@ -5,13 +5,18 @@ from api.services.github_service import GitHubService
 class ReleaseAnalysisService:
     """Retrieves and summarizes repository releases from GitHub."""
 
+    PAGE_SIZE = 100
+
     @classmethod
     def get_releases(cls, owner, repository):
         """Fetch releases for a GitHub repository."""
         endpoint = f"/repos/{owner}/{repository}/releases"
 
         try:
-            releases = GitHubService.request(endpoint)
+            releases = GitHubService.request(
+                endpoint,
+                params={"per_page": cls.PAGE_SIZE},
+            )
         except Exception:
             return []
 
@@ -53,6 +58,7 @@ class ReleaseAnalysisService:
         if not isinstance(releases, list) or not releases:
             return {
                 "total_releases": 0,
+                "capped": False,
                 "latest_release": None,
                 "releases": [],
             }
@@ -66,12 +72,14 @@ class ReleaseAnalysisService:
         if not releases_summary:
             return {
                 "total_releases": 0,
+                "capped": False,
                 "latest_release": None,
                 "releases": [],
             }
 
         return {
             "total_releases": len(releases_summary),
+            "capped": len(releases_summary) >= cls.PAGE_SIZE,
             "latest_release": releases_summary[0],
             "releases": releases_summary,
         }
