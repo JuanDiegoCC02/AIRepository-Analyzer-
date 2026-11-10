@@ -22,6 +22,7 @@ from api.services.repository_maturity_service import RepositoryMaturityService
 from api.services.repository_statistics_service import RepositoryStatisticsService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
+from api.services.commits_service import CommitsService
 
 
 class AnalyzerService:
@@ -109,6 +110,11 @@ class AnalyzerService:
             repository.name,
         )
 
+        commits_summary = CommitsService.analyze(
+            repository.owner,
+            repository.name,
+        )
+
         return {
             "technologies": technology_analysis,
             "readme": readme_analysis,
@@ -117,6 +123,7 @@ class AnalyzerService:
             "topics": topics,
             "maturity": maturity,
             "releases": releases_summary,
+            "commits": commits_summary,
         }
     
 
@@ -150,6 +157,7 @@ class AnalyzerService:
         releases,
         evaluation,
         recommendations,
+        commits=None,
     ):
 
         return {
@@ -169,6 +177,7 @@ class AnalyzerService:
             "health": health,
             "maturity": maturity,
             "releases": releases,
+            "commits": commits,
             "evaluation": evaluation,
             "recommendations": recommendations,
         }
@@ -215,6 +224,8 @@ class AnalyzerService:
 
         maturity = resources["maturity"]
 
+        commits_stats = resources["commits"]
+
         category = RepositoryClassifier.classify(
             repository.name,
             repository.language,
@@ -225,6 +236,8 @@ class AnalyzerService:
         analysis_scores = AnalysisScoreService.calculate_scores(
             repository,
             github_repository,
+            commit_stats=commits_stats,
+            releases=release_summary,
         )
 
         analysis_result = AnalysisResultService.build(
@@ -308,5 +321,6 @@ class AnalyzerService:
             maturity,
             release_summary,
             evaluation,
-            recommendations
+            recommendations,
+            commits=commits_stats
         )
