@@ -13,5 +13,7 @@ from .test_analysis_comparison_service import AnalysisComparisonServiceTests
 from .test_analysis_history_service import AnalysisHistoryServiceTests
 from .test_analysis_evaluation_service import AnalysisEvaluationServiceTests
 from .test_repository_views import RepositoryViewsTests
+from .test_score_versioning import ScoreVersioningTests
+from .test_contributors_service import ContributorsServiceTests
 
 
