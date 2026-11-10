@@ -41,7 +41,7 @@ class AnalysisScoreService:
         cls,
         repository,
         github_repository,
-        commits_stats=None,
+        commit_stats=None,
         releases=None,
 
     ):
@@ -55,7 +55,7 @@ class AnalysisScoreService:
         # Activity
         activity_score = ActivityService.calculate(
             github_repository,
-            commits_stats=commits_stats,
+            commit_stats=commit_stats,
             releases=releases,
         )
 
