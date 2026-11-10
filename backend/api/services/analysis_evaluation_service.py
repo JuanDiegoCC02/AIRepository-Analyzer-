@@ -26,6 +26,7 @@ class AnalysisEvaluationService:
         previous_analysis = AnalysisHistoryService.get_previous(
             repository,
             user=current_analysis.user,
+            score_version=current_analysis.score_version,
         )
 
         if previous_analysis is None:
