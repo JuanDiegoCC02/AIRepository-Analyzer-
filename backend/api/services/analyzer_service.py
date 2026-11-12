@@ -238,6 +238,7 @@ class AnalyzerService:
             github_repository,
             commit_stats=commits_stats,
             releases=release_summary,
+            readme=readme_analysis,
         )
 
         analysis_result = AnalysisResultService.build(
