@@ -43,6 +43,7 @@ class AnalysisScoreService:
         github_repository,
         commit_stats=None,
         releases=None,
+        readme=None,
 
     ):
         "Calculates all repository analysis scores and returns a normalized result"
@@ -61,7 +62,8 @@ class AnalysisScoreService:
 
         # Documentation
         documentation_score = DocumentationService.calculate(
-            github_repository
+            github_repository,
+            readme=readme
         )
 
         # Maintainability
