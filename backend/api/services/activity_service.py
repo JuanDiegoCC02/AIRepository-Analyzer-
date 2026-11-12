@@ -28,8 +28,8 @@ class ActivityService:
     # Recency halves every 60 days: 0 days -> 40, 60 -> 20, 120 -> 10...
     RECENCY_HALF_LIFE_DAYS = 60
 
-    # 100 commits (or more) in the window earn the full commit points.
-    COMMITS_FOR_FULL_SCORE = 100
+    # 30 commits (or more) in the window earn the full commit points.
+    COMMITS_FOR_FULL_SCORE = 30
 
     # 5 active authors (or more) earn the full author points.
     AUTHORS_FOR_FULL_SCORE = 5
