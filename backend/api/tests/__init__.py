@@ -16,5 +16,6 @@ from .test_repository_views import RepositoryViewsTests
 from .test_score_versioning import ScoreVersioningTests
 from .test_contributors_service import ContributorsServiceTests
 from .test_documentation_service import DocumentationServiceTests
-
+from .test_code_quality_service import CodeQualityServiceTests
+from .test_repository_structure_service import RepositoryStructureServiceTests
 
