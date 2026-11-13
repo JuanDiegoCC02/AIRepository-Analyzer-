@@ -340,6 +340,6 @@ class AnalyzerService:
             release_summary,
             evaluation,
             recommendations,
-            commits=commits_stats
+            commits=commits_stats,
             code_quality_signals=code_quality_signals,
         )

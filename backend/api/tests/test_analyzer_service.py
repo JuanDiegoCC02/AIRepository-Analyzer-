@@ -62,6 +62,15 @@ class AnalyzerServiceTests(TestCase):
 
         with (
             patch(
+                "api.services.analyzer_service.RepositoryStructureService.analyze",
+                return_value={
+                    "available": False,
+                    "entries": {},
+                    "workflows": None,
+                },
+            ),
+
+            patch(
                 "api.services.analyzer_service.TechnologiesService.analyze",
                 return_value={"languages": ["JavaScript"]},
             ),
@@ -200,6 +209,15 @@ class AnalyzerServiceTests(TestCase):
 
         with (
             patch(
+                "api.services.analyzer_service.RepositoryStructureService.analyze",
+                return_value={
+                    "available": False,
+                    "entries": {},
+                    "workflows": None,
+                },
+            ),
+
+            patch(
                 "api.services.analyzer_service.TechnologiesService.analyze",
                 return_value={"languages": ["JavaScript"]},
             ),
@@ -314,6 +332,15 @@ class AnalyzerServiceTests(TestCase):
         )
 
         with (
+            patch(
+                "api.services.analyzer_service.RepositoryStructureService.analyze",
+                return_value={
+                    "available": False,
+                    "entries": {},
+                    "workflows": None,
+                },
+            ),
+
             patch(
                 "api.services.analyzer_service.TechnologiesService.analyze",
                 return_value={"languages": ["JavaScript"]},
