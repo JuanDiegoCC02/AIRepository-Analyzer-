@@ -44,7 +44,7 @@ class AnalysisScoreService:
         commit_stats=None,
         releases=None,
         readme=None,
-
+        structure=None,
     ):
         "Calculates all repository analysis scores and returns a normalized result"
 
@@ -73,7 +73,8 @@ class AnalysisScoreService:
 
         # Code quality
         code_quality_score = CodeQualityService.calculate(
-            github_repository
+            github_repository,
+            structure=structure
         )
 
         # Community
