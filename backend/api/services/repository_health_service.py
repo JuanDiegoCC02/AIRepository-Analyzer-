@@ -1,19 +1,52 @@
-
+import math
 
 
 class RepositoryHealthService:
-    """Evaluates repository health using analysis scores."""
+    STRENGTH_SCORE = 80
+    WEAKNESS_SCORE = 60
+
+    # (score key, strength message, weakness message)
+    DIMENSIONS = [
+        (
+            "documentation_score",
+            "Excellent project documentation.",
+            "Documentation should be improved.",
+        ),
+        (
+            "activity_score",
+            "Repository is actively maintained.",
+            "Development activity is low.",
+        ),
+        (
+            "community_score",
+            "Strong community engagement.",
+            "Community engagement is limited.",
+        ),
+        (
+            "code_quality_score",
+            "Code quality indicators are strong.",
+            "Code quality can be improved.",
+        ),
+    ]
 
     @staticmethod
-    def generate(scores):
-        """Generate health status, strengths, and weaknesses."""
-        scores = scores or {}
+    def _number(value):
+        """Return value as a number, or 0 if it is not a valid score."""
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return 0
 
-        overall = scores.get("overall_score", 0)
-        documentation = scores.get("documentation_score", 0)
-        activity = scores.get("activity_score", 0)
-        community = scores.get("community_score", 0)
-        code_quality = scores.get("code_quality_score", 0)
+        if not math.isfinite(value):
+            return 0
+
+        return value
+
+    @classmethod
+    def generate(cls, scores):
+        """Generate health status, strengths, and weaknesses."""
+        if not isinstance(scores, dict):
+            scores = {}
+
+        overall = cls._number(scores.get("overall_score", 0))
 
         if overall >= 90:
             status = "Excellent"
@@ -27,25 +60,13 @@ class RepositoryHealthService:
         strengths = []
         weaknesses = []
 
-        if documentation >= 80:
-            strengths.append("Excellent project documentation.")
-        else:
-            weaknesses.append("Documentation should be improved.")
+        for key, strength, weakness in cls.DIMENSIONS:
+            score = cls._number(scores.get(key, 0))
 
-        if activity >= 80:
-            strengths.append("Repository is actively maintained.")
-        else:
-            weaknesses.append("Development activity is low.")
-
-        if community >= 80:
-            strengths.append("Strong community engagement.")
-        else:
-            weaknesses.append("Community engagement is limited.")
-
-        if code_quality >= 80:
-            strengths.append("Code quality indicators are strong.")
-        else:
-            weaknesses.append("Code quality can be improved.")
+            if score >= cls.STRENGTH_SCORE:
+                strengths.append(strength)
+            elif score < cls.WEAKNESS_SCORE:
+                weaknesses.append(weakness)
 
         return {
             "status": status,
