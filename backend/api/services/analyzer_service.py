@@ -23,6 +23,8 @@ from api.services.repository_statistics_service import RepositoryStatisticsServi
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
 from api.services.commits_service import CommitsService
+from api.services.code_quality_service import CodeQualityService
+from api.services.repository_structure_service import RepositoryStructureService
 
 
 class AnalyzerService:
@@ -115,6 +117,11 @@ class AnalyzerService:
             repository.name,
         )
 
+        structure = RepositoryStructureService.analyze(
+            repository.owner,
+            repository.name,
+        )
+
         return {
             "technologies": technology_analysis,
             "readme": readme_analysis,
@@ -124,6 +131,7 @@ class AnalyzerService:
             "maturity": maturity,
             "releases": releases_summary,
             "commits": commits_summary,
+            "structure": structure,
         }
     
 
@@ -158,6 +166,7 @@ class AnalyzerService:
         evaluation,
         recommendations,
         commits=None,
+        code_quality_signals=None,
     ):
 
         return {
@@ -178,6 +187,7 @@ class AnalyzerService:
             "maturity": maturity,
             "releases": releases,
             "commits": commits,
+            "code_quality_signals": code_quality_signals, 
             "evaluation": evaluation,
             "recommendations": recommendations,
         }
@@ -226,6 +236,8 @@ class AnalyzerService:
 
         commits_stats = resources["commits"]
 
+        structure = resources["structure"]
+
         category = RepositoryClassifier.classify(
             repository.name,
             repository.language,
@@ -239,6 +251,11 @@ class AnalyzerService:
             commit_stats=commits_stats,
             releases=release_summary,
             readme=readme_analysis,
+            structure=structure,
+        )
+
+        code_quality_signals = CodeQualityService.breakdown(
+            structure
         )
 
         analysis_result = AnalysisResultService.build(
@@ -319,9 +336,10 @@ class AnalyzerService:
             contributors_summary,
             readme_analysis,
             health,
-            maturity,
+            maturity, 
             release_summary,
             evaluation,
             recommendations,
             commits=commits_stats
+            code_quality_signals=code_quality_signals,
         )
