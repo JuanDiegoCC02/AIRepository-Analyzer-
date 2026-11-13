@@ -26,4 +26,5 @@ from .analysis_history_service import AnalysisHistoryService
 from .analysis_evaluation_service import AnalysisEvaluationService
 from .github_service import GitHubService
 from .commits_service import CommitsService
+from .repository_structure_service import RepositoryStructureService
 
