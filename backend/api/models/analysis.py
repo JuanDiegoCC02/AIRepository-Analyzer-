@@ -5,7 +5,7 @@ from .repository import Repository
 class Analysis(models.Model):
 
     LEGACY_SCORE_VERSION = 1
-    CURRENT_SCORE_VERSION = 3
+    CURRENT_SCORE_VERSION = 4
 
     repository = models.ForeignKey(
 
