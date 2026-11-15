@@ -5,10 +5,9 @@ from .repository import Repository
 class Analysis(models.Model):
 
     LEGACY_SCORE_VERSION = 1
-    CURRENT_SCORE_VERSION = 4
+    CURRENT_SCORE_VERSION = 5
 
     repository = models.ForeignKey(
-
         Repository,
         on_delete=models.CASCADE,
         related_name="analysis"
@@ -30,7 +29,9 @@ class Analysis(models.Model):
 
     overall_score = models.PositiveSmallIntegerField(default=0)
 
-    score_version = models.PositiveSmallIntegerField(default=LEGACY_SCORE_VERSION,)
+    score_version = models.PositiveSmallIntegerField(
+        default=LEGACY_SCORE_VERSION,
+    )
 
     ai_summary = models.TextField(blank=True, null=True)
 
