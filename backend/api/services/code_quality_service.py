@@ -2,7 +2,6 @@ import os
 
 
 class CodeQualityService:
-
     TESTS_MAX = 30
     CI_MAX = 25
     LINT_MAX = 20
@@ -121,7 +120,12 @@ class CodeQualityService:
 
     @classmethod
     def breakdown(cls, structure):
+        """
+        Points earned by every signal, with the evidence that was found.
 
+        'points' is None when the signal could not be checked. This makes
+        the score explainable (and useful as input for the AI summary).
+        """
         entries = cls._entries(structure)
 
         if entries is None:
@@ -190,7 +194,7 @@ class CodeQualityService:
         if len(docs) >= 2:
             docs_points = cls.PROJECT_DOCS_MAX
         elif len(docs) == 1:
-            docs_points = cls.PROJECT_DOCS_MAX / 2
+            docs_points = cls.PROJECT_DOCS_MAX // 2
         else:
             docs_points = 0
 
@@ -210,7 +214,13 @@ class CodeQualityService:
 
     @classmethod
     def calculate(cls, repository, structure=None):
- 
+        """
+        Return the code quality score (integer from 0 to 100).
+
+        'structure' comes from RepositoryStructureService. It is
+        optional, so calculate(github_repository) keeps working; without
+        it the neutral score is returned.
+        """
         if not isinstance(repository, dict):
             return 0
 
