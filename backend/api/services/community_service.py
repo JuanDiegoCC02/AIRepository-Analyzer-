@@ -1,32 +1,31 @@
-
+import math
 
 
 class CommunityService:
 
     @staticmethod
-    def calculate(repository):
+    def _count(value):
+        """Return value as an integer >= 0 (0 when it is not valid)."""
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return 0
+
+        if isinstance(value, float) and not math.isfinite(value):
+            return 0
+
+        return max(0, int(value))
+
+    @classmethod
+    def calculate(cls, repository):
+
+        if not isinstance(repository, dict):
+            return 0
 
         score = 0
 
-        stars = repository.get(
-            "stargazers_count",
-            0,
-        )
-
-        forks = repository.get(
-            "forks_count",
-            0,
-        )
-
-        watchers = repository.get(
-            "watchers_count",
-            0,
-        )
-
-        issues = repository.get(
-            "open_issues_count",
-            0,
-        )
+        stars = cls._count(repository.get("stargazers_count"))
+        forks = cls._count(repository.get("forks_count"))
+        subscribers = cls._count(repository.get("subscribers_count"))
+        issues = repository.get("open_issues_count")
 
         # Stars
 
@@ -53,23 +52,24 @@ class CommunityService:
         elif forks >= 100:
             score += 10
 
-        # Watchers
+        # Subscribers (people following the repository)
 
-        if watchers >= 10000:
+        if subscribers >= 1000:
             score += 20
 
-        elif watchers >= 1000:
+        elif subscribers >= 300:
             score += 15
 
-        elif watchers >= 100:
+        elif subscribers >= 50:
             score += 10
 
-        # Issues
+        # Issues (only when GitHub reported them)
 
-        if issues <= 100:
-            score += 15
+        if isinstance(issues, int) and not isinstance(issues, bool):
+            if 0 <= issues <= 100:
+                score += 15
 
-        elif issues <= 500:
-            score += 10
+            elif issues <= 500:
+                score += 10
 
         return min(score, 100)
