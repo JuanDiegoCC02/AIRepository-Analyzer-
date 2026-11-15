@@ -1,3 +1,5 @@
+import math
+
 from api.utils.score_calculator import RepositoryScore
 
 from api.services.activity_service import ActivityService
@@ -12,7 +14,7 @@ class AnalysisScoreService:
 
     @staticmethod
     def normalize_score(score):
-        """Ensures that a score is always a valid number between 0 and 100."""
+        """Ensures that a score is always an integer between 0 and 100."""
 
         if score is None:
             return 0
@@ -21,7 +23,10 @@ class AnalysisScoreService:
         except (TypeError, ValueError):
             return 0
 
-        return max(0, min(100, score))
+        if not math.isfinite(score):
+            return 0
+
+        return int(round(max(0, min(100, score))))
 
     @staticmethod
     def get_score_level(overall_score):
@@ -45,6 +50,7 @@ class AnalysisScoreService:
         releases=None,
         readme=None,
         structure=None,
+        contributors=None,
     ):
         "Calculates all repository analysis scores and returns a normalized result"
 
@@ -63,18 +69,19 @@ class AnalysisScoreService:
         # Documentation
         documentation_score = DocumentationService.calculate(
             github_repository,
-            readme=readme
+            readme=readme,
         )
 
         # Maintainability
         maintainability_score = MaintainabilityService.calculate(
-            github_repository
+            github_repository,
+            contributors=contributors,
         )
 
         # Code quality
         code_quality_score = CodeQualityService.calculate(
             github_repository,
-            structure=structure
+            structure=structure,
         )
 
         # Community
