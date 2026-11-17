@@ -1,7 +1,6 @@
 from api.services.github_service import GitHubService
 
 
-
 class RepositoryStatisticsService:
 
     @classmethod 
@@ -51,8 +50,10 @@ class RepositoryStatisticsService:
                 0
             ),
 
+            # GitHub's `watchers_count` is a copy of the stars. The people
+            # who really watch the repository are the subscribers.
             "watchers": repository_data.get(
-                "watchers_count",
+                "subscribers_count",
                 0
             ),
 
