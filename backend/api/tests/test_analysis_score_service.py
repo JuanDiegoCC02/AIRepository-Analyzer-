@@ -30,11 +30,21 @@ class AnalysisScoreServiceTests(SimpleTestCase):
             100,
         )
 
-    def test_normalize_score_preserves_valid_decimal(self):
-        self.assertEqual(
-            AnalysisScoreService.normalize_score(85.5),
-            85.5,
-        )
+    def test_normalize_score_rounds_decimals_to_integers(self):
+        for value, expected in ((85.4, 85), (85.6, 86), (89.0, 89)):
+            with self.subTest(value=value):
+                result = AnalysisScoreService.normalize_score(value)
+
+                self.assertEqual(result, expected)
+                self.assertIsInstance(result, int)
+
+    def test_normalize_score_rejects_values_that_are_not_finite(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(value=value):
+                self.assertEqual(
+                    AnalysisScoreService.normalize_score(value),
+                    0,
+                )
 
     def test_get_score_level_uses_expected_thresholds(self):
         cases = [
@@ -115,3 +125,30 @@ class AnalysisScoreServiceTests(SimpleTestCase):
             90,
             60,
         )
+
+    @patch(
+        "api.services.analysis_score_service.MaintainabilityService.calculate"
+    )
+    def test_calculate_scores_gives_contributors_to_maintainability(
+        self,
+        mock_maintainability,
+    ):
+        mock_maintainability.return_value = 80
+        contributors = {"contributors": [{"login": "a", "contributions": 1}]}
+        github_repository = {}
+
+        result = AnalysisScoreService.calculate_scores(
+            SimpleNamespace(stars=1000),
+            github_repository,
+            contributors=contributors,
+        )
+
+        mock_maintainability.assert_called_once_with(
+            github_repository,
+            contributors=contributors,
+        )
+
+        for name, value in result.items():
+            if name.endswith("_score"):
+                with self.subTest(score=name):
+                    self.assertIsInstance(value, int)
