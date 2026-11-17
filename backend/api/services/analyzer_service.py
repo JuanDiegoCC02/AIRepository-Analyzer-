@@ -11,8 +11,11 @@ from api.services.analysis_evaluation_service import AnalysisEvaluationService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
 from api.services.analysis_result_service import AnalysisResultService
 from api.services.analysis_score_service import AnalysisScoreService
+from api.services.code_quality_service import CodeQualityService
+from api.services.commits_service import CommitsService
 from api.services.contributors_service import ContributorsService
 from api.services.github_service import GitHubService
+from api.services.maintainability_service import MaintainabilityService
 from api.services.readme_service import ReadmeService
 from api.services.recommendation_service import RecommendationService
 from api.services.release_analysis_service import ReleaseAnalysisService
@@ -20,11 +23,9 @@ from api.services.repository_health_service import RepositoryHealthService
 from api.services.repository_insights_service import RepositoryInsightsService
 from api.services.repository_maturity_service import RepositoryMaturityService
 from api.services.repository_statistics_service import RepositoryStatisticsService
+from api.services.repository_structure_service import RepositoryStructureService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
-from api.services.commits_service import CommitsService
-from api.services.code_quality_service import CodeQualityService
-from api.services.repository_structure_service import RepositoryStructureService
 
 
 class AnalyzerService:
@@ -56,7 +57,9 @@ class AnalyzerService:
             "default_branch": repository.get("default_branch"),
             "stars": repository.get("stargazers_count"),
             "forks": repository.get("forks_count"),
-            "watchers": repository.get("watchers_count"),
+            # `watchers_count` is a copy of the stars; subscribers are the
+            # people who really watch the repository.
+            "watchers": repository.get("subscribers_count") or 0,
             "open_issues": repository.get("open_issues_count"),
             "github_created_at": repository["created_at"],
             "github_updated_at": repository["updated_at"],
@@ -74,13 +77,9 @@ class AnalyzerService:
             repository.name,
         )
 
-        readme = ReadmeService.get_readme(
+        readme_analysis = ReadmeService.load_analysis(
             repository.owner,
             repository.name,
-        )
-
-        readme_analysis = ReadmeService.analyze(
-            readme
         )
 
         contributors = ContributorsService.get_contributors(
@@ -103,10 +102,6 @@ class AnalyzerService:
             )
         )
 
-        maturity = RepositoryMaturityService.calculate(
-            github_repository
-        )
-
         releases_summary = ReleaseAnalysisService.analyze(
             repository.owner,
             repository.name,
@@ -115,6 +110,11 @@ class AnalyzerService:
         commits_summary = CommitsService.analyze(
             repository.owner,
             repository.name,
+        )
+
+        maturity = RepositoryMaturityService.calculate(
+            github_repository,
+            commit_stats=commits_summary,
         )
 
         structure = RepositoryStructureService.analyze(
@@ -133,7 +133,7 @@ class AnalyzerService:
             "commits": commits_summary,
             "structure": structure,
         }
-    
+
 
     @staticmethod
     def build_classification(repository, analysis):
@@ -167,6 +167,7 @@ class AnalyzerService:
         recommendations,
         commits=None,
         code_quality_signals=None,
+        maintainability_signals=None,
     ):
 
         return {
@@ -187,7 +188,8 @@ class AnalyzerService:
             "maturity": maturity,
             "releases": releases,
             "commits": commits,
-            "code_quality_signals": code_quality_signals, 
+            "code_quality_signals": code_quality_signals,
+            "maintainability_signals": maintainability_signals,
             "evaluation": evaluation,
             "recommendations": recommendations,
         }
@@ -234,7 +236,7 @@ class AnalyzerService:
 
         maturity = resources["maturity"]
 
-        commits_stats = resources["commits"]
+        commit_stats = resources["commits"]
 
         structure = resources["structure"]
 
@@ -248,14 +250,18 @@ class AnalyzerService:
         analysis_scores = AnalysisScoreService.calculate_scores(
             repository,
             github_repository,
-            commit_stats=commits_stats,
+            commit_stats=commit_stats,
             releases=release_summary,
             readme=readme_analysis,
             structure=structure,
+            contributors=contributors_summary,
         )
 
-        code_quality_signals = CodeQualityService.breakdown(
-            structure
+        code_quality_signals = CodeQualityService.breakdown(structure)
+
+        maintainability_signals = MaintainabilityService.breakdown(
+            github_repository,
+            contributors_summary,
         )
 
         analysis_result = AnalysisResultService.build(
@@ -336,10 +342,11 @@ class AnalyzerService:
             contributors_summary,
             readme_analysis,
             health,
-            maturity, 
+            maturity,
             release_summary,
             evaluation,
             recommendations,
-            commits=commits_stats,
+            commits=commit_stats,
             code_quality_signals=code_quality_signals,
+            maintainability_signals=maintainability_signals,
         )
