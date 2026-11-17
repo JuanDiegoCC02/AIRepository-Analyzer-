@@ -3,27 +3,6 @@ from urllib.parse import urlparse
 
 
 class DocumentationService:
-    """
-    Scores how well a repository is documented, from 0 to 100.
-
-    The README is the most important piece of documentation, so it carries
-    55% of the score. Metadata that helps people understand and reuse the
-    project (description, docs site, license, topics) carries the rest.
-
-    Signals (maximum points):
-      - readme_length:    words in the README                   (30)
-      - readme_structure: number of headings in the README      (25)
-      - description:      short description of the repository   (10)
-      - docs_site:        homepage, GitHub Pages or wiki        (15)
-      - license:          the project declares a license        (10)
-      - topics:           topics that make it discoverable      (10)
-
-    If the README information is not provided at all (None), its two
-    signals are left out and the result is rescaled. If it is provided
-    and the repository has no README, they earn 0 points: not having a
-    README is a real documentation problem.
-    """
-
     README_LENGTH_MAX = 30
     README_STRUCTURE_MAX = 25
     DESCRIPTION_MAX = 10
@@ -64,6 +43,11 @@ class DocumentationService:
     def _readme_points(cls, readme):
         """Return (length_points, structure_points), or (None, None)."""
         if not isinstance(readme, dict):
+            return None, None
+
+        # The README could not be checked (GitHub error): not the
+        # repository's fault, so its signals are left out.
+        if readme.get("available") is False:
             return None, None
 
         if readme.get("exists") is not True:
