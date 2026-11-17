@@ -229,3 +229,37 @@ class DocumentationServiceTests(SimpleTestCase):
 
         self.assertIsInstance(score, int)
         self.assertLessEqual(score, 100)
+
+    def test_unavailable_readme_is_left_out_like_a_missing_argument(self):
+        unavailable = {
+            "available": False,
+            "exists": None,
+            "size": 0,
+            "word_count": 0,
+            "sections": 0,
+        }
+
+        self.assertEqual(
+            DocumentationService.calculate(
+                FULL_REPOSITORY,
+                readme=unavailable,
+            ),
+            DocumentationService.calculate(FULL_REPOSITORY),
+        )
+
+    def test_missing_readme_still_scores_zero_for_its_signals(self):
+        missing = {
+            "available": True,
+            "exists": False,
+            "size": 0,
+            "word_count": 0,
+            "sections": 0,
+        }
+
+        score = DocumentationService.calculate(
+            FULL_REPOSITORY,
+            readme=missing,
+        )
+
+        # 45 points from metadata out of 100: the README signals count.
+        self.assertEqual(score, 45)
