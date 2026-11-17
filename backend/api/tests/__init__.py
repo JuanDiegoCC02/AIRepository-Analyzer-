@@ -18,4 +18,7 @@ from .test_contributors_service import ContributorsServiceTests
 from .test_documentation_service import DocumentationServiceTests
 from .test_code_quality_service import CodeQualityServiceTests
 from .test_repository_structure_service import RepositoryStructureServiceTests
-
+from .test_community_service import CommunityServiceTests
+from .test_maintainability_service import MaintainabilityServiceTests
+from .test_readme_service import ReadmeServiceTests
+from .test_repository_maturity_service import RepositoryMaturityServiceTests
