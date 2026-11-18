@@ -7,6 +7,7 @@ from api.models.analysis import Analysis
 from api.models.repository import Repository
 from api.services.analyzer_service import AnalyzerService
 
+
 SERVICE = "api.services.analyzer_service"
 
 REPOSITORY_URL = "https://github.com/facebook/react"
@@ -41,11 +42,6 @@ SCORES = {
 
 
 def patch_external_services():
-    """Patch every service that would call GitHub or other resources.
-
-    Returns an ExitStack: use it as a context manager (`with ...:`).
-    Every patch is applied where AnalyzerService imports it.
-    """
     stack = ExitStack()
 
     patches = [
@@ -122,6 +118,7 @@ class AnalyzerServiceTests(TestCase):
             "releases",
             "commits",
             "code_quality_signals",
+            "maintainability_signals",
             "evaluation",
             "recommendations",
         ):
