@@ -1,3 +1,7 @@
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubServiceError,
+)
 from api.services.github_service import GitHubService
 
 
@@ -19,7 +23,11 @@ class ContributorsService:
                 params={"per_page": cls.PAGE_SIZE},
             )
 
-        except Exception:
+        except GitHubRateLimitError:
+            # Partial data would be saved as a real analysis: stop instead.
+            raise
+
+        except GitHubServiceError:
             return []
 
         if not isinstance(contributors, list):
