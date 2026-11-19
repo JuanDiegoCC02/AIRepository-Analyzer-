@@ -54,3 +54,4 @@ class InvalidRepositoryURLError(ValueError):
     keeps working.
     """
     pass
+
