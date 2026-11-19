@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta, timezone
 
-from api.exceptions.github_exceptions import GitHubServiceError
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubServiceError,
+)
 from api.services.github_service import GitHubService
 
 
@@ -123,6 +126,9 @@ class CommitsService:
                     "per_page": cls.PAGE_SIZE,
                 },
             )
+        except GitHubRateLimitError:
+            # Partial data would be saved as a real analysis: stop instead.
+            raise
         except GitHubServiceError:
             return None
 
