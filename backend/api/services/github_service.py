@@ -1,4 +1,6 @@
 import os
+import time
+
 import requests
 
 from urllib.parse import urljoin, urlparse
@@ -8,6 +10,7 @@ from api.exceptions.github_exceptions import (
     GitHubNotFoundError,
     GitHubRateLimitError,
     GitHubRequestError,
+    InvalidRepositoryURLError,
 )
 
 
@@ -15,6 +18,9 @@ class GitHubService:
     BASE_URL = "https://api.github.com"
     TIMEOUT = 10
     MAX_REDIRECTS = 3
+
+    # Longest wait (seconds) we report to API clients after a rate limit.
+    MAX_RETRY_AFTER = 3600
 
     REDIRECT_STATUS_CODES = {301, 302, 303, 307, 308}
     ALLOWED_REPOSITORY_HOSTS = {"github.com", "www.github.com"}
@@ -86,6 +92,36 @@ class GitHubService:
         return cls._validate_api_url(url)
 
     @classmethod
+    def _retry_after_seconds(cls, headers, now=None):
+        """
+        Seconds to wait before retrying, read from the rate limit headers.
+
+        GitHub sends `Retry-After` (seconds) for secondary limits and
+        `X-RateLimit-Reset` (epoch seconds) for the primary limit. The
+        result is an integer between 1 and MAX_RETRY_AFTER, or None when
+        the headers are missing or invalid.
+        """
+        try:
+            retry_after = headers.get("Retry-After")
+            reset = headers.get("X-RateLimit-Reset")
+        except AttributeError:
+            return None
+
+        seconds = None
+
+        if isinstance(retry_after, str) and retry_after.strip().isdigit():
+            seconds = int(retry_after.strip())
+
+        elif isinstance(reset, str) and reset.strip().isdigit():
+            current = int(now if now is not None else time.time())
+            seconds = int(reset.strip()) - current
+
+        if seconds is None:
+            return None
+
+        return max(1, min(seconds, cls.MAX_RETRY_AFTER))
+
+    @classmethod
     def _handle_response_error(cls, response):
         """Convert GitHub HTTP errors into application exceptions."""
         status_code = response.status_code
@@ -102,15 +138,18 @@ class GitHubService:
 
         if status_code == 429:
             raise GitHubRateLimitError(
-                "GitHub API rate limit exceeded."
+                "GitHub API rate limit exceeded.",
+                retry_after=cls._retry_after_seconds(response.headers),
             )
 
         if status_code == 403:
             remaining = response.headers.get("X-RateLimit-Remaining")
 
-            if remaining == "0":
+            # Secondary rate limits answer 403 with a Retry-After header.
+            if remaining == "0" or response.headers.get("Retry-After"):
                 raise GitHubRateLimitError(
-                    "GitHub API rate limit exceeded."
+                    "GitHub API rate limit exceeded.",
+                    retry_after=cls._retry_after_seconds(response.headers),
                 )
 
             raise GitHubAuthenticationError(
@@ -230,7 +269,7 @@ class GitHubService:
         Extract the owner and repository from a GitHub HTTPS URL.
         """
         if not isinstance(repository_url, str) or not repository_url.strip():
-            raise ValueError(
+            raise InvalidRepositoryURLError(
                 "A valid HTTPS GitHub repository URL is required."
             )
 
@@ -239,7 +278,7 @@ class GitHubService:
         try:
             port = parsed_url.port
         except ValueError as error:
-            raise ValueError(
+            raise InvalidRepositoryURLError(
                 "The GitHub repository URL contains an invalid port."
             ) from error
 
@@ -253,12 +292,12 @@ class GitHubService:
             or parsed_url.password is not None
             or port not in (None, 443)
         ):
-            raise ValueError(
+            raise InvalidRepositoryURLError(
                 "The URL must be an HTTPS GitHub repository URL."
             )
 
         if parsed_url.query or parsed_url.fragment:
-            raise ValueError(
+            raise InvalidRepositoryURLError(
                 "The GitHub repository URL cannot contain "
                 "query parameters or fragments."
             )
@@ -274,7 +313,7 @@ class GitHubService:
             or parts[0] in {".", ".."}
             or parts[1] in {".", ".."}
         ):
-            raise ValueError(
+            raise InvalidRepositoryURLError(
                 "The URL must contain a GitHub owner and repository."
             )
 
