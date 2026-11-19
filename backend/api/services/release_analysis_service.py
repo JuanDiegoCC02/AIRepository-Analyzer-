@@ -1,10 +1,16 @@
 from urllib.parse import quote
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubServiceError,
+)
 from api.services.github_service import GitHubService
 
 
 class ReleaseAnalysisService:
     """Retrieves and summarizes repository releases from GitHub."""
 
+    # GitHub returns only 30 items per page unless asked otherwise, which
+    # silently truncated the release count. 100 is the maximum allowed.
     PAGE_SIZE = 100
 
     @classmethod
@@ -17,7 +23,11 @@ class ReleaseAnalysisService:
                 endpoint,
                 params={"per_page": cls.PAGE_SIZE},
             )
-        except Exception:
+        except GitHubRateLimitError:
+            # Partial data would be saved as a real analysis: stop instead.
+            raise
+
+        except GitHubServiceError:
             return []
 
         if not isinstance(releases, list):
@@ -79,6 +89,8 @@ class ReleaseAnalysisService:
 
         return {
             "total_releases": len(releases_summary),
+            # True when the list hit the page limit: the repository may
+            # have more releases than the ones counted here.
             "capped": len(releases_summary) >= cls.PAGE_SIZE,
             "latest_release": releases_summary[0],
             "releases": releases_summary,
