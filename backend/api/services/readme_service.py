@@ -3,10 +3,10 @@ import binascii
 
 from api.exceptions.github_exceptions import (
     GitHubNotFoundError,
+    GitHubRateLimitError,
     GitHubRequestError,
     GitHubServiceError,
 )
-
 from api.services.github_service import GitHubService
 
 
@@ -14,6 +14,7 @@ class ReadmeService:
 
     @classmethod
     def get_readme(cls, owner, repository):
+
         endpoint = (
             f"/repos/"
             f"{owner}/"
@@ -65,9 +66,7 @@ class ReadmeService:
 
     @staticmethod
     def analyze(readme):
-        """
-        Analyzes README content and returns basic documentation metrics.
-        """
+        """Analyzes README content and returns basic documentation metrics."""
 
         if readme is None:
             return {
@@ -98,15 +97,12 @@ class ReadmeService:
 
     @classmethod
     def load_analysis(cls, owner, repository):
-        """
-        Fetches and analyzes the README of a repository.
-
-        When GitHub cannot be reached the analysis is marked as
-        unavailable, so the documentation score does not punish the
-        repository for a problem that is not its own.
-        """
         try:
             readme = cls.get_readme(owner, repository)
+
+        except GitHubRateLimitError:
+            # Partial data would be saved as a real analysis: stop instead.
+            raise
 
         except GitHubServiceError:
             return cls.unavailable()
