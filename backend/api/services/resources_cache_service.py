@@ -4,8 +4,8 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class ResourcesCacheService:
     """

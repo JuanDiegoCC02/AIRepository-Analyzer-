@@ -1,3 +1,8 @@
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubServiceError,
+)
+
 from api.services.github_service import GitHubService
 
 
@@ -16,8 +21,12 @@ class TechnologiesService:
         try: 
             languages = GitHubService.request(endpoint)
 
-        except Exception:
-            return{}
+        except GitHubRateLimitError:
+            # Partial data would be saved as a real analysis: stop instead.
+            raise
+
+        except GitHubServiceError:
+            return {}
 
         if not isinstance(languages, dict,):
             return {}
