@@ -1,3 +1,5 @@
+import logging
+
 from api.models.repository import Repository
 from django.db import transaction
 
@@ -19,6 +21,7 @@ from api.services.maintainability_service import MaintainabilityService
 from api.services.readme_service import ReadmeService
 from api.services.recommendation_service import RecommendationService
 from api.services.release_analysis_service import ReleaseAnalysisService
+from api.services.resources_cache_service import ResourcesCacheService
 from api.services.repository_health_service import RepositoryHealthService
 from api.services.repository_insights_service import RepositoryInsightsService
 from api.services.repository_maturity_service import RepositoryMaturityService
@@ -27,6 +30,8 @@ from api.services.repository_structure_service import RepositoryStructureService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
 
+
+logger = logging.getLogger(__name__)
 
 class AnalyzerService:
 
@@ -57,8 +62,6 @@ class AnalyzerService:
             "default_branch": repository.get("default_branch"),
             "stars": repository.get("stargazers_count"),
             "forks": repository.get("forks_count"),
-            # `watchers_count` is a copy of the stars; subscribers are the
-            # people who really watch the repository.
             "watchers": repository.get("subscribers_count") or 0,
             "open_issues": repository.get("open_issues_count"),
             "github_created_at": repository["created_at"],
@@ -67,10 +70,11 @@ class AnalyzerService:
 
 
     @staticmethod
-    def load_external_resources(
-        repository,
-        github_repository
-    ):
+    def fetch_remote_resources(repository):
+        """
+        About 8 requests. Rate limits are not handled here: they stop the
+        analysis, so incomplete data is never saved as a real analysis.
+        """
 
         technology_analysis = TechnologiesService.analyze(
             repository.owner,
@@ -91,17 +95,6 @@ class AnalyzerService:
             contributors
         )
 
-        statistics = RepositoryStatisticsService.generate(
-            github_repository
-        )
-
-        topics = RepositoryTopicsService.analyze(
-            github_repository.get(
-                "topics",
-                []
-            )
-        )
-
         releases_summary = ReleaseAnalysisService.analyze(
             repository.owner,
             repository.name,
@@ -110,11 +103,6 @@ class AnalyzerService:
         commits_summary = CommitsService.analyze(
             repository.owner,
             repository.name,
-        )
-
-        maturity = RepositoryMaturityService.calculate(
-            github_repository,
-            commit_stats=commits_summary,
         )
 
         structure = RepositoryStructureService.analyze(
@@ -126,13 +114,105 @@ class AnalyzerService:
             "technologies": technology_analysis,
             "readme": readme_analysis,
             "contributors": contributors_summary,
-            "statistics": statistics,
-            "topics": topics,
-            "maturity": maturity,
             "releases": releases_summary,
             "commits": commits_summary,
             "structure": structure,
         }
+
+
+    @classmethod
+    def load_external_resources(
+        cls,
+        repository,
+        github_repository
+    ):
+
+        pushed_at = github_repository.get("pushed_at")
+
+        remote = ResourcesCacheService.get(
+            repository.github_id,
+            pushed_at,
+        )
+
+        if remote is None:
+            remote = cls.fetch_remote_resources(repository)
+
+            ResourcesCacheService.set(
+                repository.github_id,
+                pushed_at,
+                remote,
+            )
+
+        # These only use data that is already in memory: always fresh.
+        statistics = RepositoryStatisticsService.generate(
+            github_repository
+        )
+
+        topics = RepositoryTopicsService.analyze(
+            github_repository.get(
+                "topics",
+                []
+            )
+        )
+
+        maturity = RepositoryMaturityService.calculate(
+            github_repository,
+            commit_stats=remote["commits"],
+        )
+
+        return {
+            "technologies": remote["technologies"],
+            "readme": remote["readme"],
+            "contributors": remote["contributors"],
+            "statistics": statistics,
+            "topics": topics,
+            "maturity": maturity,
+            "releases": remote["releases"],
+            "commits": remote["commits"],
+            "structure": remote["structure"],
+        }
+
+
+    @staticmethod
+    def build_data_quality(resources):
+        missing = sorted(
+            name
+            for name in ("commits", "structure", "readme")
+            if isinstance(resources.get(name), dict)
+            and resources[name].get("available") is False
+        )
+
+        return {
+            "complete": not missing,
+            "missing": missing,
+        }
+
+
+    @staticmethod
+    def generate_summary(
+        github_repository,
+        category,
+        technologies,
+        analysis_scores,
+        evaluation,
+    ):
+        """
+        Build the analysis summary. It never raises: the summary is an
+        extra, so a failure must not cost the user the whole analysis.
+        """
+
+        try:
+            return AISummaryService.generate(
+                github_repository,
+                category,
+                technologies,
+                analysis_scores,
+                evaluation,
+            ) or ""
+
+        except Exception:
+            logger.exception("The analysis summary could not be generated.")
+            return ""
 
 
     @staticmethod
@@ -168,6 +248,7 @@ class AnalyzerService:
         commits=None,
         code_quality_signals=None,
         maintainability_signals=None,
+        data_quality=None,
     ):
 
         return {
@@ -190,6 +271,7 @@ class AnalyzerService:
             "commits": commits,
             "code_quality_signals": code_quality_signals,
             "maintainability_signals": maintainability_signals,
+            "data_quality": data_quality,
             "evaluation": evaluation,
             "recommendations": recommendations,
         }
@@ -293,32 +375,34 @@ class AnalyzerService:
                 evaluation,
             )
 
-            summary = AISummaryService.generate(
-                github_repository,
-                category,
+            insights = RepositoryInsightsService.generate(
+                repository,
+                analysis,
                 technologies,
-                analysis_scores,
                 evaluation,
             )
-
-            analysis.ai_summary = summary
 
             analysis.recommendations = "\n".join(
                 recommendations
             )
 
             analysis.save(
-                update_fields=[
-                    "ai_summary",
-                    "recommendations",
-                ]
+                update_fields=["recommendations"]
             )
 
-            insights = RepositoryInsightsService.generate(
-                repository,
-                analysis,
-                technologies,
-                evaluation,
+        summary = cls.generate_summary(
+            github_repository,
+            category,
+            technologies,
+            analysis_scores,
+            evaluation,
+        )
+
+        if summary:
+            analysis.ai_summary = summary
+
+            analysis.save(
+                update_fields=["ai_summary"]
             )
 
         repository_serializer = RepositorySerializer(
@@ -349,4 +433,5 @@ class AnalyzerService:
             commits=commit_stats,
             code_quality_signals=code_quality_signals,
             maintainability_signals=maintainability_signals,
+            data_quality=cls.build_data_quality(resources),
         )
