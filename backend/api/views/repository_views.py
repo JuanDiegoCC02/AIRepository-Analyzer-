@@ -31,16 +31,12 @@ class RepositoryAnalyzerView(APIView):
             "repository_url"
         ]
 
-        try:
-            result = AnalyzerService.analyze_repository(
-                repository_url,
-                user=request.user,
-            )
-        except ValueError as error:
-            return Response(
-                {"error": str(error)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # Errors (invalid URL, GitHub failures) are turned into safe
+        # responses by api.exceptions.api_exception_handler.
+        result = AnalyzerService.analyze_repository(
+            repository_url,
+            user=request.user,
+        )
 
         return Response(
             result,
