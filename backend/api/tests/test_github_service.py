@@ -9,6 +9,7 @@ from api.exceptions.github_exceptions import (
     GitHubNotFoundError,
     GitHubRateLimitError,
     GitHubRequestError,
+    InvalidRepositoryURLError,
 )
 
 
@@ -209,3 +210,101 @@ class GitHubServiceTests(SimpleTestCase):
             GitHubService.get_repository(
                 "https://github.com/facebook/react"
             )
+
+    # --------------------------------------------------
+    # Rate limit information
+    # --------------------------------------------------
+
+    def test_retry_after_header_is_used_in_seconds(self):
+        result = GitHubService._retry_after_seconds({"Retry-After": "42"})
+
+        self.assertEqual(result, 42)
+
+    def test_reset_header_is_converted_to_seconds_from_now(self):
+        result = GitHubService._retry_after_seconds(
+            {"X-RateLimit-Reset": "1700000600"},
+            now=1700000000,
+        )
+
+        self.assertEqual(result, 600)
+
+    def test_retry_after_is_limited_and_never_below_one_second(self):
+        too_long = GitHubService._retry_after_seconds(
+            {"Retry-After": "999999"}
+        )
+        already_reset = GitHubService._retry_after_seconds(
+            {"X-RateLimit-Reset": "1699999000"},
+            now=1700000000,
+        )
+
+        self.assertEqual(too_long, GitHubService.MAX_RETRY_AFTER)
+        self.assertEqual(already_reset, 1)
+
+    def test_invalid_rate_limit_headers_return_none(self):
+        for headers in (
+            {},
+            {"Retry-After": "soon"},
+            {"Retry-After": "-5"},
+            {"X-RateLimit-Reset": "tomorrow"},
+            {"Retry-After": None},
+            None,
+        ):
+            with self.subTest(headers=headers):
+                self.assertIsNone(
+                    GitHubService._retry_after_seconds(headers)
+                )
+
+    @patch("api.services.github_service.requests.get")
+    def test_rate_limit_error_carries_the_retry_delay(self, mock_get):
+        mock_get.return_value = self.make_response(
+            status_code=429,
+            headers={"Retry-After": "30"},
+        )
+
+        with self.assertRaises(GitHubRateLimitError) as context:
+            GitHubService.request("/repos/facebook/react")
+
+        self.assertEqual(context.exception.retry_after, 30)
+
+    @patch("api.services.github_service.requests.get")
+    def test_secondary_rate_limit_403_is_a_rate_limit(self, mock_get):
+        mock_get.return_value = self.make_response(
+            status_code=403,
+            headers={"Retry-After": "60", "X-RateLimit-Remaining": "10"},
+        )
+
+        with self.assertRaises(GitHubRateLimitError) as context:
+            GitHubService.request("/repos/facebook/react")
+
+        self.assertEqual(context.exception.retry_after, 60)
+
+    @patch("api.services.github_service.requests.get")
+    def test_rate_limit_without_headers_has_no_retry_delay(self, mock_get):
+        mock_get.return_value = self.make_response(status_code=429)
+
+        with self.assertRaises(GitHubRateLimitError) as context:
+            GitHubService.request("/repos/facebook/react")
+
+        self.assertIsNone(context.exception.retry_after)
+
+    # --------------------------------------------------
+    # Invalid repository URLs
+    # --------------------------------------------------
+
+    def test_invalid_repository_urls_raise_a_specific_error(self):
+        invalid_urls = [
+            "http://github.com/facebook/react",
+            "https://example.com/facebook/react",
+            "https://github.com/facebook",
+            "https://github.com/facebook/react?tab=readme",
+            "",
+            None,
+        ]
+
+        for url in invalid_urls:
+            with self.subTest(url=url):
+                with self.assertRaises(InvalidRepositoryURLError):
+                    GitHubService.extract_owner_repo(url)
+
+    def test_invalid_repository_url_error_is_still_a_value_error(self):
+        self.assertTrue(issubclass(InvalidRepositoryURLError, ValueError))
