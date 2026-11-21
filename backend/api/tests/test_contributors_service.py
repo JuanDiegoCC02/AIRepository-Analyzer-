@@ -2,6 +2,10 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubRequestError,
+)
 from api.services.contributors_service import ContributorsService
 
 
@@ -43,11 +47,19 @@ class ContributorsServiceTests(SimpleTestCase):
     def test_get_contributors_returns_empty_list_on_error(self):
         with patch(
             "api.services.contributors_service.GitHubService.request",
-            side_effect=Exception("GitHub request failed"),
+            side_effect=GitHubRequestError("GitHub request failed"),
         ):
             result = ContributorsService.get_contributors("owner", "repo")
 
         self.assertEqual(result, [])
+
+    def test_get_contributors_does_not_hide_the_rate_limit(self):
+        with patch(
+            "api.services.contributors_service.GitHubService.request",
+            side_effect=GitHubRateLimitError("limit"),
+        ):
+            with self.assertRaises(GitHubRateLimitError):
+                ContributorsService.get_contributors("owner", "repo")
 
     def test_get_contributors_returns_empty_list_for_unexpected_data(self):
         with patch(
