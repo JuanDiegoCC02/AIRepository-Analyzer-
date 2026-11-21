@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from api.exceptions.github_exceptions import (
+    GitHubAuthenticationError,
     GitHubNotFoundError,
     GitHubRateLimitError,
     GitHubRequestError,
@@ -124,10 +125,15 @@ class LoadAnalysisTests(SimpleTestCase):
         self.assertFalse(result["exists"])
 
     def test_github_failure_marks_the_analysis_as_unavailable(self):
-        for error in (GitHubRateLimitError("limit"),
+        for error in (GitHubAuthenticationError("forbidden"),
                       GitHubRequestError("network")):
             with self.subTest(error=type(error).__name__):
                 with patch(REQUEST, side_effect=error):
                     result = ReadmeService.load_analysis("owner", "repo")
 
                 self.assertFalse(result["available"])
+
+    def test_rate_limit_stops_the_analysis(self):
+        with patch(REQUEST, side_effect=GitHubRateLimitError("limit")):
+            with self.assertRaises(GitHubRateLimitError):
+                ReadmeService.load_analysis("owner", "repo")
