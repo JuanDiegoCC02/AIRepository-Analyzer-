@@ -1,8 +1,11 @@
-
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
+from api.exceptions.github_exceptions import (
+    GitHubRateLimitError,
+    GitHubRequestError,
+)
 from api.services.release_analysis_service import ReleaseAnalysisService
 
 
@@ -36,7 +39,7 @@ class ReleaseAnalysisServiceTests(SimpleTestCase):
     def test_get_releases_returns_empty_list_on_error(self):
         with patch(
             "api.services.release_analysis_service.GitHubService.request",
-            side_effect=Exception("GitHub request failed"),
+            side_effect=GitHubRequestError("GitHub request failed"),
         ):
             result = ReleaseAnalysisService.get_releases(
                 "owner",
@@ -44,6 +47,14 @@ class ReleaseAnalysisServiceTests(SimpleTestCase):
             )
 
         self.assertEqual(result, [])
+
+    def test_get_releases_does_not_hide_the_rate_limit(self):
+        with patch(
+            "api.services.release_analysis_service.GitHubService.request",
+            side_effect=GitHubRateLimitError("limit"),
+        ):
+            with self.assertRaises(GitHubRateLimitError):
+                ReleaseAnalysisService.get_releases("owner", "repository")
 
     def test_get_releases_handles_unexpected_response(self):
         with patch(
@@ -159,11 +170,25 @@ class ReleaseAnalysisServiceTests(SimpleTestCase):
         mock_request.assert_called_once_with(
             "/repos/owner/repository/releases",
             params={"per_page": 100},
-
         )
-        
         self.assertEqual(result["total_releases"], 2)
         self.assertEqual(
             result["latest_release"]["tag_name"],
             "v3.0.0",
         )
+        self.assertFalse(result["capped"])
+
+    def test_summarize_flags_a_full_page_of_releases_as_capped(self):
+        releases = [
+            {"tag_name": f"v{index}.0.0"}
+            for index in range(100)
+        ]
+
+        result = ReleaseAnalysisService.summarize(
+            releases,
+            "owner",
+            "repository",
+        )
+
+        self.assertEqual(result["total_releases"], 100)
+        self.assertTrue(result["capped"])
