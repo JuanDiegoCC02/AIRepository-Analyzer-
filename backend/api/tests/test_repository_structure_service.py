@@ -5,6 +5,7 @@ from django.test import SimpleTestCase
 from api.exceptions.github_exceptions import (
     GitHubNotFoundError,
     GitHubRateLimitError,
+    GitHubRequestError,
 )
 from api.services.repository_structure_service import (
     RepositoryStructureService,
@@ -89,7 +90,7 @@ class RepositoryStructureServiceTests(SimpleTestCase):
         self.assertEqual(result, {})
 
     def test_github_errors_return_none(self):
-        with patch(REQUEST, side_effect=GitHubRateLimitError("limit")):
+        with patch(REQUEST, side_effect=GitHubRequestError("failed")):
             result = RepositoryStructureService.get_root_entries(
                 "owner",
                 "repo",
@@ -130,7 +131,7 @@ class RepositoryStructureServiceTests(SimpleTestCase):
         self.assertEqual(result, [])
 
     def test_workflow_errors_return_none(self):
-        with patch(REQUEST, side_effect=GitHubRateLimitError("limit")):
+        with patch(REQUEST, side_effect=GitHubRequestError("failed")):
             result = RepositoryStructureService.get_workflow_files(
                 "owner",
                 "repo",
@@ -160,7 +161,7 @@ class RepositoryStructureServiceTests(SimpleTestCase):
         self.assertEqual(result["workflows"], [])
 
     def test_analyze_is_unavailable_when_the_root_cannot_be_read(self):
-        with patch(REQUEST, side_effect=GitHubRateLimitError("limit")):
+        with patch(REQUEST, side_effect=GitHubRequestError("failed")):
             result = RepositoryStructureService.analyze("owner", "repo")
 
         self.assertFalse(result["available"])
@@ -170,9 +171,22 @@ class RepositoryStructureServiceTests(SimpleTestCase):
     def test_analyze_keeps_root_when_only_workflows_fail(self):
         with patch(
             REQUEST,
-            side_effect=[ROOT, GitHubRateLimitError("limit")],
+            side_effect=[ROOT, GitHubRequestError("failed")],
         ):
             result = RepositoryStructureService.analyze("owner", "repo")
 
         self.assertTrue(result["available"])
         self.assertIsNone(result["workflows"])
+
+    def test_rate_limit_stops_reading_the_root(self):
+        with patch(REQUEST, side_effect=GitHubRateLimitError("limit")):
+            with self.assertRaises(GitHubRateLimitError):
+                RepositoryStructureService.analyze("owner", "repo")
+
+    def test_rate_limit_stops_reading_the_workflows(self):
+        with patch(
+            REQUEST,
+            side_effect=[ROOT, GitHubRateLimitError("limit")],
+        ):
+            with self.assertRaises(GitHubRateLimitError):
+                RepositoryStructureService.analyze("owner", "repo")
