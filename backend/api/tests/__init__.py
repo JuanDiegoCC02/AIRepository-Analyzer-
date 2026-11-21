@@ -22,3 +22,5 @@ from .test_community_service import CommunityServiceTests
 from .test_maintainability_service import MaintainabilityServiceTests
 from .test_readme_service import ReadmeServiceTests
 from .test_repository_maturity_service import RepositoryMaturityServiceTests
+from .test_analyze_endpoint_errors import AnalyzeEndpointErrorTests
+from .test_commits_service import CommitsServiceTests
