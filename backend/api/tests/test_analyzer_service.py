@@ -1,12 +1,15 @@
 from contextlib import ExitStack
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from django.test import TestCase
+from django.core.cache import cache
+from django.db import connection
+from django.test import TestCase, TransactionTestCase
 
+from api.exceptions.github_exceptions import GitHubRateLimitError
 from api.models.analysis import Analysis
 from api.models.repository import Repository
 from api.services.analyzer_service import AnalyzerService
-
+from api.services.resources_cache_service import ResourcesCacheService
 
 SERVICE = "api.services.analyzer_service"
 
@@ -25,9 +28,11 @@ GITHUB_REPOSITORY = {
     "stargazers_count": 100,
     "forks_count": 20,
     "watchers_count": 100,
+    "subscribers_count": 40,
     "open_issues_count": 10,
     "created_at": "2020-01-01T00:00:00Z",
     "updated_at": "2026-10-01T00:00:00Z",
+    "pushed_at": "2026-10-01T00:00:00Z",
 }
 
 SCORES = {
@@ -40,33 +45,51 @@ SCORES = {
     "overall_score": 78,
 }
 
+# GitHub could not provide commits and structure.
+INCOMPLETE = {
+    "CommitsService.analyze": {"available": False},
+    "RepositoryStructureService.analyze": {
+        "available": False,
+        "entries": {},
+        "workflows": None,
+    },
+}
 
-def patch_external_services():
+# Everything was retrieved: the result can be cached.
+COMPLETE = {
+    "CommitsService.analyze": {"available": True, "commits": 5},
+    "RepositoryStructureService.analyze": {
+        "available": True,
+        "entries": {},
+        "workflows": [],
+    },
+}
+
+
+def patch_pipeline(resources=None):
+    values = {
+        "GitHubService.get_repository": GITHUB_REPOSITORY,
+        "AnalysisScoreService.calculate_scores": SCORES,
+        "AnalysisEvaluationService.generate": {"status": "good"},
+        "RecommendationService.generate": ["Improve test coverage"],
+        "AISummaryService.generate": "A React repository summary.",
+        "RepositoryInsightsService.generate": {"strengths": []},
+        "TechnologiesService.analyze": {"languages": ["JavaScript"]},
+        "ReadmeService.load_analysis": {"available": True, "exists": True},
+        "ContributorsService.get_contributors": [],
+        "ContributorsService.summarize": {"total": 0},
+        "RepositoryStatisticsService.generate": {"stars": 100},
+        "RepositoryTopicsService.analyze": {"topics": ["javascript"]},
+        "ReleaseAnalysisService.analyze": {"total": 0},
+        "RepositoryHealthService.generate": {"status": "good"},
+    }
+    values.update(INCOMPLETE if resources is None else resources)
+
     stack = ExitStack()
+    stack.mocks = {}
 
-    patches = [
-        ("TechnologiesService.analyze", {"languages": ["JavaScript"]}),
-        ("ReadmeService.get_readme", "# React"),
-        ("ReadmeService.analyze", {"available": True}),
-        ("ContributorsService.get_contributors", []),
-        ("ContributorsService.summarize", {"total": 0}),
-        ("RepositoryStatisticsService.generate", {"stars": 100}),
-        (
-            "RepositoryTopicsService.analyze",
-            {"topics": ["javascript", "react"]},
-        ),
-        ("RepositoryMaturityService.calculate", {"level": "mature"}),
-        ("ReleaseAnalysisService.analyze", {"total": 0}),
-        ("CommitsService.analyze", {"available": False}),
-        (
-            "RepositoryStructureService.analyze",
-            {"available": False, "entries": {}, "workflows": None},
-        ),
-        ("RepositoryHealthService.generate", {"status": "good"}),
-    ]
-
-    for target, return_value in patches:
-        stack.enter_context(
+    for target, return_value in values.items():
+        stack.mocks[target] = stack.enter_context(
             patch(f"{SERVICE}.{target}", return_value=return_value)
         )
 
@@ -75,31 +98,12 @@ def patch_external_services():
 
 class AnalyzerServiceTests(TestCase):
 
-    @patch(f"{SERVICE}.RepositoryInsightsService.generate")
-    @patch(f"{SERVICE}.AISummaryService.generate")
-    @patch(f"{SERVICE}.RecommendationService.generate")
-    @patch(f"{SERVICE}.AnalysisEvaluationService.generate")
-    @patch(f"{SERVICE}.AnalysisScoreService.calculate_scores")
-    @patch(f"{SERVICE}.GitHubService.get_repository")
-    def test_analyze_repository_returns_expected_structure(
-        self,
-        mock_get_repository,
-        mock_calculate_scores,
-        mock_generate_evaluation,
-        mock_generate_recommendations,
-        mock_generate_summary,
-        mock_generate_insights,
-    ):
-        mock_get_repository.return_value = GITHUB_REPOSITORY
-        mock_calculate_scores.return_value = SCORES
-        mock_generate_evaluation.return_value = {"status": "good"}
-        mock_generate_recommendations.return_value = [
-            "Improve test coverage",
-        ]
-        mock_generate_summary.return_value = "A React repository summary."
-        mock_generate_insights.return_value = {"strengths": []}
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
 
-        with patch_external_services():
+    def test_analyze_repository_returns_expected_structure(self):
+        with patch_pipeline() as pipeline:
             response = AnalyzerService.analyze_repository(REPOSITORY_URL)
 
         for key in (
@@ -119,6 +123,7 @@ class AnalyzerServiceTests(TestCase):
             "commits",
             "code_quality_signals",
             "maintainability_signals",
+            "data_quality",
             "evaluation",
             "recommendations",
         ):
@@ -129,6 +134,14 @@ class AnalyzerServiceTests(TestCase):
         self.assertEqual(
             response["analysis"]["score_version"],
             Analysis.CURRENT_SCORE_VERSION,
+        )
+        self.assertEqual(
+            response["analysis"]["ai_summary"],
+            "A React repository summary.",
+        )
+        self.assertEqual(
+            response["recommendations"],
+            ["Improve test coverage"],
         )
 
         # Structure unavailable: no code quality signal has points.
@@ -141,67 +154,87 @@ class AnalyzerServiceTests(TestCase):
         )
         self.assertEqual(Analysis.objects.count(), 1)
 
-        mock_get_repository.assert_called_once()
-        mock_calculate_scores.assert_called_once()
-        mock_generate_summary.assert_called_once()
+        pipeline.mocks["GitHubService.get_repository"].assert_called_once()
+        pipeline.mocks[
+            "AnalysisScoreService.calculate_scores"
+        ].assert_called_once()
+        pipeline.mocks["AISummaryService.generate"].assert_called_once()
 
-    @patch(f"{SERVICE}.RepositoryInsightsService.generate")
-    @patch(f"{SERVICE}.AISummaryService.generate")
-    @patch(f"{SERVICE}.RecommendationService.generate")
-    @patch(f"{SERVICE}.AnalysisEvaluationService.generate")
-    @patch(f"{SERVICE}.AnalysisScoreService.calculate_scores")
-    @patch(f"{SERVICE}.GitHubService.get_repository")
-    def test_analysis_is_rolled_back_when_summary_fails(
-        self,
-        mock_get_repository,
-        mock_calculate_scores,
-        mock_evaluation,
-        mock_recommendations,
-        mock_summary,
-        mock_insights,
-    ):
-        mock_get_repository.return_value = GITHUB_REPOSITORY
-        mock_calculate_scores.return_value = SCORES
-        mock_evaluation.return_value = {"status": "good"}
-        mock_recommendations.return_value = ["Improve test coverage"]
-        mock_summary.side_effect = RuntimeError(
-            "Summary generation failed"
+    def test_data_quality_lists_the_resources_that_are_missing(self):
+        with patch_pipeline():
+            incomplete = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            incomplete["data_quality"],
+            {"complete": False, "missing": ["commits", "structure"]},
         )
 
-        with patch_external_services():
-            with self.assertRaisesMessage(
-                RuntimeError,
-                "Summary generation failed",
+        cache.clear()
+
+        with patch_pipeline(COMPLETE):
+            complete = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            complete["data_quality"],
+            {"complete": True, "missing": []},
+        )
+
+    def test_watchers_are_the_real_subscribers_not_the_stars(self):
+        with patch_pipeline():
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(response["repository"]["stars"], 100)
+        self.assertEqual(response["repository"]["watchers"], 40)
+
+    def test_missing_subscribers_are_saved_as_zero(self):
+        without = dict(GITHUB_REPOSITORY)
+        without.pop("subscribers_count")
+
+        with patch_pipeline() as pipeline:
+            pipeline.mocks[
+                "GitHubService.get_repository"
+            ].return_value = without
+
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(response["repository"]["watchers"], 0)
+
+    def test_analysis_is_kept_when_summary_fails(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks[
+                "AISummaryService.generate"
+            ].side_effect = RuntimeError("Summary generation failed")
+
+            with self.assertLogs(
+                "api.services.analyzer_service",
+                level="ERROR",
             ):
-                AnalyzerService.analyze_repository(REPOSITORY_URL)
+                response = AnalyzerService.analyze_repository(
+                    REPOSITORY_URL
+                )
 
-        self.assertEqual(Analysis.objects.count(), 0)
-
-    @patch(f"{SERVICE}.RepositoryInsightsService.generate")
-    @patch(f"{SERVICE}.AISummaryService.generate")
-    @patch(f"{SERVICE}.RecommendationService.generate")
-    @patch(f"{SERVICE}.AnalysisEvaluationService.generate")
-    @patch(f"{SERVICE}.AnalysisScoreService.calculate_scores")
-    @patch(f"{SERVICE}.GitHubService.get_repository")
-    def test_analysis_is_rolled_back_when_insights_fail(
-        self,
-        mock_get_repository,
-        mock_calculate_scores,
-        mock_evaluation,
-        mock_recommendations,
-        mock_summary,
-        mock_insights,
-    ):
-        mock_get_repository.return_value = GITHUB_REPOSITORY
-        mock_calculate_scores.return_value = SCORES
-        mock_evaluation.return_value = {"status": "good"}
-        mock_recommendations.return_value = ["Improve test coverage"]
-        mock_summary.return_value = "A React repository summary."
-        mock_insights.side_effect = RuntimeError(
-            "Insights generation failed"
+        self.assertEqual(Analysis.objects.count(), 1)
+        self.assertFalse(response["analysis"]["ai_summary"])
+        self.assertEqual(
+            response["recommendations"],
+            ["Improve test coverage"],
         )
 
-        with patch_external_services():
+    def test_empty_summary_is_not_saved_over_the_analysis(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks["AISummaryService.generate"].return_value = None
+
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertFalse(response["analysis"]["ai_summary"])
+        self.assertEqual(Analysis.objects.count(), 1)
+
+    def test_analysis_is_rolled_back_when_insights_fail(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks[
+                "RepositoryInsightsService.generate"
+            ].side_effect = RuntimeError("Insights generation failed")
+
             with self.assertRaisesMessage(
                 RuntimeError,
                 "Insights generation failed",
@@ -217,4 +250,169 @@ class AnalyzerServiceTests(TestCase):
             1,
         )
 
-        mock_insights.assert_called_once()
+        pipeline.mocks["RepositoryInsightsService.generate"].assert_called_once()
+
+    def test_analysis_is_rolled_back_when_recommendations_fail(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks[
+                "RecommendationService.generate"
+            ].side_effect = RuntimeError("Recommendations failed")
+
+            with self.assertRaises(RuntimeError):
+                AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(Analysis.objects.count(), 0)
+        pipeline.mocks["AISummaryService.generate"].assert_not_called()
+
+
+class AnalyzerServiceCacheTests(TestCase):
+
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
+
+    def test_second_analysis_reuses_the_github_data(self):
+        with patch_pipeline(COMPLETE) as pipeline:
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        mocks = pipeline.mocks
+
+        # The repository itself is always requested again...
+        self.assertEqual(
+            mocks["GitHubService.get_repository"].call_count,
+            2,
+        )
+
+        # ...but the other requests are made only once.
+        for name in (
+            "TechnologiesService.analyze",
+            "ReadmeService.load_analysis",
+            "ContributorsService.get_contributors",
+            "ReleaseAnalysisService.analyze",
+            "CommitsService.analyze",
+            "RepositoryStructureService.analyze",
+        ):
+            with self.subTest(name=name):
+                self.assertEqual(mocks[name].call_count, 1)
+
+        # Every analysis is still saved and scored.
+        self.assertEqual(Analysis.objects.count(), 2)
+        self.assertEqual(
+            mocks["AnalysisScoreService.calculate_scores"].call_count,
+            2,
+        )
+
+    def test_incomplete_data_is_not_cached(self):
+        with patch_pipeline(INCOMPLETE) as pipeline:
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            pipeline.mocks["CommitsService.analyze"].call_count,
+            2,
+        )
+
+    def test_a_new_push_makes_the_data_be_collected_again(self):
+        with patch_pipeline(COMPLETE) as pipeline:
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+            pipeline.mocks["GitHubService.get_repository"].return_value = (
+                dict(GITHUB_REPOSITORY, pushed_at="2026-11-01T00:00:00Z")
+            )
+
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            pipeline.mocks["CommitsService.analyze"].call_count,
+            2,
+        )
+
+    def test_cache_can_be_disabled(self):
+        with patch.object(ResourcesCacheService, "ttl", return_value=0):
+            with patch_pipeline(COMPLETE) as pipeline:
+                AnalyzerService.analyze_repository(REPOSITORY_URL)
+                AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            pipeline.mocks["CommitsService.analyze"].call_count,
+            2,
+        )
+
+    def test_a_broken_cache_does_not_break_the_analysis(self):
+        broken_cache = MagicMock()
+        broken_cache.get.side_effect = RuntimeError("cache down")
+        broken_cache.set.side_effect = RuntimeError("cache down")
+
+        with patch(
+            "api.services.resources_cache_service.cache",
+            broken_cache,
+        ):
+            with patch_pipeline(COMPLETE):
+                with self.assertLogs(
+                    "api.services.resources_cache_service",
+                    level="WARNING",
+                ):
+                    response = AnalyzerService.analyze_repository(
+                        REPOSITORY_URL
+                    )
+
+        self.assertIn("analysis", response)
+        self.assertEqual(Analysis.objects.count(), 1)
+
+    def test_rate_limit_stops_the_analysis_and_saves_nothing(self):
+        with patch_pipeline(COMPLETE) as pipeline:
+            pipeline.mocks[
+                "CommitsService.analyze"
+            ].side_effect = GitHubRateLimitError("limit", retry_after=30)
+
+            with self.assertRaises(GitHubRateLimitError) as context:
+                AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+            self.assertEqual(context.exception.retry_after, 30)
+            self.assertEqual(Analysis.objects.count(), 0)
+
+            scores_mock = pipeline.mocks[
+                "AnalysisScoreService.calculate_scores"
+            ]
+            scores_mock.assert_not_called()
+
+            # Nothing was cached: the next try collects the data again.
+            pipeline.mocks["CommitsService.analyze"].side_effect = None
+
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(
+            pipeline.mocks["CommitsService.analyze"].call_count,
+            2,
+        )
+        self.assertEqual(Analysis.objects.count(), 1)
+
+
+class AnalyzerServiceTransactionTests(TransactionTestCase):
+
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
+
+    def test_summary_is_generated_outside_the_transaction(self):
+        observed = []
+
+        def generate(*args, **kwargs):
+            observed.append(connection.in_atomic_block)
+            return "A React repository summary."
+
+        with patch_pipeline() as pipeline:
+            pipeline.mocks["AISummaryService.generate"].side_effect = generate
+
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(observed, [False])
+        self.assertEqual(
+            response["analysis"]["ai_summary"],
+            "A React repository summary.",
+        )
+        self.assertEqual(
+            Analysis.objects.get().ai_summary,
+            "A React repository summary.",
+        )
