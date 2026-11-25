@@ -1,4 +1,5 @@
- import logging
+import logging
+import re
 
 from rest_framework import status
 from rest_framework.exceptions import APIException
@@ -16,6 +17,12 @@ from api.exceptions.github_exceptions import (
 
 
 logger = logging.getLogger(__name__)
+
+# Shape of the repository URLs accepted by the serializers.
+SAFE_REPOSITORY_URL = re.compile(
+    r"https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+"
+)
+
 
 GITHUB_ERROR_RESPONSES = {
     GitHubNotFoundError: (
@@ -49,6 +56,7 @@ GITHUB_ERROR_RESPONSES = {
 
 
 def _retry_after(exc):
+    """Return the retry delay of a rate limit error as an int, or None."""
     value = getattr(exc, "retry_after", None)
 
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -58,6 +66,15 @@ def _retry_after(exc):
 
 
 def custom_exception_handler(exc, context):
+    """
+    Convert application exceptions into safe, consistent HTTP responses.
+
+    The body never includes the text of the original exception: those
+    messages are meant for logs, not for clients.
+
+    Delegate all other exceptions to Django REST Framework's default handler.
+    """
+
     if isinstance(exc, InvalidRepositoryURLError):
         return Response(
             {
@@ -92,6 +109,15 @@ def custom_exception_handler(exc, context):
             "message": message,
         }
         headers = {}
+
+        if isinstance(exc, GitHubNotFoundError):
+            repository_url = getattr(exc, "repository_url", None)
+
+            if (
+                isinstance(repository_url, str)
+                and SAFE_REPOSITORY_URL.fullmatch(repository_url)
+            ):
+                error["repository_url"] = repository_url
 
         if isinstance(exc, GitHubRateLimitError):
             retry_after = _retry_after(exc)
