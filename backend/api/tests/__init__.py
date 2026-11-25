@@ -26,4 +26,6 @@ from .test_analyze_endpoint_errors import AnalyzeEndpointErrorTests
 from .test_commits_service import CommitsServiceTests
 from .test_resources_cache_service import ResourcesCacheServiceTests
 from .test_technologies_service import TechnologiesServiceTests
+from .test_compare_endpoint import CompareEndpointTests
+from .test_repository_comparison_service import RepositoryComparisonServiceTests
 
