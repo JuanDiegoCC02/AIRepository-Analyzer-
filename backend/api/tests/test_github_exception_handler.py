@@ -191,3 +191,37 @@ class GitHubExceptionHandlerTests(SimpleTestCase):
         )
 
         self.assertIsNone(response)
+
+
+class NotFoundRepositoryUrlTests(SimpleTestCase):
+
+    def handle(self, repository_url):
+        request = APIRequestFactory().post("/api/compare/")
+        context = {"request": request, "view": None, "args": (), "kwargs": {}}
+
+        return custom_exception_handler(
+            GitHubNotFoundError("detail", repository_url=repository_url),
+            context,
+        )
+
+    def test_a_safe_repository_url_is_included(self):
+        response = self.handle("https://github.com/owner/repo")
+
+        self.assertEqual(
+            response.data["error"]["repository_url"],
+            "https://github.com/owner/repo",
+        )
+
+    def test_unsafe_values_are_never_echoed(self):
+        for value in (
+            "https://evil.example/owner/repo",
+            "https://github.com/owner/repo\nInjected: header",
+            "https://github.com/owner/repo/extra",
+            "<script>alert(1)</script>",
+            None,
+            123,
+        ):
+            with self.subTest(value=value):
+                response = self.handle(value)
+
+                self.assertNotIn("repository_url", response.data["error"])
