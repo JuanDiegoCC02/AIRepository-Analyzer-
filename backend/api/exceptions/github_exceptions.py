@@ -9,8 +9,14 @@ class GitHubNotFoundError(GitHubServiceError):
     """
     Raised when the requested GitHub resource
     does not exist.
+
+    `repository_url` is set when several repositories are processed
+    together (comparison), so the API can say which one was not found.
     """
-    pass
+
+    def __init__(self, *args, repository_url=None):
+        super().__init__(*args)
+        self.repository_url = repository_url
 
 
 class GitHubRateLimitError(GitHubServiceError):
@@ -54,4 +60,3 @@ class InvalidRepositoryURLError(ValueError):
     keeps working.
     """
     pass
-
