@@ -1,5 +1,7 @@
 from django.urls import path
 
+from api.views.comparison_views import RepositoryComparisonView
+
 from api.views.repository_views import (
     RepositoryAnalyzerView,
     RepositoryListView,
@@ -13,6 +15,12 @@ urlpatterns = [
           "analyze/",
           RepositoryAnalyzerView.as_view(),
           name="repository-analyze"
+     ),
+
+     path(
+          "compare/",
+          RepositoryComparisonView.as_view(),
+          name="repository-compare"
      ),
 
      path(
