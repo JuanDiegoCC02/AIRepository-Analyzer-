@@ -67,11 +67,19 @@ COMPLETE = {
 
 
 def patch_pipeline(resources=None):
+    """
+    Patch everything that would call GitHub or other slow services.
+
+    Returns an ExitStack (use it with `with`). The mocks are available as
+    `stack.mocks[name]`. Every patch is applied where AnalyzerService
+    imports it.
+    """
     values = {
         "GitHubService.get_repository": GITHUB_REPOSITORY,
         "AnalysisScoreService.calculate_scores": SCORES,
         "AnalysisEvaluationService.generate": {"status": "good"},
         "RecommendationService.generate": ["Improve test coverage"],
+        "AIInsightsService.generate": None,
         "AISummaryService.generate": "A React repository summary.",
         "RepositoryInsightsService.generate": {"strengths": []},
         "TechnologiesService.analyze": {"languages": ["JavaScript"]},
@@ -390,6 +398,10 @@ class AnalyzerServiceCacheTests(TestCase):
 
 
 class AnalyzerServiceTransactionTests(TransactionTestCase):
+    """
+    TestCase wraps every test in a transaction, which would hide whether
+    the summary runs inside the analysis transaction. This class does not.
+    """
 
     def setUp(self):
         cache.clear()
@@ -416,3 +428,97 @@ class AnalyzerServiceTransactionTests(TransactionTestCase):
             Analysis.objects.get().ai_summary,
             "A React repository summary.",
         )
+
+
+class AnalyzerServiceAISummaryTests(TestCase):
+    """The AI summary is tried first; the template is the fallback."""
+
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
+
+    def test_ai_summary_is_saved_and_marked_as_ai(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks["AIInsightsService.generate"].return_value = (
+                "A summary written by the AI model."
+            )
+
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(response["summary_source"], "ai")
+        self.assertEqual(
+            response["analysis"]["ai_summary"],
+            "A summary written by the AI model.",
+        )
+        self.assertEqual(
+            Analysis.objects.get().ai_summary,
+            "A summary written by the AI model.",
+        )
+        pipeline.mocks["AISummaryService.generate"].assert_not_called()
+
+    def test_template_is_used_when_the_ai_gives_nothing(self):
+        with patch_pipeline() as pipeline:
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(response["summary_source"], "template")
+        self.assertEqual(
+            response["analysis"]["ai_summary"],
+            "A React repository summary.",
+        )
+        pipeline.mocks["AIInsightsService.generate"].assert_called_once()
+
+    def test_template_is_used_when_the_ai_raises(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks[
+                "AIInsightsService.generate"
+            ].side_effect = RuntimeError("AI exploded")
+
+            with self.assertLogs(
+                "api.services.analyzer_service",
+                level="ERROR",
+            ):
+                response = AnalyzerService.analyze_repository(
+                    REPOSITORY_URL
+                )
+
+        self.assertEqual(response["summary_source"], "template")
+        self.assertEqual(Analysis.objects.count(), 1)
+
+    def test_use_ai_false_never_calls_the_ai(self):
+        with patch_pipeline() as pipeline:
+            response = AnalyzerService.analyze_repository(
+                REPOSITORY_URL,
+                use_ai=False,
+            )
+
+        pipeline.mocks["AIInsightsService.generate"].assert_not_called()
+        self.assertEqual(response["summary_source"], "template")
+
+    def test_source_is_none_when_there_is_no_summary(self):
+        with patch_pipeline() as pipeline:
+            pipeline.mocks["AISummaryService.generate"].return_value = None
+
+            response = AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertIsNone(response["summary_source"])
+
+
+class AnalyzerServiceAITransactionTests(TransactionTestCase):
+
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
+
+    def test_the_ai_call_runs_outside_the_transaction(self):
+        observed = []
+
+        def generate(*args, **kwargs):
+            observed.append(connection.in_atomic_block)
+            return "A summary written by the AI model."
+
+        with patch_pipeline() as pipeline:
+            pipeline.mocks["AIInsightsService.generate"].side_effect = generate
+
+            AnalyzerService.analyze_repository(REPOSITORY_URL)
+
+        self.assertEqual(observed, [False])
