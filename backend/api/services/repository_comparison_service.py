@@ -60,6 +60,7 @@ class RepositoryComparisonService:
                     AnalyzerService.analyze_repository(
                         repository_url,
                         user=user,
+                        use_ai=False,
                     )
                 )
             except GitHubNotFoundError as error:
