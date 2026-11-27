@@ -5,21 +5,6 @@ from api.services.analyzer_service import AnalyzerService
 
 
 class RepositoryComparisonService:
-    """
-    Compares several repositories using their analysis scores.
-
-    Every repository is analyzed with AnalyzerService (so it uses the
-    same score version, the same GitHub data cache and is saved in the
-    user's history) and the scores are then compared dimension by
-    dimension.
-
-    For each dimension the result says:
-      - leaders:  the repositories with the highest score
-      - winner:   the leader, or None when there is a tie
-      - margin:   points between the leader and the second best
-      - verdict:  "clear" (margin >= CLEAR_MARGIN), "close", "tie" or
-                  "unknown" (fewer than two scores to compare)
-    """
 
     MIN_REPOSITORIES = 2
     MAX_REPOSITORIES = 4

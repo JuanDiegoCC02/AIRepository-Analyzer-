@@ -8,6 +8,7 @@ from api.serializers.repository_serializer import RepositorySerializer
 
 from api.utils.repository_classifier import RepositoryClassifier
 
+from api.services.ai_insights_service import AIInsightsService
 from api.services.ai_summary_service import AISummaryService
 from api.services.analysis_evaluation_service import AnalysisEvaluationService
 from api.services.analysis_persistence_service import AnalysisPersistenceService
@@ -30,8 +31,8 @@ from api.services.repository_structure_service import RepositoryStructureService
 from api.services.repository_topics_service import RepositoryTopicsService
 from api.services.technologies_service import TechnologiesService
 
-
 logger = logging.getLogger(__name__)
+
 
 class AnalyzerService:
 
@@ -62,6 +63,8 @@ class AnalyzerService:
             "default_branch": repository.get("default_branch"),
             "stars": repository.get("stargazers_count"),
             "forks": repository.get("forks_count"),
+            # `watchers_count` is a copy of the stars; subscribers are the
+            # people who really watch the repository.
             "watchers": repository.get("subscribers_count") or 0,
             "open_issues": repository.get("open_issues_count"),
             "github_created_at": repository["created_at"],
@@ -71,10 +74,6 @@ class AnalyzerService:
 
     @staticmethod
     def fetch_remote_resources(repository):
-        """
-        About 8 requests. Rate limits are not handled here: they stop the
-        analysis, so incomplete data is never saved as a real analysis.
-        """
 
         technology_analysis = TechnologiesService.analyze(
             repository.owner,
@@ -175,6 +174,7 @@ class AnalyzerService:
 
     @staticmethod
     def build_data_quality(resources):
+
         missing = sorted(
             name
             for name in ("commits", "structure", "readme")
@@ -215,6 +215,51 @@ class AnalyzerService:
             return ""
 
 
+    @classmethod
+    def build_summary(
+        cls,
+        github_repository,
+        category,
+        technologies,
+        analysis_scores,
+        evaluation,
+        use_ai=True,
+    ):
+        """
+        Return (summary, source). The source is "ai" when the AI model
+        wrote it, "template" when the fixed template did, or None when
+        neither produced text. The AI is tried first and any failure
+        (disabled, over budget, error, rejected answer) falls back to the
+        template. It never raises.
+        """
+
+        if use_ai:
+            try:
+                summary = AIInsightsService.generate(
+                    github_repository,
+                    category,
+                    technologies,
+                    analysis_scores,
+                    evaluation,
+                )
+            except Exception:
+                logger.exception("The AI summary could not be generated.")
+                summary = None
+
+            if summary:
+                return summary, "ai"
+
+        summary = cls.generate_summary(
+            github_repository,
+            category,
+            technologies,
+            analysis_scores,
+            evaluation,
+        )
+
+        return summary, ("template" if summary else None)
+
+
     @staticmethod
     def build_classification(repository, analysis):
 
@@ -249,6 +294,7 @@ class AnalyzerService:
         code_quality_signals=None,
         maintainability_signals=None,
         data_quality=None,
+        summary_source=None,
     ):
 
         return {
@@ -274,11 +320,12 @@ class AnalyzerService:
             "data_quality": data_quality,
             "evaluation": evaluation,
             "recommendations": recommendations,
+            "summary_source": summary_source,
         }
 
 
     @classmethod
-    def analyze_repository(cls, repository_url, user=None):
+    def analyze_repository(cls, repository_url, user=None, use_ai=True):
 
         github_repository = GitHubService.get_repository(
             repository_url
@@ -354,6 +401,9 @@ class AnalyzerService:
             analysis_scores
         )
 
+        # Only database work (fast) runs inside the transaction. The
+        # summary can be slow (it will call an AI model), so it runs after
+        # the transaction and a failure there keeps the analysis.
         with transaction.atomic():
 
             analysis = AnalysisPersistenceService.save_analysis(
@@ -390,12 +440,13 @@ class AnalyzerService:
                 update_fields=["recommendations"]
             )
 
-        summary = cls.generate_summary(
+        summary, summary_source = cls.build_summary(
             github_repository,
             category,
             technologies,
             analysis_scores,
             evaluation,
+            use_ai=use_ai,
         )
 
         if summary:
@@ -434,4 +485,5 @@ class AnalyzerService:
             code_quality_signals=code_quality_signals,
             maintainability_signals=maintainability_signals,
             data_quality=cls.build_data_quality(resources),
+            summary_source=summary_source,
         )
