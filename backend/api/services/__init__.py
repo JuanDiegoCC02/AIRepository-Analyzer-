@@ -31,3 +31,4 @@ from .resources_cache_service import ResourcesCacheService
 from .repository_comparison_service import RepositoryComparisonService
 from .ai_insights_service import AIInsightsService
 from .ai_prompt_service import AIPromptService
+from .ai_service import AIClient, AIServiceError
