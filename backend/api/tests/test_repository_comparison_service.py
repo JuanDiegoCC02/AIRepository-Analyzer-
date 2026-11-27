@@ -398,7 +398,7 @@ class AnalyzeAndCompareTests(SimpleTestCase):
 
         with patch(
             ANALYZE,
-            side_effect=lambda url, user=None: responses[url],
+            side_effect=lambda url, user=None, **kwargs: responses[url],
         ) as mock_analyze:
             comparison = RepositoryComparisonService.analyze_and_compare(
                 self.URLS,
@@ -432,7 +432,7 @@ class AnalyzeAndCompareTests(SimpleTestCase):
                 mock_analyze.assert_not_called()
 
     def test_not_found_says_which_repository_failed(self):
-        def analyze(url, user=None):
+        def analyze(url, user=None, **kwargs):
             if url == self.URLS[1]:
                 raise GitHubNotFoundError("missing")
 
