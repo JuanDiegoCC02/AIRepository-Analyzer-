@@ -106,7 +106,7 @@ class CompareEndpointTests(TestCase):
         }
 
         response = self.post(
-            side_effect=lambda url, user=None: results[url],
+            side_effect=lambda url, user=None, **kwargs: results[url],
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -137,7 +137,7 @@ class CompareEndpointTests(TestCase):
                 self.mock_analyze.assert_not_called()
 
     def test_not_found_says_which_repository(self):
-        def analyze(url, user=None):
+        def analyze(url, user=None, **kwargs):
             if url == self.urls[1]:
                 raise GitHubNotFoundError("hidden detail")
 
@@ -171,7 +171,7 @@ class CompareEndpointTests(TestCase):
         with patch.object(CompareRateThrottle, "rate", "2/hour"):
             statuses = [
                 self.post(
-                    side_effect=lambda url, user=None: analysis_result(
+                    side_effect=lambda url, user=None, **kwargs: analysis_result(
                         "a/one", 70
                     ),
                 ).status_code
